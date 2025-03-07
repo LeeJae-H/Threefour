@@ -8,12 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController {
 
-    @GetMapping("/test/no-auth")
-    public String testNoAuth() {
-        return "success";
-    }
-
-    @GetMapping("/test/auth")
+    @GetMapping("/admin")
     public String testAuth() {
         return "success";
     }

@@ -20,11 +20,12 @@ public class AuthService {
         String email = joinRequest.getEmail();
         String password = bCryptPasswordEncoder.encode(joinRequest.getPassword());
         String name = joinRequest.getName();
+
         if (userRepository.existsByEmail(email)) {
             throw new ExpectedException(ErrorCode.ALREADY_EXIST_USER);
         }
 
-        User newUser = new User(email, password, name, "ROLE_ADMIN");
+        User newUser = new User(email, password, name, "ROLE_USER");
         User foundUser = userRepository.save(newUser);
         return foundUser.getName();
     }

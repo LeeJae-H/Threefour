@@ -36,18 +36,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf((auth) -> auth.disable()) //csrf disable -> CsrfFilter 비활성화
-                .formLogin((auth) -> auth.disable()) //From 로그인 방식 disable -> UsernamePasswordAuthenticationFilter 비활성화
-                .httpBasic((auth) -> auth.disable()) //http basic 인증 방식 disable -> BasicAuthenticationFilter 비활성화
+                .csrf((auth) -> auth.disable())             // csrf disable -> CsrfFilter 비활성화
+                .formLogin((auth) -> auth.disable())        // form 로그인 방식 disable -> UsernamePasswordAuthenticationFilter 비활성화
+                .httpBasic((auth) -> auth.disable())        // http basic 인증 방식 disable -> BasicAuthenticationFilter 비활성화
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  //세션 설정
 
-                //경로별 인가 작업
+                // 경로별 인가 작업
                 .authorizeHttpRequests((auth) -> auth       // -> Authorization 필터 활성화
-                        .requestMatchers("/login", "/", "/join").permitAll()
+                        .requestMatchers("/login", "/join").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated())
 
-                //필터 추가
+                // 필터 추가
                 .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class)
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
 

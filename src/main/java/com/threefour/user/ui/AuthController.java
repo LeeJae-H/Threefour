@@ -13,6 +13,12 @@ public class AuthController {
 
     private final AuthService authService;
 
+    /**
+     * 회원가입 API
+     *
+     * @param joinRequest (email, password, name)
+     * @return 사용자 이름 (name)
+     */
     @PostMapping("/join")
     public String join(@RequestBody JoinRequest joinRequest) {
         return authService.join(joinRequest);

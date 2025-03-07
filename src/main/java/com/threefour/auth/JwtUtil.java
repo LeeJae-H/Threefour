@@ -15,7 +15,9 @@ public class JwtUtil {
     // 암호화 키
     private SecretKey secretKey;
 
-    // JWT 암호화 방식은 양방향 대칭키 방식이며, HS256 알고리즘을 사용합니다.
+    /**
+     * JWT 암호화 방식은 양방향 대칭키 방식이며, HS256 알고리즘을 사용합니다.
+     */
     public JwtUtil(@Value("${spring.jwt.secret}") String secret) {
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }

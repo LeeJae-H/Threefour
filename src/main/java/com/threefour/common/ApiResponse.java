@@ -17,22 +17,36 @@ public class ApiResponse<T> {
     @JsonProperty("message") // Json으로 직렬화할 때, message 필드명으로 전달
     private final String errorMessage;
 
-    // RestController 응답에서 사용합니다.
-    // 성공 응답 - 200 상태코드의 경우 사용합니다.
-    // Body와 Header 모두에 Http 상태 코드를 담습니다.
+    /**
+     * ApiResponse 객체를 생성합니다.
+     *
+     * @param data
+     * RestController에서 성공 응답 객체를 생성할 때 사용하며, 200 상태코드일 때 사용합니다.
+     * HTTP Response의 body와 header 모두에 HTTP 상태 코드를 담습니다.
+     */
     public static <T> ResponseEntity<ApiResponse<T>> success(T data) {
         return new ResponseEntity<>(new ApiResponse<>(true, HttpStatus.OK.value(), data, null), HttpStatus.OK);
     }
 
-    // RestController 응답에서 사용합니다.
-    // 성공 응답 - 200이 아닌 상태코드의 경우 사용하며, 상태코드를 파라미터로 전달 받습니다.
-    // Body와 Header 모두에 Http 상태 코드를 담습니다.
+    /**
+     * ApiResponse 객체를 생성합니다.
+     *
+     * @param data
+     * @param status
+     * RestController에서 성공 응답 객체를 생성할 때 사용하며, 200이 아닌 상태코드일 때 사용합니다.
+     * HTTP Response의 body와 header 모두에 HTTP 상태 코드를 담습니다.
+     */
     public static <T> ResponseEntity<ApiResponse<T>> success(T data, HttpStatus status) {
         return new ResponseEntity<>(new ApiResponse<>(true, status.value(), data, null), status);
     }
 
-    // GlobalExceptionHandler에서 사용됩니다.
-    // Body와 Header 모두에 Http 상태 코드를 담습니다.
+    /**
+     * ApiResponse 객체를 생성합니다.
+     *
+     * @param errorMessage
+     * @param status
+     * GlobalExceptionHandler에서 예외 응답 객체를 생성할 때 사용합니다.
+     */
     public static <T> ResponseEntity<ApiResponse<?>> error(String errorMessage, HttpStatus status) {
         return new ResponseEntity<>(new ApiResponse<>(false, status.value(), null, errorMessage), status);
     }

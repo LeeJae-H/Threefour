@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    /**
+     * ExpectedException 예외가 발생했을 때 동작합니다.
+     */
     @ExceptionHandler(ExpectedException.class)
     public ResponseEntity<ApiResponse<?>> handleExpectedException(ExpectedException ex) {
         ErrorCode errorCode = ex.getErrorCode();
@@ -22,6 +25,9 @@ public class GlobalExceptionHandler {
         return ApiResponse.error(errorMessage, status);
     }
 
+    /**
+     * Validation 관련 예외가 발생했을 때 동작합니다.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<?>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();
@@ -41,6 +47,9 @@ public class GlobalExceptionHandler {
         return ApiResponse.error(errorMessage, status);
     }
 
+    /**
+     * 예상하지 못한 예외가 발생했을 때 동작합니다.
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handleUnExpectedException(Exception ex) {
         log.error("에러 발생 :", ex);
