@@ -1,6 +1,7 @@
 package com.threefour.config;
 
 import com.threefour.auth.JwtUtil;
+import com.threefour.auth.SecurityConstants;
 import com.threefour.auth.filter.JwtFilter;
 import com.threefour.auth.filter.LoginFilter;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ public class SecurityConfig {
 
                 // 경로별 인가 작업
                 .authorizeHttpRequests((auth) -> auth       // -> Authorization 필터 활성화
-                        .requestMatchers("/login", "/join", "/testlog").permitAll()
+                        .requestMatchers(SecurityConstants.WHITELIST_URLS).permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated())
 
