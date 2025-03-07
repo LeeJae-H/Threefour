@@ -43,7 +43,7 @@ public class SecurityConfig {
 
                 // 경로별 인가 작업
                 .authorizeHttpRequests((auth) -> auth       // -> Authorization 필터 활성화
-                        .requestMatchers("/login", "/join").permitAll()
+                        .requestMatchers("/login", "/join", "/testlog").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated())
 
