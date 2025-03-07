@@ -1,4 +1,4 @@
-package com.threefour.security;
+package com.threefour.auth;
 
 import com.threefour.user.domain.User;
 import com.threefour.user.domain.UserRepository;

@@ -1,6 +1,8 @@
 package com.threefour.config;
 
-import com.threefour.security.LoginFilter;
+import com.threefour.auth.JwtUtil;
+import com.threefour.auth.filter.JwtFilter;
+import com.threefour.auth.filter.LoginFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final JwtUtil jwtUtil;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -45,9 +48,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
 
                 //필터 추가
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class)
-
-
+                .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class)
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
 
                 .build();
     }
