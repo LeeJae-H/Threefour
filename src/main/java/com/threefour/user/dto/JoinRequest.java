@@ -1,4 +1,4 @@
-package com.threefour.user.dto.request;
+package com.threefour.user.dto;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,5 +10,5 @@ public class JoinRequest {
 
     private String email;
     private String password;
-    private String name;
+    private String nickname;
 }

@@ -2,7 +2,6 @@ package com.threefour.user.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,22 +21,29 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "nickname")
+    private String nickname;
 
     @Column(name = "role")
     private String role;
 
-    public User(String email, String password, String name, String role) {
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.role = role;
-    }
-
+    /**
+     * JwtFilter에서 사용됩니다.
+     */
     public User(String email, String password, String role) {
         this.email = email;
         this.password = password;
+        this.role = role;
+    }
+
+    public static User join(String email, String password, String nickname) {
+        return new User(email, password, nickname, "ROLE_USER");
+    }
+
+    private User(String email, String password, String nickname, String role) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
         this.role = role;
     }
 }

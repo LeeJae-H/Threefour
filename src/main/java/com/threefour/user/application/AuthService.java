@@ -2,11 +2,11 @@ package com.threefour.user.application;
 
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
+import com.threefour.user.domain.EncodePasswordService;
 import com.threefour.user.domain.User;
 import com.threefour.user.domain.UserRepository;
-import com.threefour.user.dto.request.JoinRequest;
+import com.threefour.user.dto.JoinRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,19 +14,27 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final EncodePasswordService encodePasswordService;
 
     public String join(JoinRequest joinRequest) {
         String email = joinRequest.getEmail();
-        String password = bCryptPasswordEncoder.encode(joinRequest.getPassword());
-        String name = joinRequest.getName();
-
+        String password = joinRequest.getPassword();
+        String nickname = joinRequest.getNickname();
         if (userRepository.existsByEmail(email)) {
             throw new ExpectedException(ErrorCode.ALREADY_EXIST_USER);
         }
-
-        User newUser = new User(email, password, name, "ROLE_USER");
-        User foundUser = userRepository.save(newUser);
-        return foundUser.getName();
+        if (password.length() < 8) {
+            throw new ExpectedException(ErrorCode.INVALID_PASSWORD_LENGTH);
+        }
+        if (nickname.length() < 2 || nickname.length() > 10) {
+            throw new ExpectedException(ErrorCode.INVALID_NICKNAME_LENGTH);
+        }
+        if (!nickname.matches("^[a-zA-Z0-9가-힣]+$")) {
+            throw new ExpectedException(ErrorCode.INVALID_NICKNAME_FORMAT);
+        }
+        String encodedPassword = encodePasswordService.encode(password);
+        User newUser = User.join(email, encodedPassword, nickname);
+        userRepository.save(newUser);
+        return newUser.getNickname();
     }
 }

@@ -1,7 +1,7 @@
 package com.threefour.user.ui;
 
 import com.threefour.user.application.AuthService;
-import com.threefour.user.dto.request.JoinRequest;
+import com.threefour.user.dto.JoinRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,8 +16,8 @@ public class AuthController {
     /**
      * 회원가입 API
      *
-     * @param joinRequest (email, password, name)
-     * @return 사용자 이름 (name)
+     * @param joinRequest (email, password, nickname)
+     * @return 사용자 닉네임 (nickname)
      */
     @PostMapping("/join")
     public String join(@RequestBody JoinRequest joinRequest) {
