@@ -89,16 +89,4 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         RefreshToken refreshToken = new RefreshToken(email, refresh, date.toString());
         refreshTokenRepository.save(refreshToken);
     }
-
-    /**
-     * Spring Security가 기본적으로 사용하는 username의 필드명을 email로 변경하는 메서드입니다.
-     *
-     * 추가적으로, 아래의 작업도 함께 해야 합니다.
-     * CustomUserDetailsService의 loadUserByUsername() 메서드에서 email로 데이터베이스에서 사용자 정보를 가져옵니다.
-     * CustomUserDetails의 getUsername() 메서드에서 사용자의 email을 가져옵니다.
-     */
-//    @Override
-//    public void setUsernameParameter(String usernameParameter) {
-//        super.setUsernameParameter("email");
-//    }
 }

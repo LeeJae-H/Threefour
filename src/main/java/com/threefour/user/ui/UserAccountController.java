@@ -1,8 +1,11 @@
 package com.threefour.user.ui;
 
+import com.threefour.common.ApiResponse;
 import com.threefour.user.application.UserAccountService;
 import com.threefour.user.dto.JoinRequest;
+import com.threefour.user.dto.UserInfoUpdateRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +23,21 @@ public class UserAccountController {
      * @return 사용자 닉네임 (nickname)
      */
     @PostMapping("/join")
-    public String join(@RequestBody JoinRequest joinRequest) {
-        return userAccountService.join(joinRequest);
+    public ResponseEntity<ApiResponse<String>> join(@RequestBody JoinRequest joinRequest) {
+        String nickname = userAccountService.join(joinRequest);
+        return ApiResponse.success(nickname);
+    }
+
+    /**
+     * 회원 정보 수정 API
+     *
+     * @param userInfoUpdateRequest (nickname)
+     */
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse<String>> updateUserInfo(@RequestBody UserInfoUpdateRequest userInfoUpdateRequest) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        userAccountService.updateUserInfo(userInfoUpdateRequest, email);
+        return ApiResponse.success("ok");
     }
 
     /**
@@ -30,9 +46,9 @@ public class UserAccountController {
      * @param refreshToken
      */
     @DeleteMapping
-    public String delete(@RequestHeader("RefreshToken") String refreshToken) {
+    public ResponseEntity<ApiResponse<String>> delete(@RequestHeader("RefreshToken") String refreshToken) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         userAccountService.deleteUser(refreshToken, email);
-        return "ok";
+        return ApiResponse.success("ok");
     }
 }

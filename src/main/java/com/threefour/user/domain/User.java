@@ -52,4 +52,12 @@ public class User {
         this.role = role;
         this.userTimeInfo = userTimeInfo;
     }
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

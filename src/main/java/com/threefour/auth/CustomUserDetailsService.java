@@ -21,7 +21,9 @@ public class CustomUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        // Spring Security가 기본적으로 사용하는 username의 필드를 email 필드로 변경
         Optional<User> foundUser = userRepository.findByEmail(email);
+
         if (foundUser.isPresent()) {
             return new CustomUserDetails(foundUser.get());
         }

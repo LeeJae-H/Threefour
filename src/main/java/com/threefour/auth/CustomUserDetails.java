@@ -15,6 +15,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
+        // Spring Security가 기본적으로 사용하는 username의 필드를 email 필드로 변경
         return user.getEmail();
     }
 
