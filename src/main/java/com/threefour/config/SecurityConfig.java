@@ -3,6 +3,7 @@ package com.threefour.config;
 import com.threefour.auth.JwtUtil;
 import com.threefour.auth.AuthConstants;
 import com.threefour.auth.RefreshTokenRepository;
+import com.threefour.auth.filter.CustomLogoutFilter;
 import com.threefour.auth.filter.JwtFilter;
 import com.threefour.auth.filter.CustomLoginFilter;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -52,7 +54,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
 
                 // 필터 추가
-//                .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class)
+                .addFilterAt(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class)
                 .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenRepository), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtFilter(jwtUtil), CustomLoginFilter.class)
 
