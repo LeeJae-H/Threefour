@@ -2,6 +2,7 @@ package com.threefour.config;
 
 import com.threefour.auth.JwtUtil;
 import com.threefour.auth.AuthConstants;
+import com.threefour.auth.RefreshTokenRepository;
 import com.threefour.auth.filter.JwtFilter;
 import com.threefour.auth.filter.CustomLoginFilter;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -51,7 +53,7 @@ public class SecurityConfig {
 
                 // 필터 추가
 //                .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class)
-                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenRepository), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtFilter(jwtUtil), CustomLoginFilter.class)
 
                 .build();

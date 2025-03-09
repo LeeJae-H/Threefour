@@ -1,8 +1,6 @@
 package com.threefour.auth.filter;
 
-import com.threefour.auth.AuthConstants;
-import com.threefour.auth.CustomUserDetails;
-import com.threefour.auth.JwtUtil;
+import com.threefour.auth.*;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 
 @RequiredArgsConstructor
@@ -23,6 +22,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     /**
      * 인증(Authentication)을 수행하는 메서드입니다.
@@ -51,16 +51,20 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
      */
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
+        // 사용자 정보
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-
         String email = customUserDetails.getUsername();
         Collection<? extends GrantedAuthority> authorities = customUserDetails.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
+        // 토큰 생성
         String accessToken = jwtUtil.createJwt("access", email, role, AuthConstants.ACCESS_TOKEN_EXPIRATION_TIME);
         String refreshToken = jwtUtil.createJwt("refresh", email, role, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+
+        // RefreshToken을 데이터베이스에 저장
+        saveRefreshToken(email, refreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
 
         response.setHeader("AccessToken", "Bearer " + accessToken);
         response.setHeader("RefreshToken", "Bearer " + refreshToken);
@@ -75,6 +79,12 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
         response.setStatus(401);
+    }
+
+    private void saveRefreshToken(String email, String refresh, Long expirationTime) {
+        Date date = new Date(System.currentTimeMillis() + expirationTime);
+        RefreshToken refreshToken = new RefreshToken(email, refresh, date.toString());
+        refreshTokenRepository.save(refreshToken);
     }
 
     /**
