@@ -47,7 +47,7 @@ public class ReissueService {
         String newAccessToken = jwtUtil.createJwt("access", email, role, AuthConstants.ACCESS_TOKEN_EXPIRATION_TIME);
         String newRefreshToken = jwtUtil.createJwt("refresh", email, role, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
 
-        // DB에 기존의 RefreshToken 삭제 후 새 RefreshToken 저장
+        // DB에 존재하는 RefreshToken 삭제 후 새 RefreshToken 저장
         refreshTokenRepository.deleteByRefreshToken(token);
         saveRefreshToken(email, newRefreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
 

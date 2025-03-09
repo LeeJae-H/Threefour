@@ -17,7 +17,7 @@ public class ReissueController {
     private final ReissueService reissueService;
 
     /**
-     * AccessToken 재발급(By RefreshToken) API
+     * AccessToken, RefreshToken 재발급(By RefreshToken) API
      */
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<String>> reissue(@RequestHeader("RefreshToken") String refreshToken, HttpServletResponse response) {

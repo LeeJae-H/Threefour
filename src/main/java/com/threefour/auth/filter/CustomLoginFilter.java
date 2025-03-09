@@ -45,13 +45,16 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     /**
-     * 로그인 성공 시 실행하는 메소드입니다.
+     * 인증(로그인) 성공 시 실행하는 메소드입니다.
      *
-     * 사용자의 email, role로 AccessToken, RefreshToken을 발급합니다.
+     * 사용자의 email, role로 AccessToken과 RefreshToken을 발급하며,
+     * RefreshToken은 데이터베이스에 저장합니다.
+     * 모바일, PC 등 다중 로그인을 진행할 경우를 고려하여,
+     * 데이터베이스에 존재하는 RefreshToken은 삭제하지 않습니다.
      */
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
-        // 사용자 정보
+        // 사용자 정보(email, role) 추출
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         String email = customUserDetails.getUsername();
         Collection<? extends GrantedAuthority> authorities = customUserDetails.getAuthorities();
@@ -72,7 +75,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     /**
-     * 로그인 실패 시 실행하는 메소드입니다.
+     * 인증(로그인) 실패 시 실행하는 메소드입니다.
      *
      * 401 응답 코드를 반환합니다.
      */

@@ -9,4 +9,6 @@ public interface RefreshTokenRepository extends Repository<RefreshToken, Long> {
     Boolean existsByRefreshToken(String refreshToken);
     @Transactional
     void deleteByRefreshToken(String refreshToken);
+    @Transactional
+    void deleteByUserEmail(String userEmail);
 }
