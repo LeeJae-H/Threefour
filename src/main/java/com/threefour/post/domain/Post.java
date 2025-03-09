@@ -1,10 +1,11 @@
 package com.threefour.post.domain;
 
-import com.threefour.user.domain.UserTimeInfo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "post")
@@ -30,4 +31,16 @@ public class Post {
 
     @Embedded
     private PostTimeInfo postTimeInfo;
+
+    public static Post writePost(String authorNickname, String category, String title, String content) {
+        return new Post(authorNickname, category, title, content, new PostTimeInfo(LocalDateTime.now(), LocalDateTime.now()));
+    }
+
+    private Post(String authorNickname, String category, String title, String content, PostTimeInfo postTimeInfo) {
+        this.authorNickname = authorNickname;
+        this.category = category;
+        this.title = title;
+        this.content = content;
+        this.postTimeInfo = postTimeInfo;
+    }
 }

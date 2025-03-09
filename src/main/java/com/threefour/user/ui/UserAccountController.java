@@ -19,7 +19,7 @@ public class UserAccountController {
     /**
      * 회원가입 API
      *
-     * @param joinRequest (email, password, nickname)
+     * @param joinRequest
      * @return 사용자 닉네임 (nickname)
      */
     @PostMapping("/join")
@@ -31,7 +31,7 @@ public class UserAccountController {
     /**
      * 회원 정보 수정 API
      *
-     * @param userInfoUpdateRequest (nickname)
+     * @param userInfoUpdateRequest
      */
     @PutMapping("/update")
     public ResponseEntity<ApiResponse<String>> updateUserInfo(@RequestBody UserInfoUpdateRequest userInfoUpdateRequest) {
@@ -46,7 +46,7 @@ public class UserAccountController {
      * @param refreshToken
      */
     @DeleteMapping
-    public ResponseEntity<ApiResponse<String>> delete(@RequestHeader("RefreshToken") String refreshToken) {
+    public ResponseEntity<ApiResponse<String>> deleteUser(@RequestHeader("RefreshToken") String refreshToken) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         userAccountService.deleteUser(refreshToken, email);
         return ApiResponse.success("ok");

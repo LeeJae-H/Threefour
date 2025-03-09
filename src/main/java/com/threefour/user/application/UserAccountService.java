@@ -68,6 +68,12 @@ public class UserAccountService {
 
     @Transactional
     public void deleteUser(String refreshToken, String email) {
+        User foundUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+
+        // DB에서 회원 삭제
+        userRepository.delete(foundUser);
+
         // RefreshToken 헤더의 값이 유효한 지 검증
         if (refreshToken == null || !refreshToken.startsWith("Bearer ")) {
             throw new ExpectedException(ErrorCode.INVALID_REFRESH_TOKEN_FORMAT);
@@ -93,12 +99,6 @@ public class UserAccountService {
 
         // DB에 존재하는 해당 사용자의 모든 RefreshToken 삭제
         refreshTokenRepository.deleteByUserEmail(email);
-
-        User foundUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
-
-        // DB에서 회원 삭제
-        userRepository.delete(foundUser);
     }
 
     private void validatePassword(String password) {
