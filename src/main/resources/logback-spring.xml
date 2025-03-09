@@ -25,9 +25,10 @@
             <appender-ref ref="CONSOLE" />
             <appender-ref ref="FILE" />
         </logger>
-        <!-- 내 프로젝트의 로그를 제외한 모든 로그는 파일에 출력한다. -->
+        <!-- 내 프로젝트의 로그를 제외한 모든 로그는 콘솔, 파일에 출력한다. -->
         <root level="INFO">
             <appender-ref ref="CONSOLE" />
+            <appender-ref ref="FILE" />
         </root>
     </springProfile>
 

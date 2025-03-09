@@ -44,16 +44,25 @@ public class UserAccountService {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
 
+        // 회원 정보의 변경이 이루어졌는지 여부
+        boolean isUpdated = false;
+
         if (userInfoUpdateRequest.getPassword() != null) {
             String newPassword = userInfoUpdateRequest.getPassword();
             validatePassword(newPassword);
             foundUser.changePassword(encodePasswordService.encode(newPassword));
+            isUpdated = true;
         }
 
         if (userInfoUpdateRequest.getNickname() != null) {
             String newNickname = userInfoUpdateRequest.getNickname();
             validateNickname(newNickname);
             foundUser.changeNickname(newNickname);
+            isUpdated = true;
+        }
+
+        if (isUpdated) {
+            foundUser.updateUpdatedAt();
         }
     }
 

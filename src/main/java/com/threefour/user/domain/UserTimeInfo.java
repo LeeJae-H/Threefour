@@ -21,4 +21,8 @@ public class UserTimeInfo {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 }

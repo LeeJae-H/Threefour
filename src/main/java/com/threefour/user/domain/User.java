@@ -60,4 +60,9 @@ public class User {
     public void changeNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    public void updateUpdatedAt() {
+        LocalDateTime createdAt = userTimeInfo.getCreatedAt();
+        this.userTimeInfo = new UserTimeInfo(createdAt, LocalDateTime.now());
+    }
 }
