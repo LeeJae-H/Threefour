@@ -1,6 +1,7 @@
 package com.threefour.auth.ui;
 
 import com.threefour.auth.ReissueService;
+import com.threefour.auth.TokenDTO;
 import com.threefour.common.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,9 @@ public class ReissueController {
      */
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<String>> reissue(@RequestHeader("RefreshToken") String refreshToken, HttpServletResponse response) {
-        String newAccessToken = reissueService.reissue(refreshToken);
-        response.setHeader("AccessToken", "Bearer " + newAccessToken);
+        TokenDTO tokenDTO = reissueService.reissue(refreshToken);
+        response.setHeader("AccessToken", "Bearer " + tokenDTO.getAccessToken());
+        response.setHeader("RefreshToken", "Bearer " + tokenDTO.getRefreshToken());
         return ApiResponse.success("ok");
     }
 }

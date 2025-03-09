@@ -11,7 +11,7 @@ public class ReissueService {
 
     private final JwtUtil jwtUtil;
 
-    public String reissue(String refreshToken) {
+    public TokenDTO reissue(String refreshToken) {
         // RefreshToken 헤더의 값이 유효한 지 검증
         if (refreshToken == null || !refreshToken.startsWith("Bearer ")) {
             throw new ExpectedException(ErrorCode.INVALID_REFRESH_TOKEN_FORMAT);
@@ -34,6 +34,9 @@ public class ReissueService {
         String email = jwtUtil.getEmail(token);
         String role = jwtUtil.getRole(token);
 
-        return jwtUtil.createJwt("access", email, role, AuthConstants.ACCESS_TOKEN_EXPIRATION_TIME);
+        String newAccessToken = jwtUtil.createJwt("access", email, role, AuthConstants.ACCESS_TOKEN_EXPIRATION_TIME);
+        String newRefreshToken = jwtUtil.createJwt("refresh", email, role, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+
+        return new TokenDTO(newAccessToken, newRefreshToken);
     }
 }
