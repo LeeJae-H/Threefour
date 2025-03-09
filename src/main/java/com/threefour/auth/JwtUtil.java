@@ -25,7 +25,7 @@ public class JwtUtil {
     /**
      * JWT를 생성하는 메서드입니다.
      *
-     * JWT의 Payload에 저장될 정보는 {email, role, 생성일, 만료일} 입니다.
+     * JWT의 Payload에 저장될 정보는 {토큰 종류, 이메일, 권한, 생성일, 만료일} 입니다.
      */
     public String createJwt(String category, String email, String role, Long expiredMs) {
         return Jwts.builder()

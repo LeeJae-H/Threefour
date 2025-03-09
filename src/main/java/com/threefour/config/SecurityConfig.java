@@ -1,8 +1,7 @@
 package com.threefour.config;
 
 import com.threefour.auth.JwtUtil;
-import com.threefour.auth.SecurityConstants;
-import com.threefour.auth.filter.CustomLogoutFilter;
+import com.threefour.auth.AuthConstants;
 import com.threefour.auth.filter.JwtFilter;
 import com.threefour.auth.filter.CustomLoginFilter;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -47,7 +45,7 @@ public class SecurityConfig {
 
                 // 경로별 인가 작업
                 .authorizeHttpRequests((auth) -> auth       // -> Authorization 필터 활성화
-                        .requestMatchers(SecurityConstants.WHITELIST_URLS).permitAll()
+                        .requestMatchers(AuthConstants.WHITELIST_URLS).permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated())
 

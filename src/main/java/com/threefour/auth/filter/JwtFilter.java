@@ -2,7 +2,7 @@ package com.threefour.auth.filter;
 
 import com.threefour.auth.CustomUserDetails;
 import com.threefour.auth.JwtUtil;
-import com.threefour.auth.SecurityConstants;
+import com.threefour.auth.AuthConstants;
 import com.threefour.user.domain.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -30,7 +30,7 @@ public class JwtFilter extends OncePerRequestFilter {
      */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return PatternMatchUtils.simpleMatch(SecurityConstants.WHITELIST_URLS, request.getRequestURI());
+        return PatternMatchUtils.simpleMatch(AuthConstants.WHITELIST_URLS, request.getRequestURI());
     }
 
     /**

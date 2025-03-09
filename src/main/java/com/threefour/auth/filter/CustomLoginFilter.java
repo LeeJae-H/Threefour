@@ -1,5 +1,6 @@
 package com.threefour.auth.filter;
 
+import com.threefour.auth.AuthConstants;
 import com.threefour.auth.CustomUserDetails;
 import com.threefour.auth.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -58,8 +59,8 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String accessToken = jwtUtil.createJwt("access", email, role, 60*60*10L);
-        String refreshToken = jwtUtil.createJwt("refresh", email, role, 60*60*60*24L);
+        String accessToken = jwtUtil.createJwt("access", email, role, AuthConstants.ACCESS_TOKEN_EXPIRATION_TIME);
+        String refreshToken = jwtUtil.createJwt("refresh", email, role, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
 
         response.setHeader("AccessToken", "Bearer " + accessToken);
         response.setHeader("RefreshToken", "Bearer " + refreshToken);

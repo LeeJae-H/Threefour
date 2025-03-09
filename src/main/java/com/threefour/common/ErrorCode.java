@@ -14,6 +14,11 @@ public enum ErrorCode {
     // Validation
     FAIL_VALIDATION(HttpStatus.BAD_REQUEST, "잘못된 입력 : %s"),
 
+    // Jwt
+    INVALID_REFRESH_TOKEN_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 리포레시 토큰 형식입니다."),
+    INVALID_REFRESH_TOKEN_TYPE(HttpStatus.BAD_REQUEST, "리프레시 토큰이 아닙니다."),
+    REFRESH_TOKEN_IS_EXPIRED(HttpStatus.BAD_REQUEST, "만료된 리프레시 토큰입니다."),
+
     // 회원
     INVALID_PASSWORD_LENGTH(HttpStatus.BAD_REQUEST, "비밀번호는 최소 8자 이상이어야 합니다."),
     INVALID_NICKNAME_LENGTH(HttpStatus.BAD_REQUEST, "닉네임은 2~10자 이내여야 합니다."),
