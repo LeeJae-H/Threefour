@@ -49,7 +49,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = accessToken.split(" ")[1];
 
         // 토큰이 AccessToken인 지 검증
-        String category = jwtUtil.getCategory(accessToken);
+        String category = jwtUtil.getCategory(token);
         if (!category.equals("access")) {
             // todo 예외 발생 로직 추가
             return;

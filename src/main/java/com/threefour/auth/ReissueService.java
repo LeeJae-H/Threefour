@@ -28,7 +28,6 @@ public class ReissueService {
         String category = jwtUtil.getCategory(token);
         if (!category.equals("refresh")) {
             throw new ExpectedException(ErrorCode.INVALID_REFRESH_TOKEN_TYPE);
-
         }
 
         // RefreshToken이 만료되었는 지 검증
