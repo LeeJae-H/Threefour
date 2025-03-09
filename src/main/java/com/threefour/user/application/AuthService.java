@@ -33,8 +33,16 @@ public class AuthService {
             throw new ExpectedException(ErrorCode.INVALID_NICKNAME_FORMAT);
         }
         String encodedPassword = encodePasswordService.encode(password);
+
         User newUser = User.join(email, encodedPassword, nickname);
         userRepository.save(newUser);
         return newUser.getNickname();
     }
+
+//    public void deleteUser(String email) {
+//        User foundUser = userRepository.findByEmail(email)
+//                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+//
+//        userRepository.delete(foundUser);
+//    }
 }

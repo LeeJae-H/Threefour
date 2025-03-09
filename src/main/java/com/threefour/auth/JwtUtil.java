@@ -27,14 +27,19 @@ public class JwtUtil {
      *
      * JWT의 Payload에 저장될 정보는 {email, role, 생성일, 만료일} 입니다.
      */
-    public String createJwt(String email, String role, Long expiredMs) {
+    public String createJwt(String category, String email, String role, Long expiredMs) {
         return Jwts.builder()
+                .claim("category", category)
                 .claim("email", email)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
                 .compact();
+    }
+
+    public String getCategory(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
     }
 
     public String getEmail(String token) {

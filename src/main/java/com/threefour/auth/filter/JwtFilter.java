@@ -33,21 +33,31 @@ public class JwtFilter extends OncePerRequestFilter {
         return PatternMatchUtils.simpleMatch(SecurityConstants.WHITELIST_URLS, request.getRequestURI());
     }
 
+    /**
+     * AccessToken을 검증하는 메서드입니다.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authorization= request.getHeader("Authorization");
+        String accessToken = request.getHeader("AccessToken");
 
-        // Authorization 헤더의 값이 유효한 지 검증
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+        // AccessToken 헤더의 값이 유효한 지 검증
+        if (accessToken == null || !accessToken.startsWith("Bearer ")) {
+            // todo 예외 발생 로직 추가
             return;
         }
 
-        String token = authorization.split(" ")[1];
+        String token = accessToken.split(" ")[1];
 
-        // 토큰이 만료되었는 지 검증
+        // 토큰이 AccessToken인 지 검증
+        String category = jwtUtil.getCategory(accessToken);
+        if (!category.equals("access")) {
+            // todo 예외 발생 로직 추가
+            return;
+        }
+
+        // AccessToken이 만료되었는 지 검증
         if (jwtUtil.isExpired(token)) {
-            filterChain.doFilter(request, response);
+            // todo 예외 발생 로직 추가
             return;
         }
 

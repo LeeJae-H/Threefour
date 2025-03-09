@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "user")
 @Getter
@@ -27,6 +29,9 @@ public class User {
     @Column(name = "role")
     private String role;
 
+    @Embedded
+    private UserTimeInfo userTimeInfo;
+
     /**
      * JwtFilter에서 사용됩니다.
      */
@@ -37,13 +42,14 @@ public class User {
     }
 
     public static User join(String email, String password, String nickname) {
-        return new User(email, password, nickname, "ROLE_USER");
+        return new User(email, password, nickname, "ROLE_USER", new UserTimeInfo(LocalDateTime.now(), LocalDateTime.now()));
     }
 
-    private User(String email, String password, String nickname, String role) {
+    private User(String email, String password, String nickname, String role, UserTimeInfo userTimeInfo) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.role = role;
+        this.userTimeInfo = userTimeInfo;
     }
 }

@@ -2,8 +2,9 @@ package com.threefour.config;
 
 import com.threefour.auth.JwtUtil;
 import com.threefour.auth.SecurityConstants;
+import com.threefour.auth.filter.CustomLogoutFilter;
 import com.threefour.auth.filter.JwtFilter;
-import com.threefour.auth.filter.LoginFilter;
+import com.threefour.auth.filter.CustomLoginFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -37,9 +39,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf((auth) -> auth.disable())             // csrf disable -> CsrfFilter 비활성화
-                .formLogin((auth) -> auth.disable())        // form 로그인 방식 disable -> UsernamePasswordAuthenticationFilter 비활성화
-                .httpBasic((auth) -> auth.disable())        // http basic 인증 방식 disable -> BasicAuthenticationFilter 비활성화
+                .csrf((auth) -> auth.disable())             // CsrfFilter 비활성화
+                .logout((auth) -> auth.disable())           // LogoutFilter 비활성화
+                .formLogin((auth) -> auth.disable())        // UsernamePasswordAuthenticationFilter 비활성화
+                .httpBasic((auth) -> auth.disable())        // BasicAuthenticationFilter 비활성화
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  //세션 설정
 
                 // 경로별 인가 작업
@@ -49,8 +52,9 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
 
                 // 필터 추가
-                .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class)
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class)
+                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(jwtUtil), CustomLoginFilter.class)
 
                 .build();
     }

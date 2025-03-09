@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,7 +18,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 @RequiredArgsConstructor
-public class LoginFilter extends UsernamePasswordAuthenticationFilter {
+public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
@@ -45,20 +46,24 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     /**
      * 로그인 성공 시 실행하는 메소드입니다.
      *
-     * 사용자의 email, role을 가져와서 JWT를 발급합니다.
+     * 사용자의 email, role로 AccessToken, RefreshToken을 발급합니다.
      */
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
         String email = customUserDetails.getUsername();
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        Collection<? extends GrantedAuthority> authorities = customUserDetails.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String token = jwtUtil.createJwt(email, role, 60*60*10L);
-        response.addHeader("Authorization", "Bearer " + token);
+        String accessToken = jwtUtil.createJwt("access", email, role, 60*60*10L);
+        String refreshToken = jwtUtil.createJwt("refresh", email, role, 60*60*60*24L);
+
+        response.setHeader("AccessToken", "Bearer " + accessToken);
+        response.setHeader("RefreshToken", "Bearer " + refreshToken);
+        response.setStatus(HttpStatus.OK.value());
     }
 
     /**
