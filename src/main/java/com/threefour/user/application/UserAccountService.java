@@ -47,7 +47,7 @@ public class UserAccountService {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
 
-        // 본인만 회원 정보 수정 가능
+        // 본인인 지 확인
         if (!foundUser.getId().equals(userId)) {
             throw new ExpectedException(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
         }
@@ -81,7 +81,7 @@ public class UserAccountService {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
 
-        // 본인만 회원 탈퇴 가능
+        // 본인인 지 확인
         if (!foundUser.getId().equals(userId)) {
             throw new ExpectedException(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
         }

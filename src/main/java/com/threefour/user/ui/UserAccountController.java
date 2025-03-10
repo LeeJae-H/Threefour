@@ -31,6 +31,9 @@ public class UserAccountController {
     /**
      * 회원 정보 수정 API
      *
+     * 본인만 가능합니다.
+     *
+     * @param userId
      * @param updateUserInfoRequest
      */
     @PutMapping("/{userId}")
@@ -45,6 +48,9 @@ public class UserAccountController {
     /**
      * 회원탈퇴 API
      *
+     * 본인만 가능합니다.
+     *
+     * @param userId
      * @param refreshToken
      */
     @DeleteMapping("/{userId}")

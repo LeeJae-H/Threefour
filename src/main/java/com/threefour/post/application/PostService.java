@@ -44,7 +44,7 @@ public class PostService {
         Post foundPost = postRepository.findById(postId)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
 
-        // 작성자만 게시글 수정 가능
+        // 작성자 본인인 지 확인
         if (!foundPost.getAuthorNickname().equals(foundUser.getNickname())) {
             throw new ExpectedException(ErrorCode.POST_ACCESS_DENIED);
         }
@@ -79,7 +79,7 @@ public class PostService {
         Post foundPost = postRepository.findById(postId)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
 
-        // 작성자만 게시글 삭제 가능
+        // 작성자 본인인 지 확인
         if (!foundPost.getAuthorNickname().equals(foundUser.getNickname())) {
             throw new ExpectedException(ErrorCode.POST_ACCESS_DENIED);
         }

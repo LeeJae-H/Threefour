@@ -4,7 +4,6 @@ import com.threefour.common.ApiResponse;
 import com.threefour.post.application.PostService;
 import com.threefour.post.dto.EditPostRequest;
 import com.threefour.post.dto.WritePostReqeust;
-import com.threefour.user.dto.UpdateUserInfoRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,6 +31,8 @@ public class PostController {
     /**
      * 게시글 수정 API
      *
+     * 작성자 본인만 가능합니다.
+     *
      * @param postId
      * @param editPostRequest
      */
@@ -46,6 +47,8 @@ public class PostController {
 
     /**
      * 게시글 삭제 API
+     *
+     * 작성자 본인만 가능합니다.
      *
      * @param postId
      */
