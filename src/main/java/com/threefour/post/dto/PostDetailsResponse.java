@@ -14,12 +14,14 @@ public class PostDetailsResponse {
     private String authorNickname;
     private PostTimeInfo postTimeInfo;
     private Long userId;
+    private boolean isMine;
 
-    public PostDetailsResponse(String title, String content, String authorNickname, PostTimeInfo postTimeInfo, Long userId) {
+    public PostDetailsResponse(String title, String content, String authorNickname, PostTimeInfo postTimeInfo, Long userId, boolean isMine) {
         this.title = title;
         this.content = content;
         this.authorNickname = authorNickname;
         this.postTimeInfo = postTimeInfo;
         this.userId = userId;
+        this.isMine = isMine;
     }
 }

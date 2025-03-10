@@ -6,13 +6,18 @@ import com.threefour.post.domain.Post;
 import com.threefour.post.domain.PostRepository;
 import com.threefour.post.dto.EditPostRequest;
 import com.threefour.post.dto.PostDetailsResponse;
+import com.threefour.post.dto.PostSummaryResponse;
 import com.threefour.post.dto.WritePostReqeust;
 import com.threefour.user.domain.User;
 import com.threefour.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -110,6 +115,17 @@ public class PostService {
         Post foundPost = postRepository.findById(postId)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
 
-        return new PostDetailsResponse(foundPost.getTitle(), foundPost.getContent(), foundPost.getAuthorNickname(), foundPost.getPostTimeInfo(), foundUser.getId());
+        // 본인 게시글 여부
+        boolean isMine = foundPost.getAuthorNickname().equals(foundUser.getNickname());
+
+        return new PostDetailsResponse(foundPost.getTitle(), foundPost.getContent(), foundPost.getAuthorNickname(), foundPost.getPostTimeInfo(), foundUser.getId(), isMine);
+    }
+
+    public List<PostSummaryResponse> getPostsList(Pageable pageable) {
+        Page<Post> posts = postRepository.findAll(pageable);
+
+        return posts.stream()
+                .map(post -> new PostSummaryResponse(post.getTitle(), post.getAuthorNickname(), post.getPostTimeInfo().getCreatedAt()))
+                .collect(Collectors.toList());
     }
 }

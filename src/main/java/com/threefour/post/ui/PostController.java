@@ -2,14 +2,18 @@ package com.threefour.post.ui;
 
 import com.threefour.common.ApiResponse;
 import com.threefour.post.application.PostService;
-import com.threefour.post.domain.Post;
 import com.threefour.post.dto.EditPostRequest;
 import com.threefour.post.dto.PostDetailsResponse;
+import com.threefour.post.dto.PostSummaryResponse;
 import com.threefour.post.dto.WritePostReqeust;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/posts")
@@ -72,5 +76,23 @@ public class PostController {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         PostDetailsResponse postDetailsResponse = postService.getPostDetails(postId, email);
         return ApiResponse.success(postDetailsResponse);
+    }
+
+    /**
+     * 게시글 목록 조회 API
+     *
+     * 홈 화면에서 보여지는 게시글 목록입니다.
+     * 페이지 단위로 조회합니다.
+     *
+     * @param page
+     * @param size
+     */
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<PostSummaryResponse>>> getPostsList(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        List<PostSummaryResponse> postsList = postService.getPostsList(pageable);
+        return ApiResponse.success(postsList);
     }
 }
