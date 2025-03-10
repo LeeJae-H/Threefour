@@ -27,6 +27,7 @@ public class UserTest {
         assertThat(newUser.getNickname()).isEqualTo(nickname);
         assertThat(newUser.getRole()).isEqualTo("ROLE_USER");
         assertThat(newUser.getUserTimeInfo().getCreatedAt()).isNotNull();
+        assertThat(newUser.getUserTimeInfo().getUpdatedAt()).isNotNull();
     }
 
     @Test
@@ -74,12 +75,12 @@ public class UserTest {
         String nickname = "테스트닉네임";
 
         User user = User.join(email, password, nickname);
-        LocalDateTime updatedAt = user.getUserTimeInfo().getUpdatedAt();
+        LocalDateTime updatedAtBefore = user.getUserTimeInfo().getUpdatedAt();
 
         // when
         user.updateUpdatedAt();
 
         // then
-        assertThat(user.getUserTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAt);
+        assertThat(user.getUserTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
     }
 }

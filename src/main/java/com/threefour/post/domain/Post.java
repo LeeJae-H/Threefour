@@ -1,6 +1,5 @@
 package com.threefour.post.domain;
 
-import com.threefour.user.domain.UserTimeInfo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
