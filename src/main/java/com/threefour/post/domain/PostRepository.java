@@ -9,4 +9,5 @@ public interface PostRepository extends Repository<Post, Long> {
     void save(Post post);
     Optional<Post> findById(Long id);
     void delete(Post post);
+    void deleteByAuthorNickname(String authorNickname);
 }

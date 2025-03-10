@@ -4,6 +4,7 @@ import com.threefour.auth.JwtUtil;
 import com.threefour.auth.RefreshTokenRepository;
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
+import com.threefour.post.domain.PostRepository;
 import com.threefour.user.domain.EncodePasswordService;
 import com.threefour.user.domain.User;
 import com.threefour.user.domain.UserRepository;
@@ -21,6 +22,7 @@ public class UserAccountService {
     private final EncodePasswordService encodePasswordService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtUtil jwtUtil;
+    private final PostRepository postRepository;
 
     @Transactional
     public String join(JoinRequest joinRequest) {
@@ -70,6 +72,9 @@ public class UserAccountService {
     public void deleteUser(String refreshToken, String email) {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+
+        // 회원이 작성한 게시글 모두 삭제
+        postRepository.deleteByAuthorNickname(foundUser.getNickname());
 
         // DB에서 회원 삭제
         userRepository.delete(foundUser);
