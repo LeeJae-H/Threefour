@@ -36,7 +36,7 @@ public class UserAccountController {
      * @param userId
      * @param updateUserInfoRequest
      */
-    @PutMapping("/{userId}")
+    @PutMapping("/my/{userId}")
     public ResponseEntity<ApiResponse<String>> updateUserInfo(
             @PathVariable Long userId,
             @RequestBody UpdateUserInfoRequest updateUserInfoRequest) {
@@ -53,7 +53,7 @@ public class UserAccountController {
      * @param userId
      * @param refreshToken
      */
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/my/{userId}")
     public ResponseEntity<ApiResponse<String>> deleteUser(
             @PathVariable Long userId,
             @RequestHeader("RefreshToken") String refreshToken) {

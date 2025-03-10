@@ -5,6 +5,7 @@ import com.threefour.common.ExpectedException;
 import com.threefour.user.domain.User;
 import com.threefour.user.domain.UserRepository;
 import com.threefour.user.dto.MyUserInfoResponse;
+import com.threefour.user.dto.OtherUserInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,5 +25,12 @@ public class UserService {
         }
 
         return new MyUserInfoResponse(foundUser.getEmail(), foundUser.getNickname());
+    }
+
+    public OtherUserInfoResponse getOtherUserInfo(Long userId) {
+        User otherUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+
+        return new OtherUserInfoResponse(otherUser.getNickname());
     }
 }
