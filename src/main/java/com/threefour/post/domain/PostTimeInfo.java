@@ -26,6 +26,7 @@ public class PostTimeInfo {
         return createdAt;
     }
 
+    // 테스트를 위해 추가한 메서드입니다.
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
