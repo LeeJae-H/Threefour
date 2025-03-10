@@ -102,13 +102,13 @@ public class UserAccountService {
     }
 
     private void validatePassword(String password) {
-        if (password.length() < 8) {
+        if (password == null || password.length() < 8) {
             throw new ExpectedException(ErrorCode.INVALID_PASSWORD_LENGTH);
         }
     }
 
     private void validateNickname(String nickname) {
-        if (nickname.length() < 2 || nickname.length() > 10) {
+        if (nickname == null || nickname.length() < 2 || nickname.length() > 10) {
             throw new ExpectedException(ErrorCode.INVALID_NICKNAME_LENGTH);
         }
         if (!nickname.matches("^[a-zA-Z0-9가-힣]+$")) {
