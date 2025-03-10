@@ -6,9 +6,9 @@ import java.util.Optional;
 
 public interface UserRepository extends Repository<User, Long> {
 
-    Boolean existsByEmail(String email);
-    void save(User user);
+    User save(User user);
+    Optional<User> findById(Long id);
     Optional<User> findByEmail(String email);
     void delete(User user);
-    Optional<User> findById(Long id);
+    Boolean existsByEmail(String email);
 }

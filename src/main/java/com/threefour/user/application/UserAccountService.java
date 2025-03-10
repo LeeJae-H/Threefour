@@ -38,8 +38,9 @@ public class UserAccountService {
 
         // 비밀번호는 암호화되어 저장되며, 닉네임은 양쪽 끝의 공백을 제거한 후 저장된다.
         User newUser = User.join(email, encodePasswordService.encode(password), nickname.trim());
-        userRepository.save(newUser);
-        return newUser.getNickname();
+
+        User savedUser = userRepository.save(newUser);
+        return savedUser.getNickname();
     }
 
     @Transactional

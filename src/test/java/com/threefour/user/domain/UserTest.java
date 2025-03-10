@@ -14,7 +14,7 @@ public class UserTest {
     void joinTest() {
         // given
         String email = "test@naver.com";
-        String password = "testEncodedPassword";
+        String password = "testPassword";
         String nickname = "테스트닉네임";
 
         // when
@@ -34,7 +34,7 @@ public class UserTest {
     void changePasswordTest() {
         // given
         String email = "test@naver.com";
-        String password = "testEncodedPassword";
+        String password = "testPassword";
         String nickname = "테스트닉네임";
 
         User user = User.join(email, password, nickname);
@@ -52,7 +52,7 @@ public class UserTest {
     void changeNicknameTest() {
         // given
         String email = "test@naver.com";
-        String password = "testEncodedPassword";
+        String password = "testPassword";
         String nickname = "테스트닉네임";
 
         User user = User.join(email, password, nickname);
@@ -70,7 +70,7 @@ public class UserTest {
     void updateUpdatedAtTest() {
         // given
         String email = "test@naver.com";
-        String password = "testEncodedPassword";
+        String password = "testPassword";
         String nickname = "테스트닉네임";
 
         User user = User.join(email, password, nickname);
