@@ -4,7 +4,8 @@ import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
 import com.threefour.post.domain.Post;
 import com.threefour.post.domain.PostRepository;
-import com.threefour.post.dto.PostCreateReqeust;
+import com.threefour.post.dto.EditPostRequest;
+import com.threefour.post.dto.WritePostReqeust;
 import com.threefour.user.domain.User;
 import com.threefour.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,16 +20,48 @@ public class PostService {
     private final PostRepository postRepository;
 
     @Transactional
-    public void createPost(PostCreateReqeust postCreateReqeust, String email) {
+    public void writePost(WritePostReqeust writePostReqeust, String email) {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
 
         String authorNickname = foundUser.getNickname();
-        String category = postCreateReqeust.getCategory();
-        String title = postCreateReqeust.getTitle();
-        String content = postCreateReqeust.getContent();
+        String category = writePostReqeust.getCategory();
+        String title = writePostReqeust.getTitle();
+        String content = writePostReqeust.getContent();
 
         Post newPost = Post.writePost(authorNickname, category, title, content);
         postRepository.save(newPost);
+    }
+
+    public void editPost(Long postId, EditPostRequest editPostRequest, String email) {
+        User foundUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+
+        Post foundPost = postRepository.findById(postId)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
+
+        // 작성자만 게시글 수정 가능
+        if (!foundPost.getAuthorNickname().equals(foundUser.getNickname())) {
+            throw new ExpectedException(ErrorCode.POST_ACCESS_DENIED);
+        }
+
+        // 게시글 수정이 이루어졌는지 여부
+        boolean isUpdated = false;
+
+        if (editPostRequest.getTitle() != null) {
+            String newTitle = editPostRequest.getTitle();
+            foundPost.editTitle(newTitle);
+            isUpdated = true;
+        }
+
+        if (editPostRequest.getContent() != null) {
+            String newContent = editPostRequest.getContent();
+            foundPost.editContent(newContent);
+            isUpdated = true;
+        }
+
+        if (isUpdated) {
+            foundPost.updateUpdatedAt();
+        }
     }
 }

@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostCreateReqeust {
+public class WritePostReqeust {
 
     private String category;
     private String title;

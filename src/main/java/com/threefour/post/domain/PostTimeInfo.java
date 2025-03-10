@@ -21,5 +21,9 @@ public class PostTimeInfo {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 }
 

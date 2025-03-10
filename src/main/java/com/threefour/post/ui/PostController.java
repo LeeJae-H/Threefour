@@ -2,14 +2,13 @@ package com.threefour.post.ui;
 
 import com.threefour.common.ApiResponse;
 import com.threefour.post.application.PostService;
-import com.threefour.post.dto.PostCreateReqeust;
+import com.threefour.post.dto.EditPostRequest;
+import com.threefour.post.dto.WritePostReqeust;
+import com.threefour.user.dto.UpdateUserInfoRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/posts")
@@ -18,16 +17,30 @@ public class PostController {
 
     private final PostService postService;
 
-
     /**
-     * 게시글 생성 API
+     * 게시글 작성 API
      *
-     * @param postCreateReqeust
+     * @param writePostReqeust
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<String>> createPost(@RequestBody PostCreateReqeust postCreateReqeust) {
+    public ResponseEntity<ApiResponse<String>> writePost(@RequestBody WritePostReqeust writePostReqeust) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        postService.createPost(postCreateReqeust, email);
+        postService.writePost(writePostReqeust, email);
+        return ApiResponse.success("ok");
+    }
+
+    /**
+     * 게시글 수정 API
+     *
+     * @param postId
+     * @param editPostRequest
+     */
+    @PutMapping("/{postId}")
+    public ResponseEntity<ApiResponse<String>> editPost(
+            @PathVariable Long postId,
+            @RequestBody EditPostRequest editPostRequest) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        postService.editPost(postId, editPostRequest, email);
         return ApiResponse.success("ok");
     }
 }

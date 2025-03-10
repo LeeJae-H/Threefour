@@ -1,5 +1,6 @@
 package com.threefour.post.domain;
 
+import com.threefour.user.domain.UserTimeInfo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -42,5 +43,18 @@ public class Post {
         this.title = title;
         this.content = content;
         this.postTimeInfo = postTimeInfo;
+    }
+
+    public void editTitle(String title) {
+        this.title = title;
+    }
+
+    public void editContent(String content) {
+        this.content = content;
+    }
+
+    public void updateUpdatedAt() {
+        LocalDateTime createdAt = postTimeInfo.getCreatedAt();
+        this.postTimeInfo = new PostTimeInfo(createdAt, LocalDateTime.now());
     }
 }

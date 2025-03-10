@@ -8,7 +8,7 @@ import com.threefour.user.domain.EncodePasswordService;
 import com.threefour.user.domain.User;
 import com.threefour.user.domain.UserRepository;
 import com.threefour.user.dto.JoinRequest;
-import com.threefour.user.dto.UserInfoUpdateRequest;
+import com.threefour.user.dto.UpdateUserInfoRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,22 +40,22 @@ public class UserAccountService {
     }
 
     @Transactional
-    public void updateUserInfo(UserInfoUpdateRequest userInfoUpdateRequest, String email) {
+    public void updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest, String email) {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
 
         // 회원 정보의 변경이 이루어졌는지 여부
         boolean isUpdated = false;
 
-        if (userInfoUpdateRequest.getPassword() != null) {
-            String newPassword = userInfoUpdateRequest.getPassword();
+        if (updateUserInfoRequest.getPassword() != null) {
+            String newPassword = updateUserInfoRequest.getPassword();
             validatePassword(newPassword);
             foundUser.changePassword(encodePasswordService.encode(newPassword));
             isUpdated = true;
         }
 
-        if (userInfoUpdateRequest.getNickname() != null) {
-            String newNickname = userInfoUpdateRequest.getNickname();
+        if (updateUserInfoRequest.getNickname() != null) {
+            String newNickname = updateUserInfoRequest.getNickname();
             validateNickname(newNickname);
             foundUser.changeNickname(newNickname);
             isUpdated = true;

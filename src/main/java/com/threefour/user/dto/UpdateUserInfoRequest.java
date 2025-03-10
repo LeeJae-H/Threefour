@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserInfoUpdateRequest {
+public class UpdateUserInfoRequest {
 
     private String password;
     private String nickname;
