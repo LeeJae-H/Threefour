@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public interface PostRepository extends Repository<Post, Long> {
 
-    void save(Post post);
+    Post save(Post post);
     Optional<Post> findById(Long id);
+    Page<Post> findAll(Pageable pageable);
     void delete(Post post);
     void deleteByAuthorNickname(String authorNickname);
-    Page<Post> findAll(Pageable pageable);
 }

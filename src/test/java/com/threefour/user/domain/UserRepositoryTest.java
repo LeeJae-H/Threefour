@@ -31,6 +31,7 @@ public class UserRepositoryTest {
         User savedUser = userRepository.save(user);
 
         // then
+        assertThat(savedUser).isNotNull();
         assertThat(savedUser.getId()).isNotNull(); // DB에 저장됐는지 여부 확인 -> DB에 저장되지 않으면 Id는 null 값
         assertThat(savedUser.getEmail()).isEqualTo(email);
         assertThat(savedUser.getNickname()).isEqualTo(nickname);
@@ -85,14 +86,14 @@ public class UserRepositoryTest {
         String nickname = "테스트닉네임";
 
         User user = User.join(email, password, nickname);
-        userRepository.save(user);
+        Long userId = userRepository.save(user).getId();
 
         // when
         userRepository.delete(user);
 
         // then
-        Optional<User> foundUser = userRepository.findByEmail(email);
-        boolean isExist = foundUser.isPresent();
+        Optional<User> deletedUser = userRepository.findById(userId);
+        boolean isExist = deletedUser.isPresent();
         assertThat(isExist).isFalse();
     }
 
