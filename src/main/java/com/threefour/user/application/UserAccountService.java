@@ -36,7 +36,8 @@ public class UserAccountService {
         validatePassword(password);
         validateNickname(nickname);
 
-        User newUser = User.join(email, encodePasswordService.encode(password), nickname);
+        // 비밀번호는 암호화되어 저장되며, 닉네임은 양쪽 끝의 공백을 제거한 후 저장된다.
+        User newUser = User.join(email, encodePasswordService.encode(password), nickname.trim());
         userRepository.save(newUser);
         return newUser.getNickname();
     }
@@ -57,6 +58,7 @@ public class UserAccountService {
         if (updateUserInfoRequest.getPassword() != null) {
             String newPassword = updateUserInfoRequest.getPassword();
             validatePassword(newPassword);
+            // 비밀번호는 암호화되어 저장된다.
             foundUser.changePassword(encodePasswordService.encode(newPassword));
             isUpdated = true;
         }
@@ -64,7 +66,8 @@ public class UserAccountService {
         if (updateUserInfoRequest.getNickname() != null) {
             String newNickname = updateUserInfoRequest.getNickname();
             validateNickname(newNickname);
-            foundUser.changeNickname(newNickname);
+            // 닉네임은 양쪽 끝의 공백을 제거한 후 저장된다.
+            foundUser.changeNickname(newNickname.trim());
             isUpdated = true;
         }
 
@@ -116,17 +119,23 @@ public class UserAccountService {
         refreshTokenRepository.deleteByUserEmail(email);
     }
 
+    // 비밀번호는 최소 8자 이상이어야 하며, 공백을 포함할 수 없다.
     private void validatePassword(String password) {
-        if (password == null || password.length() < 8) {
+        if (password == null || password.contains(" ") || password.length() < 8) {
             throw new ExpectedException(ErrorCode.INVALID_PASSWORD_LENGTH);
         }
     }
 
+    // 닉네임은 (양쪽 끝의 공백 제거 후) 2~10자 이내여야 하며, 특수문자를 포함할 수 없다.
     private void validateNickname(String nickname) {
-        if (nickname == null || nickname.length() < 2 || nickname.length() > 10) {
+        if (nickname == null) {
             throw new ExpectedException(ErrorCode.INVALID_NICKNAME_LENGTH);
         }
-        if (!nickname.matches("^[a-zA-Z0-9가-힣]+$")) {
+        String trimmedNickname = nickname.trim();
+        if (trimmedNickname.length() < 2 || trimmedNickname.length() > 10) {
+            throw new ExpectedException(ErrorCode.INVALID_NICKNAME_LENGTH);
+        }
+        if (!trimmedNickname.matches("^[a-zA-Z0-9가-힣]+$")) {
             throw new ExpectedException(ErrorCode.INVALID_NICKNAME_FORMAT);
         }
     }
