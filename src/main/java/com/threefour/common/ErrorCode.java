@@ -26,6 +26,7 @@ public enum ErrorCode {
     INVALID_NICKNAME_FORMAT(HttpStatus.BAD_REQUEST, "닉네임은 특수문자를 포함할 수 없습니다."),
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "사용자를 찾을 수 없습니다."),
     ALREADY_EXIST_USER(HttpStatus.BAD_REQUEST, "이미 존재하는 사용자입니다."),
+    USER_ACCOUNT_ACCESS_DENIED(HttpStatus.BAD_REQUEST, "회원 계정 접근 권한이 없습니다."),
 
     // 게시글
     POST_NOT_FOUND(HttpStatus.BAD_REQUEST, "게시글을 찾을 수 없습니다."),

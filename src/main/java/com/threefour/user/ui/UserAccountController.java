@@ -33,10 +33,12 @@ public class UserAccountController {
      *
      * @param updateUserInfoRequest
      */
-    @PutMapping("/update")
-    public ResponseEntity<ApiResponse<String>> updateUserInfo(@RequestBody UpdateUserInfoRequest updateUserInfoRequest) {
+    @PutMapping("/{userId}")
+    public ResponseEntity<ApiResponse<String>> updateUserInfo(
+            @PathVariable Long userId,
+            @RequestBody UpdateUserInfoRequest updateUserInfoRequest) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        userAccountService.updateUserInfo(updateUserInfoRequest, email);
+        userAccountService.updateUserInfo(userId, updateUserInfoRequest, email);
         return ApiResponse.success("ok");
     }
 
@@ -45,10 +47,12 @@ public class UserAccountController {
      *
      * @param refreshToken
      */
-    @DeleteMapping
-    public ResponseEntity<ApiResponse<String>> deleteUser(@RequestHeader("RefreshToken") String refreshToken) {
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<ApiResponse<String>> deleteUser(
+            @PathVariable Long userId,
+            @RequestHeader("RefreshToken") String refreshToken) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        userAccountService.deleteUser(refreshToken, email);
+        userAccountService.deleteUser(userId, refreshToken, email);
         return ApiResponse.success("ok");
     }
 }

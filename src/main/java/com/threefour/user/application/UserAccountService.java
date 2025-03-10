@@ -42,9 +42,14 @@ public class UserAccountService {
     }
 
     @Transactional
-    public void updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest, String email) {
+    public void updateUserInfo(Long userId, UpdateUserInfoRequest updateUserInfoRequest, String email) {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+
+        // 본인만 회원 정보 수정 가능
+        if (!foundUser.getId().equals(userId)) {
+            throw new ExpectedException(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
+        }
 
         // 회원 정보의 변경이 이루어졌는지 여부
         boolean isUpdated = false;
@@ -69,9 +74,14 @@ public class UserAccountService {
     }
 
     @Transactional
-    public void deleteUser(String refreshToken, String email) {
+    public void deleteUser(Long userId, String refreshToken, String email) {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+
+        // 본인만 회원 탈퇴 가능
+        if (!foundUser.getId().equals(userId)) {
+            throw new ExpectedException(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
+        }
 
         // 회원이 작성한 게시글 모두 삭제
         postRepository.deleteByAuthorNickname(foundUser.getNickname());
