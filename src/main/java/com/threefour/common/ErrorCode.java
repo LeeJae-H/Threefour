@@ -29,7 +29,9 @@ public enum ErrorCode {
 
     // 게시글
     POST_NOT_FOUND(HttpStatus.BAD_REQUEST, "게시글을 찾을 수 없습니다."),
-    POST_ACCESS_DENIED(HttpStatus.BAD_REQUEST, "게시글 접근 권한이 없습니다.");
+    POST_ACCESS_DENIED(HttpStatus.BAD_REQUEST, "게시글 접근 권한이 없습니다."),
+    INVALID_TITLE_LENGTH(HttpStatus.BAD_REQUEST, "게시글 제목은 1~50자 이내여야 합니다."),
+    INVALID_CONTENT_LENGTH(HttpStatus.BAD_REQUEST, "게시글 내용은 최소 1자 이상이어야 합니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

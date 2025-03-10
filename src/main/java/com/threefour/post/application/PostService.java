@@ -29,6 +29,9 @@ public class PostService {
         String title = writePostReqeust.getTitle();
         String content = writePostReqeust.getContent();
 
+        validateTitle(title);
+        validateContent(content);
+
         Post newPost = Post.writePost(authorNickname, category, title, content);
         postRepository.save(newPost);
     }
@@ -51,12 +54,14 @@ public class PostService {
 
         if (editPostRequest.getTitle() != null) {
             String newTitle = editPostRequest.getTitle();
+            validateTitle(newTitle);
             foundPost.editTitle(newTitle);
             isUpdated = true;
         }
 
         if (editPostRequest.getContent() != null) {
             String newContent = editPostRequest.getContent();
+            validateContent(newContent);
             foundPost.editContent(newContent);
             isUpdated = true;
         }
@@ -80,5 +85,17 @@ public class PostService {
         }
 
         postRepository.delete(foundPost);
+    }
+
+    private void validateTitle(String title) {
+        if (title == null || title.trim().isEmpty() || title.length() > 50) {
+            throw new ExpectedException(ErrorCode.INVALID_TITLE_LENGTH);
+        }
+    }
+
+    private void validateContent(String content) {
+        if (content == null || content.trim().isEmpty()) {
+            throw new ExpectedException(ErrorCode.INVALID_CONTENT_LENGTH);
+        }
     }
 }
