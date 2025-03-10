@@ -43,4 +43,16 @@ public class PostController {
         postService.editPost(postId, editPostRequest, email);
         return ApiResponse.success("ok");
     }
+
+    /**
+     * 게시글 삭제 API
+     *
+     * @param postId
+     */
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<ApiResponse<String>> deletePost(@PathVariable Long postId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        postService.deletePost(postId, email);
+        return ApiResponse.success("ok");
+    }
 }

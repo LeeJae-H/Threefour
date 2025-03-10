@@ -33,6 +33,7 @@ public class PostService {
         postRepository.save(newPost);
     }
 
+    @Transactional
     public void editPost(Long postId, EditPostRequest editPostRequest, String email) {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
@@ -63,5 +64,21 @@ public class PostService {
         if (isUpdated) {
             foundPost.updateUpdatedAt();
         }
+    }
+
+    @Transactional
+    public void deletePost(Long postId, String email) {
+        User foundUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+
+        Post foundPost = postRepository.findById(postId)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
+
+        // 작성자만 게시글 삭제 가능
+        if (!foundPost.getAuthorNickname().equals(foundUser.getNickname())) {
+            throw new ExpectedException(ErrorCode.POST_ACCESS_DENIED);
+        }
+
+        postRepository.delete(foundPost);
     }
 }
