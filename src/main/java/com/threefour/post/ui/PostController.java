@@ -2,7 +2,9 @@ package com.threefour.post.ui;
 
 import com.threefour.common.ApiResponse;
 import com.threefour.post.application.PostService;
+import com.threefour.post.domain.Post;
 import com.threefour.post.dto.EditPostRequest;
+import com.threefour.post.dto.PostDetailsResponse;
 import com.threefour.post.dto.WritePostReqeust;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -57,5 +59,18 @@ public class PostController {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         postService.deletePost(postId, email);
         return ApiResponse.success("ok");
+    }
+
+    /**
+     * 게시글 세부 사항 조회 API
+     *
+     * @param postId
+     * @return PostDetailsResponse
+     */
+    @GetMapping("/{postId}")
+    public ResponseEntity<ApiResponse<PostDetailsResponse>> getPostDetails(@PathVariable Long postId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        PostDetailsResponse postDetailsResponse = postService.getPostDetails(postId, email);
+        return ApiResponse.success(postDetailsResponse);
     }
 }

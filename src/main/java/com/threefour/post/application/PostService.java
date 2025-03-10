@@ -5,10 +5,12 @@ import com.threefour.common.ExpectedException;
 import com.threefour.post.domain.Post;
 import com.threefour.post.domain.PostRepository;
 import com.threefour.post.dto.EditPostRequest;
+import com.threefour.post.dto.PostDetailsResponse;
 import com.threefour.post.dto.WritePostReqeust;
 import com.threefour.user.domain.User;
 import com.threefour.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,5 +101,15 @@ public class PostService {
         if (content == null || content.trim().isEmpty()) {
             throw new ExpectedException(ErrorCode.INVALID_CONTENT_LENGTH);
         }
+    }
+
+    public PostDetailsResponse getPostDetails(Long postId, String email) {
+        User foundUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+
+        Post foundPost = postRepository.findById(postId)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
+
+        return new PostDetailsResponse(foundPost.getTitle(), foundPost.getContent(), foundPost.getAuthorNickname(), foundPost.getPostTimeInfo(), foundUser.getId());
     }
 }
