@@ -172,6 +172,39 @@ public class PostServiceIntegrationTest {
         assertThat(foundPost.getPostTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
     }
 
+    @Test
+    @DisplayName("게시글 수정 성공 - 모두 유효한 입력값, 제목만 수정")
+    void editPost_ByValidInput_OnlyTitle_Then_Success() {
+        // DB에 사용자(작성자)가 존재
+        User author = createTestUserAndSave();
+
+        Post post = createTestPostInstance(author.getNickname());
+        String newTitle = "새로운제목";
+
+        // given
+        // DB에 게시글이 존재
+        Post savedPost = savePost(post);
+        LocalDateTime updatedAtBefore = savedPost.getPostTimeInfo().getUpdatedAt();
+        Long postId = savedPost.getId();
+
+        // when
+        postService.editPost(postId, new EditPostRequest(newTitle, null),author.getEmail());
+
+        // then
+        String foundPostQuery = "SELECT author_nickname, category, title, content FROM post WHERE id = ?";
+        Post foundPost = jdbcTemplate.queryForObject(foundPostQuery, new PostRowMapper(), postId);
+        assertThat(foundPost).isNotNull();
+
+        // 1. 제목이 변경되었는지 확인
+        assertThat(foundPost.getTitle()).isEqualTo(newTitle);
+
+        // 2. 내용은 변경되지 않았는지 확인
+        assertThat(foundPost.getContent()).isEqualTo(savedPost.getContent());
+
+        // 3. 수정일시가 갱신되었는지 확인
+        assertThat(foundPost.getPostTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
+    }
+
     private Post createTestPostInstance(String authorNickname) {
         String category = "테스트게시판";
         String title = "테스트제목";
