@@ -1,7 +1,10 @@
 package com.threefour.user.application;
 
+import com.threefour.common.ErrorCode;
+import com.threefour.common.ExpectedException;
 import com.threefour.user.domain.User;
 import com.threefour.user.dto.JoinRequest;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -45,7 +49,7 @@ public class UserAccountServiceIntegrationTest {
 
     @Test
     @DisplayName("회원가입 성공 - 모두 유효한 입력값")
-    void join_Success() {
+    void join_ByAllValidInput_Then_Success() {
         // given
         String inputEmail = "test@naver.com";
         String inputPassword = "testPassword";
@@ -71,5 +75,26 @@ public class UserAccountServiceIntegrationTest {
         // 3. 비밀번호가 암호화되었는지 확인
         String password = savedUser.getPassword();
         assertThat(password).isNotEqualTo(inputPassword);
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - 이미 존재하는 이메일로 회원가입 시 예외 발생")
+    void join_ByExistingEmail_Then_Exception() {
+        // given
+        String inputEmail = "test@naver.com";
+        String inputPassword = "testPassword";
+        String inputNickname = "테스트닉네임";
+        JoinRequest joinRequest = new JoinRequest(inputEmail, inputPassword, inputNickname);
+        JoinRequest invalidReqeust = new JoinRequest(inputEmail, "testPassword2", "테스트닉네임2");
+
+        userAccountService.join(joinRequest);
+
+        // when & then
+        assertThatThrownBy(() -> userAccountService.join(invalidReqeust))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.ALREADY_EXIST_USER);
+                });
     }
 }
