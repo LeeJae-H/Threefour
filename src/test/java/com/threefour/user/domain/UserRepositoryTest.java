@@ -20,11 +20,9 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("사용자 저장")
     void saveUserTest() {
-        // given
         String email = "test@naver.com";
         String password = "testPassword";
         String nickname = "테스트닉네임";
-
         User user = User.join(email, password, nickname);
 
         // when
@@ -40,12 +38,13 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("Id로 사용자 조회")
     void findUserByIdTest() {
-        // given
         String email = "test@naver.com";
         String password = "testPassword";
         String nickname = "테스트닉네임";
-
         User user = User.join(email, password, nickname);
+
+        // given
+        // DB에 사용자가 존재
         Long userId = userRepository.save(user).getId();
 
         // when
@@ -60,12 +59,13 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("Email로 사용자 조회")
     void findUserByEmailTest() {
-        // given
         String email = "test@naver.com";
         String password = "testPassword";
         String nickname = "테스트닉네임";
-
         User user = User.join(email, password, nickname);
+
+        // given
+        // DB에 사용자가 존재
         userRepository.save(user);
 
         // when
@@ -80,12 +80,13 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("사용자 삭제")
     void deleteUserTest() {
-        // given
         String email = "test@naver.com";
         String password = "testPassword";
         String nickname = "테스트닉네임";
-
         User user = User.join(email, password, nickname);
+
+        // given
+        // DB에 사용자가 존재
         Long userId = userRepository.save(user).getId();
 
         // when
@@ -100,15 +101,15 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("이메일 존재 여부 확인")
     void existsByEmailTest() {
-        // given
         String email = "test@naver.com";
         String password = "testPassword";
         String nickname = "테스트닉네임";
-
         User user = User.join(email, password, nickname);
-        userRepository.save(user);
-
         String emailForTestingNotExist = "notUsed@naver.com";
+
+        // given
+        // DB에 사용자가 존재
+        userRepository.save(user);
 
         // when
         Boolean isExist = userRepository.existsByEmail(email);
