@@ -5,6 +5,7 @@ import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
 import com.threefour.user.domain.User;
 import com.threefour.user.dto.MyUserInfoResponse;
+import com.threefour.user.dto.OtherUserInfoResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,7 +38,7 @@ public class UserServiceIntegrationTest {
 
     @Test
     @DisplayName("내 정보 조회 성공")
-    void getMyUserInfo__Success() {
+    void getMyUserInfo_Success() {
         // given
         String email = "test@naver.com";
         String encodedPassword = "testEncodedPassword";
@@ -78,6 +79,24 @@ public class UserServiceIntegrationTest {
                     ExpectedException ex = (ExpectedException) e;
                     assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
                 });
+    }
+
+    @Test
+    @DisplayName("다른 회원 정보 조회 성공")
+    void getOtherUserInfo_Success() {
+        // given
+        String email = "test@naver.com";
+        String encodedPassword = "testEncodedPassword";
+        String nickname = "테스트닉네임";
+        User savedUser = saveUser(email, encodedPassword, nickname);
+        Long userId = savedUser.getId();
+
+        // when
+        OtherUserInfoResponse response = userService.getOtherUserInfo(userId);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getNickname()).isEqualTo(nickname);
     }
 
     private User saveUser(String email, String password, String nickname) {
