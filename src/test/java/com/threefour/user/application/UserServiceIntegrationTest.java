@@ -1,12 +1,10 @@
 package com.threefour.user.application;
 
-import com.threefour.auth.AuthConstants;
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
 import com.threefour.user.domain.User;
 import com.threefour.user.dto.MyUserInfoResponse;
 import com.threefour.user.dto.OtherUserInfoResponse;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,40 +37,37 @@ public class UserServiceIntegrationTest {
     @Test
     @DisplayName("내 정보 조회 성공")
     void getMyUserInfo_Success() {
-        String email = "test@naver.com";
-        String encodedPassword = "testEncodedPassword";
-        String nickname = "테스트닉네임";
+        User user = createTestUserInstance();
 
         // given
         // DB에 사용자가 존재
-        User savedUser = saveUser(email, encodedPassword, nickname);
+        User savedUser = saveUser(user);
         Long userId = savedUser.getId();
 
         // when
-        MyUserInfoResponse response = userService.getMyUserInfo(userId, email);
+        MyUserInfoResponse response = userService.getMyUserInfo(userId, savedUser.getEmail());
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.getEmail()).isEqualTo(email);
-        assertThat(response.getNickname()).isEqualTo(nickname);
+        assertThat(response.getEmail()).isEqualTo(savedUser.getEmail());
+        assertThat(response.getNickname()).isEqualTo(savedUser.getNickname());
     }
 
     @Test
     @DisplayName("내 정보 조회 실패 - 다른 사용자가 조회하려고 할 때 예외 발생")
     void getMyUserInfo_FromAnotherUser_Then_Exception() {
-        String email = "test@naver.com";
-        String encodedPassword = "testEncodedPassword";
-        String nickname = "테스트닉네임";
-        String anotherUserEmail = email + "a";
+        User user = createTestUserInstance();
+        String anotherUserEmail = user.getEmail() + "a";
         String anotherEncodedPassword = "testEncodedPassword1";
         String anotherNickname = "테스트닉네임1";
+        User anotherUser = User.join(anotherUserEmail, anotherEncodedPassword, anotherNickname);
 
         // given
         // DB에 사용자(본인)가 존재
-        User savedUser = saveUser(email, encodedPassword, nickname);
+        User savedUser = saveUser(user);
         Long userId = savedUser.getId();
         // DB에 사용자(다른 사용자)가 존재
-        saveUser(anotherUserEmail, anotherEncodedPassword, anotherNickname);
+        saveUser(anotherUser);
 
         // when & then
         assertThatThrownBy(() -> userService.getMyUserInfo(userId, anotherUserEmail))
@@ -86,13 +81,11 @@ public class UserServiceIntegrationTest {
     @Test
     @DisplayName("다른 회원 정보 조회 성공")
     void getOtherUserInfo_Success() {
-        String email = "test@naver.com";
-        String encodedPassword = "testEncodedPassword";
-        String nickname = "테스트닉네임";
+        User user = createTestUserInstance();
 
         // given
         // DB에 사용자가 존재
-        User savedUser = saveUser(email, encodedPassword, nickname);
+        User savedUser = saveUser(user);
         Long userId = savedUser.getId();
 
         // when
@@ -100,7 +93,7 @@ public class UserServiceIntegrationTest {
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.getNickname()).isEqualTo(nickname);
+        assertThat(response.getNickname()).isEqualTo(savedUser.getNickname());
     }
 
     @Test
@@ -117,9 +110,14 @@ public class UserServiceIntegrationTest {
                 });
     }
 
-    private User saveUser(String email, String password, String nickname) {
-        User user = User.join(email, password, nickname);
+    private User createTestUserInstance() {
+        String email = "test@naver.com";
+        String encodedPassword = "testEncodedPassword";
+        String nickname = "테스트닉네임"; // 처음과 끝에 공백을 넣으면 안됩니다.
+        return User.join(email, encodedPassword, nickname);
+    }
 
+    private User saveUser(User user) {
         // DB에 User 객체 저장
         String saveQuery = "INSERT INTO user (email, password, nickname, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(saveQuery,
@@ -133,7 +131,7 @@ public class UserServiceIntegrationTest {
 
         // DB로부터 userId 가져옴
         String getIdQuery = "SELECT id FROM user WHERE email = ?";  // email은 unique 제약 조건
-        Long userId = jdbcTemplate.queryForObject(getIdQuery, Long.class, email);
+        Long userId = jdbcTemplate.queryForObject(getIdQuery, Long.class, user.getEmail());
 
         // User 객체에 userId 값 반영
         ReflectionTestUtils.setField(user, "id", userId);

@@ -30,7 +30,7 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("사용자 저장")
     void saveUserTest() {
-        User user = createUserInstance();
+        User user = createTestUserInstance();
 
         // when
         User savedUser = userRepository.save(user);
@@ -45,7 +45,7 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("Id로 사용자 조회")
     void findUserByIdTest() {
-        User user = createUserInstance();
+        User user = createTestUserInstance();
 
         // given
         // DB에 사용자가 존재
@@ -63,7 +63,7 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("Email로 사용자 조회")
     void findUserByEmailTest() {
-        User user = createUserInstance();
+        User user = createTestUserInstance();
 
         // given
         // DB에 사용자가 존재
@@ -81,7 +81,7 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("사용자 삭제")
     void deleteUserTest() {
-        User user = createUserInstance();
+        User user = createTestUserInstance();
 
         // given
         // DB에 사용자가 존재
@@ -99,7 +99,7 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("이메일 존재 여부 확인")
     void existsByEmailTest() {
-        User user = createUserInstance();
+        User user = createTestUserInstance();
         String notExistingEmail = "notUsed@naver.com";
 
         // given
@@ -115,10 +115,10 @@ public class UserRepositoryTest {
         assertThat(isNotExist).isFalse();
     }
 
-    private User createUserInstance() {
+    private User createTestUserInstance() {
         String email = "test@naver.com";
-        String password = "testPassword";
+        String encodedPassword = "testEncodedPassword";
         String nickname = "테스트닉네임"; // 처음과 끝에 공백을 넣으면 안됩니다.
-        return User.join(email, password, nickname);
+        return User.join(email, encodedPassword, nickname);
     }
 }
