@@ -241,6 +241,26 @@ public class PostServiceIntegrationTest {
                 });
     }
 
+    @Test
+    @DisplayName("게시글 삭제 성공")
+    void deletePost_Success() {
+        // given
+        // DB에 사용자(작성자)가 존재
+        User author = createTestUserAndSave();
+        // DB에 게시글이 존재
+        Post post = createTestPostInstance(author.getNickname());
+        Post savedPost = savePost(post);
+        Long postId = savedPost.getId();
+
+        // when
+        postService.deletePost(postId, author.getEmail());
+
+        // then
+        String checkPostQuery = "SELECT COUNT(*) FROM post WHERE id = ?";
+        Integer postCount = jdbcTemplate.queryForObject(checkPostQuery, Integer.class, postId);
+        assertThat(postCount).isEqualTo(0);;
+    }
+
     private Post createTestPostInstance(String authorNickname) {
         String category = "테스트게시판";
         String title = "테스트제목";
