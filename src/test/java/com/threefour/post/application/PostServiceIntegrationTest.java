@@ -89,25 +89,52 @@ public class PostServiceIntegrationTest {
 
         // when & then
         // 1. null 값의 제목
-        assertThatThrownBy(() -> postService.writePost(new WritePostReqeust("테스트게시판", inputNullTitle, "테스트제목"), author.getEmail()))
+        assertThatThrownBy(() -> postService.writePost(new WritePostReqeust("테스트게시판", inputNullTitle, "테스트내용"), author.getEmail()))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
                     assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_TITLE_LENGTH);
                 });
         // 2. 양쪽 끝의 공백 제거 후 1자 미만인 제목
-        assertThatThrownBy(() -> postService.writePost(new WritePostReqeust("테스트게시판", inputWhiteSpaceTitle, "테스트제목"), author.getEmail()))
+        assertThatThrownBy(() -> postService.writePost(new WritePostReqeust("테스트게시판", inputWhiteSpaceTitle, "테스트내용"), author.getEmail()))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
                     assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_TITLE_LENGTH);
                 });
         // 3. 양쪽 끝의 공백 제거 후 51자 이상인 제목
-        assertThatThrownBy(() -> postService.writePost(new WritePostReqeust("테스트게시판", inputLongTitle, "테스트제목"), author.getEmail()))
+        assertThatThrownBy(() -> postService.writePost(new WritePostReqeust("테스트게시판", inputLongTitle, "테스트내용"), author.getEmail()))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
                     assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_TITLE_LENGTH);
+                });
+    }
+
+    @Test
+    @DisplayName("게시글 작성 실패 - 내용 값 검증 실패 시 예외 발생")
+    void writePost_ByInvalidContent_Then_Exception() {
+        String inputNullContent = null;
+        String inputWhiteSpaceContent = " ";
+
+        // given
+        // DB에 사용자(작성자)가 존재
+        User author = createTestUserAndSave();
+
+        // when & then
+        // 1. null 값의 내용
+        assertThatThrownBy(() -> postService.writePost(new WritePostReqeust("테스트게시판", "테스트제목", inputNullContent), author.getEmail()))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_CONTENT_LENGTH);
+                });
+        // 2. 양쪽 끝의 공백 제거 후 1자 미만인 내용
+        assertThatThrownBy(() -> postService.writePost(new WritePostReqeust("테스트게시판", "테스트제목", inputWhiteSpaceContent), author.getEmail()))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_CONTENT_LENGTH);
                 });
     }
 
