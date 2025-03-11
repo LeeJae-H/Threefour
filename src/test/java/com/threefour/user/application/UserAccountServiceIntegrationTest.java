@@ -4,7 +4,6 @@ import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
 import com.threefour.user.domain.User;
 import com.threefour.user.dto.JoinRequest;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,19 +59,19 @@ public class UserAccountServiceIntegrationTest {
         String nickname = userAccountService.join(joinRequest);
 
         // then
-        // 1. return 값 확인
+        // return 값 확인
         assertThat(nickname).isNotNull();
         assertThat(nickname).isEqualTo(inputNickname);
 
         String query = "SELECT email, password, nickname FROM user WHERE email = ?";  // email은 unique 제약 조건
         User savedUser = jdbcTemplate.queryForObject(query, new UserRowMapper(), inputEmail);
 
-        // 2. DB에 데이터가 저장되었는지 확인
+        // DB에 데이터가 저장되었는지 확인
         assertThat(savedUser).isNotNull();
         assertThat(savedUser.getEmail()).isEqualTo(inputEmail);
         assertThat(savedUser.getNickname()).isEqualTo(inputNickname);
 
-        // 3. 비밀번호가 암호화되었는지 확인
+        // 비밀번호가 암호화되었는지 확인
         String password = savedUser.getPassword();
         assertThat(password).isNotEqualTo(inputPassword);
     }
@@ -82,19 +81,53 @@ public class UserAccountServiceIntegrationTest {
     void join_ByExistingEmail_Then_Exception() {
         // given
         String inputEmail = "test@naver.com";
-        String inputPassword = "testPassword";
-        String inputNickname = "테스트닉네임";
-        JoinRequest joinRequest = new JoinRequest(inputEmail, inputPassword, inputNickname);
-        JoinRequest invalidReqeust = new JoinRequest(inputEmail, "testPassword2", "테스트닉네임2");
+        String inputExistingEmail = inputEmail;
+        JoinRequest joinRequest = new JoinRequest(inputEmail, "testPassword1", "테스트닉네임1");
+        JoinRequest existingEmailRequest = new JoinRequest(inputExistingEmail, "testPassword2", "테스트닉네임2");
 
         userAccountService.join(joinRequest);
 
         // when & then
-        assertThatThrownBy(() -> userAccountService.join(invalidReqeust))
+        assertThatThrownBy(() -> userAccountService.join(existingEmailRequest))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
                     assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.ALREADY_EXIST_USER);
+                });
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - 비밀번호 값 검증 실패 시 예외 발생")
+    void join_ByInvalidPassword_Then_Exception() {
+        // given
+        String inputNullPassword = null;
+        String inputShortPassword = "1234";
+        String inputWhiteSpacePassword = "12 34 56 78";
+        JoinRequest nullPasswordRequest = new JoinRequest("test@naver.com", inputNullPassword, "테스트닉네임");
+        JoinRequest shortPasswordRequest = new JoinRequest("test@naver.com", inputShortPassword, "테스트닉네임");
+        JoinRequest whitespacePasswordRequest = new JoinRequest("test@naver.com", inputWhiteSpacePassword, "테스트닉네임");
+
+        // when & then
+        // 1. null 값의 비밀번호
+        assertThatThrownBy(() -> userAccountService.join(nullPasswordRequest))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD_LENGTH);
+                });
+        // 2. 8자 미만인 비밀번호
+        assertThatThrownBy(() -> userAccountService.join(shortPasswordRequest))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD_LENGTH);
+                });
+        // 3. 공백이 포함된 비밀번호
+        assertThatThrownBy(() -> userAccountService.join(whitespacePasswordRequest))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD_LENGTH);
                 });
     }
 }
