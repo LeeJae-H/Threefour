@@ -12,7 +12,6 @@ public class PostTest {
     @Test
     @DisplayName("게시글 작성")
     void writePostTest() {
-        // given
         String authorNickname = "테스트작성자닉네임";
         String category = "테스트게시판";
         String title = "테스트제목";
@@ -34,14 +33,15 @@ public class PostTest {
     @Test
     @DisplayName("게시글 제목 수정")
     void editTitleTest() {
-        // given
         String authorNickname = "테스트작성자닉네임";
         String category = "테스트게시판";
         String title = "테스트제목";
         String content = "테스트내용";
-
-        Post post = Post.writePost(authorNickname, category, title, content);
         String newTitle = "새로운제목";
+
+        // given
+        // 게시글 정보가 존재
+        Post post = Post.writePost(authorNickname, category, title, content);
 
         // when
         post.editTitle(newTitle);
@@ -53,14 +53,15 @@ public class PostTest {
     @Test
     @DisplayName("게시글 내용 수정")
     void editContentTest() {
-        // given
         String authorNickname = "테스트작성자닉네임";
         String category = "테스트게시판";
         String title = "테스트제목";
         String content = "테스트내용";
-
-        Post post = Post.writePost(authorNickname, category, title, content);
         String newContent = "새로운내용";
+
+        // given
+        // 게시글 정보가 존재
+        Post post = Post.writePost(authorNickname, category, title, content);
 
         // when
         post.editContent(newContent);
@@ -72,12 +73,13 @@ public class PostTest {
     @Test
     @DisplayName("수정일시 갱신")
     void updateUpdatedAtTest() {
-        // given
         String authorNickname = "테스트작성자닉네임";
         String category = "테스트게시판";
         String title = "테스트제목";
         String content = "테스트내용";
 
+        // given
+        // 게시글 정보가 존재
         Post post = Post.writePost(authorNickname, category, title, content);
         LocalDateTime updatedAtBefore = post.getPostTimeInfo().getUpdatedAt();
 
