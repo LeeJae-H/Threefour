@@ -31,7 +31,7 @@ public class UserAccountService {
         String nickname = joinRequest.getNickname();
 
         if (userRepository.existsByEmail(email)) {
-            throw new ExpectedException(ErrorCode.ALREADY_EXIST_USER);
+            throw new ExpectedException(ErrorCode.ALREADY_USED_EMAIL);
         }
         validatePassword(password);
         validateNickname(nickname);
@@ -127,7 +127,7 @@ public class UserAccountService {
         }
     }
 
-    // 닉네임은 (양쪽 끝의 공백 제거 후) 2~10자 이내여야 하며, 특수문자를 포함할 수 없다.
+    // 닉네임은 (양쪽 끝의 공백 제거 후) 2~10자 이내여야 하며, 특수문자를 포함할 수 없다. 또한, 닉네임은 고유하다.
     private void validateNickname(String nickname) {
         if (nickname == null) {
             throw new ExpectedException(ErrorCode.INVALID_NICKNAME_LENGTH);
@@ -138,6 +138,9 @@ public class UserAccountService {
         }
         if (!trimmedNickname.matches("^[a-zA-Z0-9가-힣]+$")) {
             throw new ExpectedException(ErrorCode.INVALID_NICKNAME_FORMAT);
+        }
+        if (userRepository.existsByNickname(trimmedNickname)) {
+            throw new ExpectedException(ErrorCode.ALREADY_USED_NICKNAME);
         }
     }
 }
