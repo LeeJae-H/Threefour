@@ -190,7 +190,7 @@ public class UserAccountServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("회원 정보 수정 성공 - 모두 유효한 입력값")
+    @DisplayName("회원 정보 수정 성공 - 모두 유효한 입력값, 모든 정보 수정")
     void updateUserInfo_ByValidInput_Then_Success() {
         // given
         String email = "test@naver.com";
@@ -201,7 +201,7 @@ public class UserAccountServiceIntegrationTest {
         Long userId = savedUser.getId();
 
         String newPassword = "newPassword";
-        String newNickname = "새로운닉네임";
+        String newNickname = " 새로운닉네임 ";
         UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest(newPassword, newNickname);
 
         // when
@@ -216,8 +216,41 @@ public class UserAccountServiceIntegrationTest {
         assertThat(getUser.getPassword()).isNotEqualTo(encodedPassword);
         assertThat(getUser.getPassword()).isNotEqualTo(newPassword);
 
-        // 2. 닉네임이 변경되었는지 확인
-        assertThat(getUser.getNickname()).isEqualTo(newNickname);
+        // 2. 닉네임이 변경되었는지 확인 + 양쪽 끝의 공백을 제거된 후 저장되었는지 확인
+        assertThat(getUser.getNickname()).isEqualTo(newNickname.trim());
+
+        // 3. 수정일시가 갱신되었는지 확인
+        assertThat(getUser.getUserTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 성공 - 모두 유효한 입력값, 비밀번호만 수정")
+    void updateUserInfo_ByValidInput_OnlyPassword_Then_Success() {
+        // given
+        String email = "test@naver.com";
+        String encodedPassword = "testEncodedPassword";
+        String nickname = "테스트닉네임";
+        User savedUser = saveUser(email, encodedPassword, nickname);
+        LocalDateTime updatedAtBefore = savedUser.getUserTimeInfo().getUpdatedAt();
+        Long userId = savedUser.getId();
+
+        String newPassword = "newPassword";
+        UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest(newPassword, null);
+
+        // when
+        userAccountService.updateUserInfo(userId, updateRequest, email);
+
+        // then
+        String getUserQuery = "SELECT email, password, nickname FROM user WHERE email = ?";
+        User getUser = jdbcTemplate.queryForObject(getUserQuery, new UserRowMapper(), email);
+        assertThat(getUser).isNotNull();
+
+        // 1. 비밀번호가 변경되었는지 확인 + 비밀번호가 암호화되었는지 확인
+        assertThat(getUser.getPassword()).isNotEqualTo(encodedPassword);
+        assertThat(getUser.getPassword()).isNotEqualTo(newPassword);
+
+        // 2. 닉네임은 변경되지 않았는지 확인
+        assertThat(getUser.getNickname()).isEqualTo(nickname);
 
         // 3. 수정일시가 갱신되었는지 확인
         assertThat(getUser.getUserTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
