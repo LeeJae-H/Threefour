@@ -5,9 +5,7 @@ import com.threefour.common.ExpectedException;
 import com.threefour.post.domain.Post;
 import com.threefour.post.dto.EditPostRequest;
 import com.threefour.post.dto.WritePostReqeust;
-import com.threefour.user.application.UserAccountServiceIntegrationTest;
 import com.threefour.user.domain.User;
-import com.threefour.user.dto.UpdateUserInfoRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -218,10 +216,7 @@ public class PostServiceIntegrationTest {
         Post savedPost = savePost(post);
         Long postId = savedPost.getId();
         // DB에 사용자(작성자가 아닌 사용자)가 존재
-        String anotherUserEmail = author.getEmail() + "a";
-        String anotherEncodedPassword = "testEncodedPassword";
-        String anotherNickname = "고유 닉네임";
-        User anotherUser = User.join(anotherUserEmail, anotherEncodedPassword, anotherNickname);
+        User anotherUser = User.join(author.getEmail() + "a", "testEncodedPassword", "고유 닉네임");
         String saveQuery = "INSERT INTO user (email, password, nickname, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(saveQuery,
                 anotherUser.getEmail(),
@@ -259,6 +254,37 @@ public class PostServiceIntegrationTest {
         String checkPostQuery = "SELECT COUNT(*) FROM post WHERE id = ?";
         Integer postCount = jdbcTemplate.queryForObject(checkPostQuery, Integer.class, postId);
         assertThat(postCount).isEqualTo(0);;
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 실패 - 다른 사용자가 수정하려고 할 때 예외 발생")
+    void deletePost_FromAnotherUser_Then_Exception() {
+        // given
+        // DB에 사용자(작성자)가 존재
+        User author = createTestUserAndSave();
+        // DB에 게시글이 존재
+        Post post = createTestPostInstance(author.getNickname());
+        Post savedPost = savePost(post);
+        Long postId = savedPost.getId();
+        // DB에 사용자(작성자가 아닌 사용자)가 존재
+        User anotherUser = User.join(author.getEmail() + "a", "testEncodedPassword", "고유 닉네임");
+        String saveQuery = "INSERT INTO user (email, password, nickname, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(saveQuery,
+                anotherUser.getEmail(),
+                anotherUser.getPassword(),
+                anotherUser.getNickname(),
+                anotherUser.getRole(),
+                Timestamp.valueOf(anotherUser.getUserTimeInfo().getCreatedAt()),
+                Timestamp.valueOf(anotherUser.getUserTimeInfo().getUpdatedAt())
+        );
+
+        // when & then
+        assertThatThrownBy(() -> postService.deletePost(postId, anotherUser.getEmail()))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.POST_ACCESS_DENIED);
+                });
     }
 
     private Post createTestPostInstance(String authorNickname) {
