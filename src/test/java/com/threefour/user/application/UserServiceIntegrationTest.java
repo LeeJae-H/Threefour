@@ -1,5 +1,8 @@
 package com.threefour.user.application;
 
+import com.threefour.auth.AuthConstants;
+import com.threefour.common.ErrorCode;
+import com.threefour.common.ExpectedException;
 import com.threefour.user.domain.User;
 import com.threefour.user.dto.MyUserInfoResponse;
 import org.assertj.core.api.Assertions;
@@ -15,6 +18,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.sql.Timestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -48,6 +52,32 @@ public class UserServiceIntegrationTest {
         assertThat(response).isNotNull();
         assertThat(response.getEmail()).isEqualTo(email);
         assertThat(response.getNickname()).isEqualTo(nickname);
+    }
+
+    @Test
+    @DisplayName("내 정보 조회 실패 - 다른 사용자가 조회하려고 할 때 예외 발생")
+    void getMyUserInfo_FromAnotherUser_Then_Exception() {
+        // given
+        // 사용자 저장
+        String email = "test@naver.com";
+        String encodedPassword = "testEncodedPassword";
+        String nickname = "테스트닉네임";
+        User savedUser = saveUser(email, encodedPassword, nickname);
+        Long userId = savedUser.getId();
+
+        // 사용자(다른 사용자) 저장
+        String anotherUserEmail = email + "a";
+        String anotherEncodedPassword = "testEncodedPassword1";
+        String anotherNickname = "테스트닉네임1";
+        saveUser(anotherUserEmail, anotherEncodedPassword, anotherNickname);
+
+        // when & then
+        assertThatThrownBy(() -> userService.getMyUserInfo(userId, anotherUserEmail))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
+                });
     }
 
     private User saveUser(String email, String password, String nickname) {
