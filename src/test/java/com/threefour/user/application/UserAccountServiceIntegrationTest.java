@@ -66,12 +66,12 @@ public class UserAccountServiceIntegrationTest {
         JoinRequest joinRequest = new JoinRequest(inputEmail, inputPassword, inputNickname);
 
         // when
-        String nickname = userAccountService.join(joinRequest);
+        String response = userAccountService.join(joinRequest);
 
         // then
         // 1. return 값 확인
-        assertThat(nickname).isNotNull();
-        assertThat(nickname).isEqualTo(inputNickname.trim());
+        assertThat(response).isNotNull();
+        assertThat(response).isEqualTo(inputNickname.trim());
 
         String query = "SELECT email, password, nickname FROM user WHERE email = ?";  // email은 unique 제약 조건
         User savedUser = jdbcTemplate.queryForObject(query, new UserRowMapper(), inputEmail);
