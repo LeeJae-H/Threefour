@@ -232,4 +232,52 @@ public class UserAccountServiceIntegrationTest {
         // 3. 수정일시가 갱신되었는지 확인
         assertThat(savedUser.getUserTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
     }
+
+    @Test
+    @DisplayName("회원 정보 수정 실패 - 다른 사용자가 정보를 변경하려고 할 때 예외 발생")
+    void updateUserInfo_FromAnotherUser_Then_Exception() {
+        // given
+        // 사용자 저장
+        String email = "test@naver.com";
+        String encodedPassword = "testEncodedPassword";
+        String nickname = "테스트닉네임";
+        User user = User.join(email, encodedPassword, nickname);
+        String saveQuery = "INSERT INTO user (email, password, nickname, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(saveQuery,
+                user.getEmail(),
+                user.getPassword(),
+                user.getNickname(),
+                user.getRole(),
+                Timestamp.valueOf(user.getUserTimeInfo().getCreatedAt()),
+                Timestamp.valueOf(user.getUserTimeInfo().getUpdatedAt())
+        );
+
+        String getIdQuery = "SELECT id FROM user WHERE email = ?";  // email은 unique 제약 조건
+        Long userId = jdbcTemplate.queryForObject(getIdQuery, Long.class, email);
+
+        // 사용자(다른 사용자) 저장
+        String anotherUserEmail = email + "a";
+        String anotherEncodedPassword = "testEncodedPassword1";
+        String anotherNickname = "테스트닉네임1";
+        User anotherUser = User.join(anotherUserEmail, anotherEncodedPassword, anotherNickname);
+        jdbcTemplate.update(saveQuery,
+                anotherUser.getEmail(),
+                anotherUser.getPassword(),
+                anotherUser.getNickname(),
+                anotherUser.getRole(),
+                Timestamp.valueOf(anotherUser.getUserTimeInfo().getCreatedAt()),
+                Timestamp.valueOf(anotherUser.getUserTimeInfo().getUpdatedAt())
+        );
+
+        UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest("newPassword", "새로운닉네임");
+
+        // when & then
+        assertThatThrownBy(() -> userAccountService.updateUserInfo(userId, updateRequest, anotherUserEmail))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
+                });
+    }
+
 }
