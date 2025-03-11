@@ -1,7 +1,10 @@
 package com.threefour.user.application;
 
+import com.threefour.auth.AuthConstants;
+import com.threefour.auth.JwtUtil;
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
+import com.threefour.post.domain.Post;
 import com.threefour.user.domain.User;
 import com.threefour.user.dto.JoinRequest;
 import com.threefour.user.dto.UpdateUserInfoRequest;
@@ -29,6 +32,9 @@ public class UserAccountServiceIntegrationTest {
 
     @Autowired
     private UserAccountService userAccountService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -83,7 +89,6 @@ public class UserAccountServiceIntegrationTest {
     @DisplayName("회원가입 실패 - 이미 존재하는 이메일로 회원가입 시 예외 발생")
     void join_ByExistingEmail_Then_Exception() {
         // given
-        // 사용자 저장
         String email = "test@naver.com";
         String encodedPassword = "testEncodedPassword";
         String nickname = "테스트닉네임";
@@ -284,8 +289,55 @@ public class UserAccountServiceIntegrationTest {
                 });
     }
 
+    @Test
+    @DisplayName("회원 탈퇴 성공 - 유효한 RefreshToken")
+    void deleteUser_ByValidRefreshToken_Then_Success() {
+        // given
+        String email = "test@naver.com";
+        String encodedPassword = "testEncodedPassword";
+        String nickname = "테스트닉네임";
+        User savedUser = saveUser(email, encodedPassword, nickname);
+        Long userId = savedUser.getId();
 
+        // RefreshToken
+        // 생성 후 DB에 저장
+        String refreshToken = jwtUtil.createJwt("refresh", email, savedUser.getRole(), AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+        String insertQuery = "INSERT INTO refresh_token (user_email, refresh_token, expiration) VALUES (?, ?, ?)";
+        jdbcTemplate.update(insertQuery, email, refreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+        // 헤더 형식 맞추기
+        String refreshTokenHeader = "Bearer " + refreshToken;
 
+        // 게시글 저장
+        Post post = Post.writePost(nickname, "테스트게시판", "테스트제목", "테스트내용");
+        String saveQuery = "INSERT INTO post (author_nickname, category, title, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(saveQuery,
+                post.getAuthorNickname(),
+                post.getCategory(),
+                post.getTitle(),
+                post.getContent(),
+                Timestamp.valueOf(post.getPostTimeInfo().getCreatedAt()),
+                Timestamp.valueOf(post.getPostTimeInfo().getUpdatedAt())
+        );
+
+        // when
+        userAccountService.deleteUser(userId, refreshTokenHeader, email);
+
+        // then
+        // 1. 회원이 작성한 게시글이 모두 삭제되었는지 확인
+        String checkPostQuery = "SELECT COUNT(*) FROM post WHERE author_nickname = ?";
+        Integer postCount = jdbcTemplate.queryForObject(checkPostQuery, Integer.class, nickname);
+        assertThat(postCount).isEqualTo(0);;
+
+        // 2. 회원 정보가 삭제되었는지 확인
+        String checkUserQuery = "SELECT COUNT(*) FROM user WHERE email = ?";
+        Integer userCount = jdbcTemplate.queryForObject(checkUserQuery, Integer.class, email);
+        assertThat(userCount).isEqualTo(0);
+
+        // 3. 해당 사용자의 모든 RefreshToken이 삭제되었는지 확인
+        String checkTokenQuery = "SELECT COUNT(*) FROM refresh_token WHERE refresh_token = ?";
+        Integer tokenCount = jdbcTemplate.queryForObject(checkTokenQuery, Integer.class, refreshToken);
+        assertThat(tokenCount).isEqualTo(0);
+    }
 
     private User saveUser(String email, String password, String nickname) {
         User user = User.join(email, password, nickname);
