@@ -39,10 +39,12 @@ public class UserServiceIntegrationTest {
     @Test
     @DisplayName("내 정보 조회 성공")
     void getMyUserInfo_Success() {
-        // given
         String email = "test@naver.com";
         String encodedPassword = "testEncodedPassword";
         String nickname = "테스트닉네임";
+
+        // given
+        // DB에 사용자가 존재
         User savedUser = saveUser(email, encodedPassword, nickname);
         Long userId = savedUser.getId();
 
@@ -58,18 +60,18 @@ public class UserServiceIntegrationTest {
     @Test
     @DisplayName("내 정보 조회 실패 - 다른 사용자가 조회하려고 할 때 예외 발생")
     void getMyUserInfo_FromAnotherUser_Then_Exception() {
-        // given
-        // 사용자 저장
         String email = "test@naver.com";
         String encodedPassword = "testEncodedPassword";
         String nickname = "테스트닉네임";
-        User savedUser = saveUser(email, encodedPassword, nickname);
-        Long userId = savedUser.getId();
-
-        // 사용자(다른 사용자) 저장
         String anotherUserEmail = email + "a";
         String anotherEncodedPassword = "testEncodedPassword1";
         String anotherNickname = "테스트닉네임1";
+
+        // given
+        // DB에 사용자(본인)가 존재
+        User savedUser = saveUser(email, encodedPassword, nickname);
+        Long userId = savedUser.getId();
+        // DB에 사용자(다른 사용자)가 존재
         saveUser(anotherUserEmail, anotherEncodedPassword, anotherNickname);
 
         // when & then
@@ -84,10 +86,12 @@ public class UserServiceIntegrationTest {
     @Test
     @DisplayName("다른 회원 정보 조회 성공")
     void getOtherUserInfo_Success() {
-        // given
         String email = "test@naver.com";
         String encodedPassword = "testEncodedPassword";
         String nickname = "테스트닉네임";
+
+        // given
+        // DB에 사용자가 존재
         User savedUser = saveUser(email, encodedPassword, nickname);
         Long userId = savedUser.getId();
 
@@ -102,7 +106,6 @@ public class UserServiceIntegrationTest {
     @Test
     @DisplayName("다른 회원 정보 조회 실패 - 존재하지 않는 사용자 Id")
     void getOtherUserInfo_ByNotExistingUserId_Then_Exception() {
-        // given
         Long notExistingUserId = 999999999L;
 
         // when & then
