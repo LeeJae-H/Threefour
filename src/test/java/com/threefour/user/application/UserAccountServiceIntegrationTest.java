@@ -72,30 +72,25 @@ public class UserAccountServiceIntegrationTest {
         assertThat(response).isNotNull();
         assertThat(response).isEqualTo(inputNickname.trim());
 
+        // 2. DB에 데이터가 저장되었는지 확인
         String query = "SELECT email, password, nickname FROM user WHERE email = ?";  // email은 unique 제약 조건
         User savedUser = jdbcTemplate.queryForObject(query, new UserRowMapper(), inputEmail);
-
-        // 2. DB에 데이터가 저장되었는지 확인
         assertThat(savedUser).isNotNull();
         assertThat(savedUser.getEmail()).isEqualTo(inputEmail);
-        // 비밀번호가 암호화되었는지 확인
-        assertThat(savedUser.getPassword()).isNotEqualTo(inputPassword);
-        // 닉네임이 양쪽 끝의 공백을 제거된 후 저장되었는지 확인
-        assertThat(savedUser.getNickname()).isEqualTo(inputNickname.trim());
+        assertThat(savedUser.getPassword()).isNotEqualTo(inputPassword); // 비밀번호가 암호화되었는지 확인
+        assertThat(savedUser.getNickname()).isEqualTo(inputNickname.trim()); // 닉네임이 양쪽 끝의 공백을 제거된 후 저장되었는지 확인
     }
 
     @Test
     @DisplayName("회원가입 실패 - 이미 존재하는 이메일로 회원가입 시 예외 발생")
     void join_ByExistingEmail_Then_Exception() {
-        String email = "test@naver.com";
-        String encodedPassword = "testEncodedPassword";
-        String nickname = "테스트닉네임";
-        String inputEmail = email;
-        JoinRequest existingEmailRequest = new JoinRequest(inputEmail, "testPassword2", "테스트닉네임2");
+        User user = createTestUserInstance();
+        String inputEmail = user.getEmail();
+        JoinRequest existingEmailRequest = new JoinRequest(inputEmail, "testPassword1", "테스트닉네임1");
 
         // given
         // DB에 해당 이메일을 사용 중인 사용자가 존재
-        saveUser(email, encodedPassword, nickname);
+        saveUser(user);
 
         // when & then
         assertThatThrownBy(() -> userAccountService.join(existingEmailRequest))
@@ -195,68 +190,63 @@ public class UserAccountServiceIntegrationTest {
     @Test
     @DisplayName("회원 정보 수정 성공 - 모두 유효한 입력값, 모든 정보 수정")
     void updateUserInfo_ByValidInput_Then_Success() {
-        String email = "test@naver.com";
-        String encodedPassword = "testEncodedPassword";
-        String nickname = "테스트닉네임";
+        User user = createTestUserInstance();
         String newPassword = "newPassword";
         String newNickname = " 새로운닉네임 ";
         UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest(newPassword, newNickname);
 
         // given
         // DB에 사용자가 존재
-        User savedUser = saveUser(email, encodedPassword, nickname);
+        User savedUser = saveUser(user);
         LocalDateTime updatedAtBefore = savedUser.getUserTimeInfo().getUpdatedAt();
         Long userId = savedUser.getId();
 
         // when
-        userAccountService.updateUserInfo(userId, updateRequest, email);
+        userAccountService.updateUserInfo(userId, updateRequest, savedUser.getEmail());
 
         // then
-        String getUserQuery = "SELECT email, password, nickname FROM user WHERE email = ?";  // email은 unique 제약 조건
-        User getUser = jdbcTemplate.queryForObject(getUserQuery, new UserRowMapper(), email);
-        assertThat(getUser).isNotNull();
+        String foundUserQuery = "SELECT email, password, nickname FROM user WHERE email = ?";  // email은 unique 제약 조건
+        User foundUser = jdbcTemplate.queryForObject(foundUserQuery, new UserRowMapper(), savedUser.getEmail());
+        assertThat(foundUser).isNotNull();
 
         // 1. 비밀번호가 변경되었는지 확인 + 비밀번호가 암호화되었는지 확인
-        assertThat(getUser.getPassword()).isNotEqualTo(encodedPassword);
-        assertThat(getUser.getPassword()).isNotEqualTo(newPassword);
+        assertThat(foundUser.getPassword()).isNotEqualTo(savedUser.getPassword());
+        assertThat(foundUser.getPassword()).isNotEqualTo(newPassword);
 
         // 2. 닉네임이 변경되었는지 확인 + 양쪽 끝의 공백을 제거된 후 저장되었는지 확인
-        assertThat(getUser.getNickname()).isEqualTo(newNickname.trim());
+        assertThat(foundUser.getNickname()).isEqualTo(newNickname.trim());
 
         // 3. 수정일시가 갱신되었는지 확인
-        assertThat(getUser.getUserTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
+        assertThat(foundUser.getUserTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
     }
 
     @Test
     @DisplayName("회원 정보 수정 성공 - 모두 유효한 입력값, 비밀번호만 수정")
     void updateUserInfo_ByValidInput_OnlyPassword_Then_Success() {
-        // given
-        String email = "test@naver.com";
-        String encodedPassword = "testEncodedPassword";
-        String nickname = "테스트닉네임";
+        User user = createTestUserInstance();
         String newPassword = "newPassword";
         UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest(newPassword, null);
 
         // given
         // DB에 사용자가 존재
-        User savedUser = saveUser(email, encodedPassword, nickname);
+        User savedUser = saveUser(user);
         LocalDateTime updatedAtBefore = savedUser.getUserTimeInfo().getUpdatedAt();
         Long userId = savedUser.getId();
 
         // when
-        userAccountService.updateUserInfo(userId, updateRequest, email);
+        userAccountService.updateUserInfo(userId, updateRequest, savedUser.getEmail());
 
         // then
         String getUserQuery = "SELECT email, password, nickname FROM user WHERE email = ?";
-        User getUser = jdbcTemplate.queryForObject(getUserQuery, new UserRowMapper(), email);
+        User getUser = jdbcTemplate.queryForObject(getUserQuery, new UserRowMapper(), savedUser.getEmail());
         assertThat(getUser).isNotNull();
 
         // 1. 비밀번호가 변경되었는지 확인 + 비밀번호가 암호화되었는지 확인
-        assertThat(getUser.getPassword()).isNotEqualTo(encodedPassword);
+        assertThat(getUser.getPassword()).isNotEqualTo(savedUser.getPassword());
         assertThat(getUser.getPassword()).isNotEqualTo(newPassword);
 
         // 2. 닉네임은 변경되지 않았는지 확인
-        assertThat(getUser.getNickname()).isEqualTo(nickname);
+        assertThat(getUser.getNickname()).isEqualTo(savedUser.getNickname());
 
         // 3. 수정일시가 갱신되었는지 확인
         assertThat(getUser.getUserTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
@@ -265,20 +255,19 @@ public class UserAccountServiceIntegrationTest {
     @Test
     @DisplayName("회원 정보 수정 실패 - 다른 사용자가 정보를 변경하려고 할 때 예외 발생")
     void updateUserInfo_FromAnotherUser_Then_Exception() {
-        String email = "test@naver.com";
-        String encodedPassword = "testEncodedPassword";
-        String nickname = "테스트닉네임";
-        String anotherUserEmail = email + "a";
+        User user = createTestUserInstance();
+        String anotherUserEmail = user.getEmail() + "a";
         String anotherEncodedPassword = "testEncodedPassword1";
         String anotherNickname = "테스트닉네임1";
+        User anotherUser = User.join(anotherUserEmail, anotherEncodedPassword, anotherNickname);
         UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest("newPassword", "새로운닉네임");
 
         // given
         // DB에 사용자(본인)가 존재
-        User savedUser = saveUser(email, encodedPassword, nickname);
+        User savedUser = saveUser(user);
         Long userId = savedUser.getId();
         // DB에 사용자(다른 사용자)가 존재
-        saveUser(anotherUserEmail, anotherEncodedPassword, anotherNickname);
+        saveUser(anotherUser);
 
         // when & then
         assertThatThrownBy(() -> userAccountService.updateUserInfo(userId, updateRequest, anotherUserEmail))
@@ -292,21 +281,18 @@ public class UserAccountServiceIntegrationTest {
     @Test
     @DisplayName("회원 탈퇴 성공 - 유효한 RefreshToken")
     void deleteUser_ByValidRefreshToken_Then_Success() {
-        String email = "test@naver.com";
-        String encodedPassword = "testEncodedPassword";
-        String nickname = "테스트닉네임";
-        String refreshToken = jwtUtil.createJwt("refresh", email, "ROLE_USER", AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
-        String refreshTokenHeader = "Bearer " + refreshToken;
-        Post post = Post.writePost(nickname, "테스트게시판", "테스트제목", "테스트내용");
+        User user = createTestUserInstance();
 
         // given
         // DB에 사용자가 존재
-        User savedUser = saveUser(email, encodedPassword, nickname);
+        User savedUser = saveUser(user);
         Long userId = savedUser.getId();
         // DB에 RefreshToken이 존재
+        String refreshToken = jwtUtil.createJwt("refresh", savedUser.getEmail(), "ROLE_USER", AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
         String insertQuery = "INSERT INTO refresh_token (user_email, refresh_token, expiration) VALUES (?, ?, ?)";
-        jdbcTemplate.update(insertQuery, email, refreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+        jdbcTemplate.update(insertQuery, savedUser.getEmail(), refreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
         // DB에 사용자가 작성한 게시글 존재
+        Post post = Post.writePost(savedUser.getNickname(), "테스트게시판", "테스트제목", "테스트내용");
         String saveQuery = "INSERT INTO post (author_nickname, category, title, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(saveQuery,
                 post.getAuthorNickname(),
@@ -318,17 +304,17 @@ public class UserAccountServiceIntegrationTest {
         );
 
         // when
-        userAccountService.deleteUser(userId, refreshTokenHeader, email);
+        userAccountService.deleteUser(userId, "Bearer " + refreshToken, savedUser.getEmail());
 
         // then
         // 1. 회원이 작성한 게시글이 모두 삭제되었는지 확인
         String checkPostQuery = "SELECT COUNT(*) FROM post WHERE author_nickname = ?";
-        Integer postCount = jdbcTemplate.queryForObject(checkPostQuery, Integer.class, nickname);
+        Integer postCount = jdbcTemplate.queryForObject(checkPostQuery, Integer.class, savedUser.getNickname());
         assertThat(postCount).isEqualTo(0);;
 
         // 2. 회원 정보가 삭제되었는지 확인
         String checkUserQuery = "SELECT COUNT(*) FROM user WHERE email = ?";
-        Integer userCount = jdbcTemplate.queryForObject(checkUserQuery, Integer.class, email);
+        Integer userCount = jdbcTemplate.queryForObject(checkUserQuery, Integer.class, savedUser.getEmail());
         assertThat(userCount).isEqualTo(0);
 
         // 3. 해당 사용자의 모든 RefreshToken이 삭제되었는지 확인
@@ -340,27 +326,25 @@ public class UserAccountServiceIntegrationTest {
     @Test
     @DisplayName("회원 탈퇴 실패 - 다른 사용자가 탈퇴하려고 할 때 예외 발생")
     void deleteUser_FromAnotherUser_Then_Exception() {
-        // given
-        // 사용자 저장
-        String email = "test@naver.com";
-        String encodedPassword = "testEncodedPassword";
-        String nickname = "테스트닉네임";
-        User savedUser = saveUser(email, encodedPassword, nickname);
-        Long userId = savedUser.getId();
-
-        // 사용자(다른 사용자) 저장
-        String anotherUserEmail = email + "a";
+        User user = createTestUserInstance();
+        String anotherUserEmail = user.getEmail() + "a";
         String anotherEncodedPassword = "testEncodedPassword1";
         String anotherNickname = "테스트닉네임1";
-        User savedAnotherUser = saveUser(anotherUserEmail, anotherEncodedPassword, anotherNickname);
+        User anotherUser = User.join(anotherUserEmail, anotherEncodedPassword, anotherNickname);
 
-        String refreshToken = jwtUtil.createJwt("refresh", anotherUserEmail, savedAnotherUser.getRole(), AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+        // given
+        // DB에 사용자가 존재
+        User savedUser = saveUser(user);
+        Long userId = savedUser.getId();
+        // DB에 사용자(다른 사용자)가 존재
+        User savedAnotherUser = saveUser(anotherUser);
+        // DB에 RefreshToken이 존재
+        String refreshToken = jwtUtil.createJwt("refresh", savedAnotherUser.getEmail(), "ROLE_USER", AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
         String insertQuery = "INSERT INTO refresh_token (user_email, refresh_token, expiration) VALUES (?, ?, ?)";
-        jdbcTemplate.update(insertQuery, email, refreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
-        String refreshTokenHeader = "Bearer " + refreshToken;
+        jdbcTemplate.update(insertQuery, savedAnotherUser.getEmail(), refreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
 
         // when & then
-        assertThatThrownBy(() -> userAccountService.deleteUser(userId, refreshTokenHeader, anotherUserEmail))
+        assertThatThrownBy(() -> userAccountService.deleteUser(userId, "Bearer " + refreshToken, anotherUserEmail))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
@@ -368,9 +352,14 @@ public class UserAccountServiceIntegrationTest {
                 });
     }
 
-    private User saveUser(String email, String password, String nickname) {
-        User user = User.join(email, password, nickname);
+    private User createTestUserInstance() {
+        String email = "test@naver.com";
+        String encodedPassword = "testEncodedPassword";
+        String nickname = "테스트닉네임"; // 처음과 끝에 공백을 넣으면 안됩니다.
+        return User.join(email, encodedPassword, nickname);
+    }
 
+    private User saveUser(User user) {
         // DB에 User 객체 저장
         String saveQuery = "INSERT INTO user (email, password, nickname, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(saveQuery,
@@ -384,7 +373,7 @@ public class UserAccountServiceIntegrationTest {
 
         // DB로부터 userId 가져옴
         String getIdQuery = "SELECT id FROM user WHERE email = ?";  // email은 unique 제약 조건
-        Long userId = jdbcTemplate.queryForObject(getIdQuery, Long.class, email);
+        Long userId = jdbcTemplate.queryForObject(getIdQuery, Long.class, user.getEmail());
 
         // User 객체에 userId 값 반영
         ReflectionTestUtils.setField(user, "id", userId);
