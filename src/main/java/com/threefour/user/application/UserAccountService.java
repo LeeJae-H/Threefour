@@ -30,9 +30,7 @@ public class UserAccountService {
         String password = joinRequest.getPassword();
         String nickname = joinRequest.getNickname();
 
-        if (userRepository.existsByEmail(email)) {
-            throw new ExpectedException(ErrorCode.ALREADY_USED_EMAIL);
-        }
+        validateEmail(email);
         validatePassword(password);
         validateNickname(nickname);
 
@@ -118,6 +116,13 @@ public class UserAccountService {
 
         // DB에 존재하는 해당 사용자의 모든 RefreshToken 삭제
         refreshTokenRepository.deleteByUserEmail(email);
+    }
+
+    // 이메일은 고유하다.
+    private void validateEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new ExpectedException(ErrorCode.ALREADY_USED_EMAIL);
+        }
     }
 
     // 비밀번호는 최소 8자 이상이어야 하며, 공백을 포함할 수 없다.
