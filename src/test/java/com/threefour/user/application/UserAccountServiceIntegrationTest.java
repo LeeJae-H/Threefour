@@ -59,7 +59,6 @@ public class UserAccountServiceIntegrationTest {
     @Test
     @DisplayName("회원가입 성공 - 모두 유효한 입력값")
     void join_ByValidInput_Then_Success() {
-        // given
         String inputEmail = "test@naver.com";
         String inputPassword = "testPassword";
         String inputNickname = " 테스트닉네임 ";
@@ -88,14 +87,15 @@ public class UserAccountServiceIntegrationTest {
     @Test
     @DisplayName("회원가입 실패 - 이미 존재하는 이메일로 회원가입 시 예외 발생")
     void join_ByExistingEmail_Then_Exception() {
-        // given
         String email = "test@naver.com";
         String encodedPassword = "testEncodedPassword";
         String nickname = "테스트닉네임";
-        saveUser(email, encodedPassword, nickname);
-
         String inputEmail = email;
         JoinRequest existingEmailRequest = new JoinRequest(inputEmail, "testPassword2", "테스트닉네임2");
+
+        // given
+        // DB에 해당 이메일을 사용 중인 사용자가 존재
+        saveUser(email, encodedPassword, nickname);
 
         // when & then
         assertThatThrownBy(() -> userAccountService.join(existingEmailRequest))
@@ -109,7 +109,6 @@ public class UserAccountServiceIntegrationTest {
     @Test
     @DisplayName("회원가입 실패 - 비밀번호 값 검증 실패 시 예외 발생")
     void join_ByInvalidPassword_Then_Exception() {
-        // given
         String inputNullPassword = null;
         String inputShortPassword = "1234";
         String inputWhiteSpacePassword = "12 34 56 78";
@@ -144,7 +143,6 @@ public class UserAccountServiceIntegrationTest {
     @Test
     @DisplayName("회원가입 실패 - 닉네임 값 검증 실패 시 예외 발생")
     void join_ByInvalidNickname_Then_Exception() {
-        // given
         String inputNullNickname = null;
         String inputShortNickname = "닉";
         String inputLongNickname = "너무너무너무너무긴닉네임";
@@ -197,17 +195,18 @@ public class UserAccountServiceIntegrationTest {
     @Test
     @DisplayName("회원 정보 수정 성공 - 모두 유효한 입력값, 모든 정보 수정")
     void updateUserInfo_ByValidInput_Then_Success() {
-        // given
         String email = "test@naver.com";
         String encodedPassword = "testEncodedPassword";
         String nickname = "테스트닉네임";
-        User savedUser = saveUser(email, encodedPassword, nickname);
-        LocalDateTime updatedAtBefore = savedUser.getUserTimeInfo().getUpdatedAt();
-        Long userId = savedUser.getId();
-
         String newPassword = "newPassword";
         String newNickname = " 새로운닉네임 ";
         UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest(newPassword, newNickname);
+
+        // given
+        // DB에 사용자가 존재
+        User savedUser = saveUser(email, encodedPassword, nickname);
+        LocalDateTime updatedAtBefore = savedUser.getUserTimeInfo().getUpdatedAt();
+        Long userId = savedUser.getId();
 
         // when
         userAccountService.updateUserInfo(userId, updateRequest, email);
@@ -235,12 +234,14 @@ public class UserAccountServiceIntegrationTest {
         String email = "test@naver.com";
         String encodedPassword = "testEncodedPassword";
         String nickname = "테스트닉네임";
+        String newPassword = "newPassword";
+        UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest(newPassword, null);
+
+        // given
+        // DB에 사용자가 존재
         User savedUser = saveUser(email, encodedPassword, nickname);
         LocalDateTime updatedAtBefore = savedUser.getUserTimeInfo().getUpdatedAt();
         Long userId = savedUser.getId();
-
-        String newPassword = "newPassword";
-        UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest(newPassword, null);
 
         // when
         userAccountService.updateUserInfo(userId, updateRequest, email);
@@ -264,21 +265,20 @@ public class UserAccountServiceIntegrationTest {
     @Test
     @DisplayName("회원 정보 수정 실패 - 다른 사용자가 정보를 변경하려고 할 때 예외 발생")
     void updateUserInfo_FromAnotherUser_Then_Exception() {
-        // given
-        // 사용자 저장
         String email = "test@naver.com";
         String encodedPassword = "testEncodedPassword";
         String nickname = "테스트닉네임";
-        User savedUser = saveUser(email, encodedPassword, nickname);
-        Long userId = savedUser.getId();
-
-        // 사용자(다른 사용자) 저장
         String anotherUserEmail = email + "a";
         String anotherEncodedPassword = "testEncodedPassword1";
         String anotherNickname = "테스트닉네임1";
-        saveUser(anotherUserEmail, anotherEncodedPassword, anotherNickname);
-
         UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest("newPassword", "새로운닉네임");
+
+        // given
+        // DB에 사용자(본인)가 존재
+        User savedUser = saveUser(email, encodedPassword, nickname);
+        Long userId = savedUser.getId();
+        // DB에 사용자(다른 사용자)가 존재
+        saveUser(anotherUserEmail, anotherEncodedPassword, anotherNickname);
 
         // when & then
         assertThatThrownBy(() -> userAccountService.updateUserInfo(userId, updateRequest, anotherUserEmail))
@@ -292,23 +292,21 @@ public class UserAccountServiceIntegrationTest {
     @Test
     @DisplayName("회원 탈퇴 성공 - 유효한 RefreshToken")
     void deleteUser_ByValidRefreshToken_Then_Success() {
-        // given
         String email = "test@naver.com";
         String encodedPassword = "testEncodedPassword";
         String nickname = "테스트닉네임";
+        String refreshToken = jwtUtil.createJwt("refresh", email, "ROLE_USER", AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+        String refreshTokenHeader = "Bearer " + refreshToken;
+        Post post = Post.writePost(nickname, "테스트게시판", "테스트제목", "테스트내용");
+
+        // given
+        // DB에 사용자가 존재
         User savedUser = saveUser(email, encodedPassword, nickname);
         Long userId = savedUser.getId();
-
-        // RefreshToken
-        // 생성 후 DB에 저장
-        String refreshToken = jwtUtil.createJwt("refresh", email, savedUser.getRole(), AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+        // DB에 RefreshToken이 존재
         String insertQuery = "INSERT INTO refresh_token (user_email, refresh_token, expiration) VALUES (?, ?, ?)";
         jdbcTemplate.update(insertQuery, email, refreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
-        // 헤더 형식 맞추기
-        String refreshTokenHeader = "Bearer " + refreshToken;
-
-        // 게시글 저장
-        Post post = Post.writePost(nickname, "테스트게시판", "테스트제목", "테스트내용");
+        // DB에 사용자가 작성한 게시글 존재
         String saveQuery = "INSERT INTO post (author_nickname, category, title, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(saveQuery,
                 post.getAuthorNickname(),
