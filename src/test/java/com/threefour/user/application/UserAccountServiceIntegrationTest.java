@@ -56,28 +56,27 @@ public class UserAccountServiceIntegrationTest {
         // given
         String inputEmail = "test@naver.com";
         String inputPassword = "testPassword";
-        String inputNickname = "테스트닉네임";
+        String inputNickname = " 테스트닉네임 ";
         JoinRequest joinRequest = new JoinRequest(inputEmail, inputPassword, inputNickname);
 
         // when
         String nickname = userAccountService.join(joinRequest);
 
         // then
-        // return 값 확인
+        // 1. return 값 확인
         assertThat(nickname).isNotNull();
-        assertThat(nickname).isEqualTo(inputNickname);
+        assertThat(nickname).isEqualTo(inputNickname.trim());
 
         String query = "SELECT email, password, nickname FROM user WHERE email = ?";  // email은 unique 제약 조건
         User savedUser = jdbcTemplate.queryForObject(query, new UserRowMapper(), inputEmail);
 
-        // DB에 데이터가 저장되었는지 확인
+        // 2. DB에 데이터가 저장되었는지 확인
         assertThat(savedUser).isNotNull();
         assertThat(savedUser.getEmail()).isEqualTo(inputEmail);
-        assertThat(savedUser.getNickname()).isEqualTo(inputNickname);
-
         // 비밀번호가 암호화되었는지 확인
-        String password = savedUser.getPassword();
-        assertThat(password).isNotEqualTo(inputPassword);
+        assertThat(savedUser.getPassword()).isNotEqualTo(inputPassword);
+        // 닉네임이 양쪽 끝의 공백을 제거된 후 저장되었는지 확인
+        assertThat(savedUser.getNickname()).isEqualTo(inputNickname.trim());
     }
 
     @Test
@@ -249,6 +248,9 @@ public class UserAccountServiceIntegrationTest {
                     assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
                 });
     }
+
+
+
 
     private User saveUser(String email, String password, String nickname) {
         User user = User.join(email, password, nickname);
