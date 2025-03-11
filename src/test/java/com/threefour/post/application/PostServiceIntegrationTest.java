@@ -7,6 +7,7 @@ import com.threefour.post.dto.EditPostRequest;
 import com.threefour.post.dto.WritePostReqeust;
 import com.threefour.user.application.UserAccountServiceIntegrationTest;
 import com.threefour.user.domain.User;
+import com.threefour.user.dto.UpdateUserInfoRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,12 +58,13 @@ public class PostServiceIntegrationTest {
     @Test
     @DisplayName("게시글 작성 성공 - 모두 유효한 입력값")
     void writePost_ByValidInput_Then_Success() {
-        // DB에 사용자(작성자)가 존재
-        User author = createTestUserAndSave();
-
         String inputCategory = "테스트게시판";
         String inputTitle = "테스트제목";
         String inputContent = "테스트내용";
+
+        // given
+        // DB에 사용자(작성자)가 존재
+        User author = createTestUserAndSave();
 
         // when
         Long postId = postService.writePost(new WritePostReqeust(inputCategory, inputTitle, inputContent), author.getEmail());
@@ -81,12 +83,13 @@ public class PostServiceIntegrationTest {
     @Test
     @DisplayName("게시글 작성 실패 - 제목 값 검증 실패 시 예외 발생")
     void writePost_ByInvalidTitle_Then_Exception() {
-        // DB에 사용자(작성자)가 존재
-        User author = createTestUserAndSave();
-
         String inputNullTitle = null;
         String inputWhiteSpaceTitle = " ";
         String inputLongTitle = "a".repeat(51); // 51자
+
+        // given
+        // DB에 사용자(작성자)가 존재
+        User author = createTestUserAndSave();
 
         // when & then
         // 1. null 값의 제목
@@ -115,11 +118,12 @@ public class PostServiceIntegrationTest {
     @Test
     @DisplayName("게시글 작성 실패 - 내용 값 검증 실패 시 예외 발생")
     void writePost_ByInvalidContent_Then_Exception() {
-        // DB에 사용자(작성자)가 존재
-        User author = createTestUserAndSave();
-
         String inputNullContent = null;
         String inputWhiteSpaceContent = " ";
+
+        // given
+        // DB에 사용자(작성자)가 존재
+        User author = createTestUserAndSave();
 
         // when & then
         // 1. null 값의 내용
@@ -141,15 +145,14 @@ public class PostServiceIntegrationTest {
     @Test
     @DisplayName("게시글 수정 성공 - 모두 유효한 입력값, 모든 정보 수정")
     void editPost_ByValidInput_Then_Success() {
-        // DB에 사용자(작성자)가 존재
-        User author = createTestUserAndSave();
-
-        Post post = createTestPostInstance(author.getNickname());
         String newTitle = "새로운제목";
         String newContent = "새로운내용";
 
         // given
+        // DB에 사용자(작성자)가 존재
+        User author = createTestUserAndSave();
         // DB에 게시글이 존재
+        Post post = createTestPostInstance(author.getNickname());
         Post savedPost = savePost(post);
         LocalDateTime updatedAtBefore = savedPost.getPostTimeInfo().getUpdatedAt();
         Long postId = savedPost.getId();
@@ -175,14 +178,13 @@ public class PostServiceIntegrationTest {
     @Test
     @DisplayName("게시글 수정 성공 - 모두 유효한 입력값, 제목만 수정")
     void editPost_ByValidInput_OnlyTitle_Then_Success() {
-        // DB에 사용자(작성자)가 존재
-        User author = createTestUserAndSave();
-
-        Post post = createTestPostInstance(author.getNickname());
         String newTitle = "새로운제목";
 
         // given
+        // DB에 사용자(작성자)가 존재
+        User author = createTestUserAndSave();
         // DB에 게시글이 존재
+        Post post = createTestPostInstance(author.getNickname());
         Post savedPost = savePost(post);
         LocalDateTime updatedAtBefore = savedPost.getPostTimeInfo().getUpdatedAt();
         Long postId = savedPost.getId();
@@ -203,6 +205,40 @@ public class PostServiceIntegrationTest {
 
         // 3. 수정일시가 갱신되었는지 확인
         assertThat(foundPost.getPostTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
+    }
+
+    @Test
+    @DisplayName("게시글 수정 실패 - 다른 사용자가 수정하려고 할 때 예외 발생")
+    void editPost_FromAnotherUser_Then_Exception() {
+        // given
+        // DB에 사용자(작성자)가 존재
+        User author = createTestUserAndSave();
+        // DB에 게시글이 존재
+        Post post = createTestPostInstance(author.getNickname());
+        Post savedPost = savePost(post);
+        Long postId = savedPost.getId();
+        // DB에 사용자(작성자가 아닌 사용자)가 존재
+        String anotherUserEmail = author.getEmail() + "a";
+        String anotherEncodedPassword = "testEncodedPassword";
+        String anotherNickname = "고유 닉네임";
+        User anotherUser = User.join(anotherUserEmail, anotherEncodedPassword, anotherNickname);
+        String saveQuery = "INSERT INTO user (email, password, nickname, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(saveQuery,
+                anotherUser.getEmail(),
+                anotherUser.getPassword(),
+                anotherUser.getNickname(),
+                anotherUser.getRole(),
+                Timestamp.valueOf(anotherUser.getUserTimeInfo().getCreatedAt()),
+                Timestamp.valueOf(anotherUser.getUserTimeInfo().getUpdatedAt())
+        );
+
+        // when & then
+        assertThatThrownBy(() -> postService.editPost(postId, new EditPostRequest("새로운제목", "새로운내용"), anotherUser.getEmail()))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.POST_ACCESS_DENIED);
+                });
     }
 
     private Post createTestPostInstance(String authorNickname) {
