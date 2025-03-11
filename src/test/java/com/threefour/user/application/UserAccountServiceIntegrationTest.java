@@ -4,6 +4,7 @@ import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
 import com.threefour.user.domain.User;
 import com.threefour.user.dto.JoinRequest;
+import com.threefour.user.dto.UpdateUserInfoRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -48,7 +51,7 @@ public class UserAccountServiceIntegrationTest {
 
     @Test
     @DisplayName("회원가입 성공 - 모두 유효한 입력값")
-    void join_ByAllValidInput_Then_Success() {
+    void join_ByValidInput_Then_Success() {
         // given
         String inputEmail = "test@naver.com";
         String inputPassword = "testPassword";
@@ -182,5 +185,51 @@ public class UserAccountServiceIntegrationTest {
                     ExpectedException ex = (ExpectedException) e;
                     assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME_LENGTH);
                 });
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 성공 - 모두 유효한 입력값")
+    void updateUserInfo_ByValidInput_Then_Success() {
+        // given
+        // 사용자 저장
+        String email = "test@naver.com";
+        String encodedPassword = "testEncodedPassword";
+        String nickname = "테스트닉네임";
+        User user = User.join(email, encodedPassword, nickname);
+        String saveQuery = "INSERT INTO user (email, password, nickname, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(saveQuery,
+                user.getEmail(),
+                user.getPassword(),
+                user.getNickname(),
+                user.getRole(),
+                Timestamp.valueOf(user.getUserTimeInfo().getCreatedAt()),
+                Timestamp.valueOf(user.getUserTimeInfo().getUpdatedAt())
+        );
+        String getIdQuery = "SELECT id FROM user WHERE email = ?";  // email은 unique 제약 조건
+        Long userId = jdbcTemplate.queryForObject(getIdQuery, Long.class, email);
+
+        String newPassword = "newPassword";
+        String newNickname = "새로운닉네임";
+        UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest(newPassword, newNickname);
+
+        LocalDateTime updatedAtBefore = user.getUserTimeInfo().getUpdatedAt();
+
+        // when
+        userAccountService.updateUserInfo(userId, updateRequest, email);
+
+        // then
+        String getUserQuery = "SELECT email, password, nickname FROM user WHERE email = ?";  // email은 unique 제약 조건
+        User savedUser = jdbcTemplate.queryForObject(getUserQuery, new UserRowMapper(), email);
+        assertThat(savedUser).isNotNull();
+
+        // 1. 비밀번호가 변경되었는지 확인 + 비밀번호가 암호화되었는지 확인
+        assertThat(savedUser.getPassword()).isNotEqualTo(encodedPassword);
+        assertThat(savedUser.getPassword()).isNotEqualTo(newPassword);
+
+        // 2. 닉네임이 변경되었는지 확인
+        assertThat(savedUser.getNickname()).isEqualTo(newNickname);
+
+        // 3. 수정일시가 갱신되었는지 확인
+        assertThat(savedUser.getUserTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
     }
 }
