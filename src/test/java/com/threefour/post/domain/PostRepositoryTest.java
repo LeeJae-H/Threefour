@@ -26,7 +26,7 @@ public class PostRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        jdbcTemplate.update("truncate table user"); // 테스트 전 데이터를 초기화
+        jdbcTemplate.update("truncate table post"); // 테스트 전 데이터를 초기화
     }
 
     @Test

@@ -27,7 +27,7 @@ public class PostService {
     private final PostRepository postRepository;
 
     @Transactional
-    public void writePost(WritePostReqeust writePostReqeust, String email) {
+    public Long writePost(WritePostReqeust writePostReqeust, String email) {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
 
@@ -40,7 +40,8 @@ public class PostService {
         validateContent(content);
 
         Post newPost = Post.writePost(authorNickname, category, title, content);
-        postRepository.save(newPost);
+        Post savedPost = postRepository.save(newPost);
+        return savedPost.getId();
     }
 
     @Transactional
