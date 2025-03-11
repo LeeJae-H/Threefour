@@ -130,4 +130,57 @@ public class UserAccountServiceIntegrationTest {
                     assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD_LENGTH);
                 });
     }
+
+    @Test
+    @DisplayName("회원가입 실패 - 닉네임 값 검증 실패 시 예외 발생")
+    void join_ByInvalidNickname_Then_Exception() {
+        // given
+        String inputNullNickname = null;
+        String inputShortNickname = "닉";
+        String inputLongNickname = "너무너무너무너무긴닉네임";
+        String inputSpecialCharNickname = "닉!네@임";
+        String inputWhiteSpaceNickname = "   닉   ";
+        JoinRequest inputNullNicknameRequest = new JoinRequest("test@naver.com", "testPassword", inputNullNickname);
+        JoinRequest inputShortNicknameRequest = new JoinRequest("test@naver.com", "testPassword", inputShortNickname);
+        JoinRequest inputLongNicknameRequest = new JoinRequest("test@naver.com", "testPassword", inputLongNickname);
+        JoinRequest inputSpecialCharNicknameRequest = new JoinRequest("test@naver.com", "testPassword", inputSpecialCharNickname);
+        JoinRequest inputWhiteSpaceNicknameRequest = new JoinRequest("test@naver.com", "testPassword", inputWhiteSpaceNickname);
+
+        // when & then
+        // 1. null 값의 닉네임
+        assertThatThrownBy(() -> userAccountService.join(inputNullNicknameRequest))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME_LENGTH);
+                });
+        // 2. 2자 미만인 닉네임
+        assertThatThrownBy(() -> userAccountService.join(inputShortNicknameRequest))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME_LENGTH);
+                });
+        // 3. 10자 이상인 닉네임
+        assertThatThrownBy(() -> userAccountService.join(inputLongNicknameRequest))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME_LENGTH);
+                });
+        // 4. 특수문자가 포함된 닉네임
+        assertThatThrownBy(() -> userAccountService.join(inputSpecialCharNicknameRequest))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME_FORMAT);
+                });
+        // 5. 공백이 포함된 닉네임
+        assertThatThrownBy(() -> userAccountService.join(inputWhiteSpaceNicknameRequest))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME_LENGTH);
+                });
+    }
 }
