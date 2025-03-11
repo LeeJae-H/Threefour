@@ -2,6 +2,7 @@ package com.threefour.user.application;
 
 import com.threefour.user.domain.User;
 import com.threefour.user.dto.JoinRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +29,18 @@ public class UserAccountServiceIntegrationTest {
     private static class UserRowMapper implements RowMapper<User> {
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return new User(
+            // 생성자가 없어 정적 팩토리 메서드 사용
+            return User.join(
                     rs.getString("email"),
                     rs.getString("password"),
                     rs.getString("nickname")
             );
         }
+    }
+
+    @BeforeEach
+    void setUp() {
+        jdbcTemplate.update("truncate table user"); // 테스트 전 데이터를 초기화
     }
 
     @Test
@@ -59,7 +66,7 @@ public class UserAccountServiceIntegrationTest {
         // 2. DB에 데이터가 저장되었는지 확인
         assertThat(savedUser).isNotNull();
         assertThat(savedUser.getEmail()).isEqualTo(inputEmail);
-//        assertThat(savedUser.getNickname()).isEqualTo(inputNickname);
+        assertThat(savedUser.getNickname()).isEqualTo(inputNickname);
 
         // 3. 비밀번호가 암호화되었는지 확인
         String password = savedUser.getPassword();
