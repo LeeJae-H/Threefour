@@ -3,7 +3,9 @@ package com.threefour.post.application;
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
 import com.threefour.post.domain.Post;
+import com.threefour.post.dto.EditPostRequest;
 import com.threefour.post.dto.WritePostReqeust;
+import com.threefour.user.application.UserAccountServiceIntegrationTest;
 import com.threefour.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +20,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -54,13 +57,12 @@ public class PostServiceIntegrationTest {
     @Test
     @DisplayName("게시글 작성 성공 - 모두 유효한 입력값")
     void writePost_ByValidInput_Then_Success() {
+        // DB에 사용자(작성자)가 존재
+        User author = createTestUserAndSave();
+
         String inputCategory = "테스트게시판";
         String inputTitle = "테스트제목";
         String inputContent = "테스트내용";
-
-        // given
-        // DB에 사용자(작성자)가 존재
-        User author = createTestUserAndSave();
 
         // when
         Long postId = postService.writePost(new WritePostReqeust(inputCategory, inputTitle, inputContent), author.getEmail());
@@ -79,13 +81,12 @@ public class PostServiceIntegrationTest {
     @Test
     @DisplayName("게시글 작성 실패 - 제목 값 검증 실패 시 예외 발생")
     void writePost_ByInvalidTitle_Then_Exception() {
+        // DB에 사용자(작성자)가 존재
+        User author = createTestUserAndSave();
+
         String inputNullTitle = null;
         String inputWhiteSpaceTitle = " ";
         String inputLongTitle = "a".repeat(51); // 51자
-
-        // given
-        // DB에 사용자(작성자)가 존재
-        User author = createTestUserAndSave();
 
         // when & then
         // 1. null 값의 제목
@@ -114,12 +115,11 @@ public class PostServiceIntegrationTest {
     @Test
     @DisplayName("게시글 작성 실패 - 내용 값 검증 실패 시 예외 발생")
     void writePost_ByInvalidContent_Then_Exception() {
-        String inputNullContent = null;
-        String inputWhiteSpaceContent = " ";
-
-        // given
         // DB에 사용자(작성자)가 존재
         User author = createTestUserAndSave();
+
+        String inputNullContent = null;
+        String inputWhiteSpaceContent = " ";
 
         // when & then
         // 1. null 값의 내용
@@ -138,12 +138,70 @@ public class PostServiceIntegrationTest {
                 });
     }
 
-    private Post createTestPostInstance() {
-        String authorNickname = "테스트작성자닉네임";
+    @Test
+    @DisplayName("게시글 수정 성공 - 모두 유효한 입력값, 모든 정보 수정")
+    void editPost_ByValidInput_Then_Success() {
+        // DB에 사용자(작성자)가 존재
+        User author = createTestUserAndSave();
+
+        Post post = createTestPostInstance(author.getNickname());
+        String newTitle = "새로운제목";
+        String newContent = "새로운내용";
+
+        // given
+        // DB에 게시글이 존재
+        Post savedPost = savePost(post);
+        LocalDateTime updatedAtBefore = savedPost.getPostTimeInfo().getUpdatedAt();
+        Long postId = savedPost.getId();
+
+        // when
+        postService.editPost(postId, new EditPostRequest(newTitle, newContent),author.getEmail());
+
+        // then
+        String foundPostQuery = "SELECT author_nickname, category, title, content FROM post WHERE id = ?";
+        Post foundPost = jdbcTemplate.queryForObject(foundPostQuery, new PostRowMapper(), postId);
+        assertThat(foundPost).isNotNull();
+
+        // 1. 제목이 변경되었는지 확인
+        assertThat(foundPost.getTitle()).isEqualTo(newTitle);
+
+        // 2. 내용이 변경되었는지 확인
+        assertThat(foundPost.getContent()).isEqualTo(newContent);
+
+        // 3. 수정일시가 갱신되었는지 확인
+        assertThat(foundPost.getPostTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
+    }
+
+    private Post createTestPostInstance(String authorNickname) {
         String category = "테스트게시판";
         String title = "테스트제목";
         String content = "테스트내용";
         return Post.writePost(authorNickname, category, title, content);
+    }
+
+    private Post savePost(Post post) {
+        // DB에 Post 객체 저장
+        String saveQuery = "INSERT INTO post (author_nickname, category, title, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(saveQuery,
+                post.getAuthorNickname(),
+                post.getCategory(),
+                post.getTitle(),
+                post.getContent(),
+                Timestamp.valueOf(post.getPostTimeInfo().getCreatedAt()),
+                Timestamp.valueOf(post.getPostTimeInfo().getUpdatedAt())
+        );
+
+            // DB로부터 postId 가져옴
+            String getIdQuery = "SELECT id FROM post " +
+                    "WHERE title = ? AND content = ? AND author_nickname = ? " +
+                    "ORDER BY created_at DESC " +
+                    "LIMIT 1";                    // todo unique 키가 없어서 임시 조회 쿼리
+            Long postId = jdbcTemplate.queryForObject(getIdQuery, Long.class, post.getTitle(), post.getContent(), post.getAuthorNickname());
+
+        // Post 객체에 postId 값 반영
+        ReflectionTestUtils.setField(post, "id", postId);
+
+        return post;
     }
 
     private User createTestUserAndSave() {

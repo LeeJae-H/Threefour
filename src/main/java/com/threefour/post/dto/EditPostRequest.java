@@ -10,4 +10,10 @@ public class EditPostRequest {
 
     private String title;
     private String content;
+
+    // 테스트를 위해 추가한 생성자입니다.
+    public EditPostRequest(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 }
