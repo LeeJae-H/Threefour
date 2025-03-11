@@ -83,12 +83,14 @@ public class UserAccountServiceIntegrationTest {
     @DisplayName("회원가입 실패 - 이미 존재하는 이메일로 회원가입 시 예외 발생")
     void join_ByExistingEmail_Then_Exception() {
         // given
-        String inputEmail = "test@naver.com";
-        String inputExistingEmail = inputEmail;
-        JoinRequest joinRequest = new JoinRequest(inputEmail, "testPassword1", "테스트닉네임1");
-        JoinRequest existingEmailRequest = new JoinRequest(inputExistingEmail, "testPassword2", "테스트닉네임2");
+        // 사용자 저장
+        String email = "test@naver.com";
+        String encodedPassword = "testEncodedPassword";
+        String nickname = "테스트닉네임";
+        saveUser(email, encodedPassword, nickname);
 
-        userAccountService.join(joinRequest);
+        String inputEmail = email;
+        JoinRequest existingEmailRequest = new JoinRequest(inputEmail, "testPassword2", "테스트닉네임2");
 
         // when & then
         assertThatThrownBy(() -> userAccountService.join(existingEmailRequest))
