@@ -99,6 +99,21 @@ public class UserServiceIntegrationTest {
         assertThat(response.getNickname()).isEqualTo(nickname);
     }
 
+    @Test
+    @DisplayName("다른 회원 정보 조회 실패 - 존재하지 않는 사용자 Id")
+    void getOtherUserInfo_ByNotExistingUserId_Then_Exception() {
+        // given
+        Long notExistingUserId = 999999999L;
+
+        // when & then
+        assertThatThrownBy(() -> userService.getOtherUserInfo(notExistingUserId))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.USER_NOT_FOUND);
+                });
+    }
+
     private User saveUser(String email, String password, String nickname) {
         User user = User.join(email, password, nickname);
 
