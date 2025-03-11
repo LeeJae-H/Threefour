@@ -12,7 +12,6 @@ public class UserTest {
     @Test
     @DisplayName("회원가입")
     void joinTest() {
-        // given
         String email = "test@naver.com";
         String password = "testPassword";
         String nickname = "테스트닉네임";
@@ -33,13 +32,14 @@ public class UserTest {
     @Test
     @DisplayName("비밀번호 변경")
     void changePasswordTest() {
-        // given
         String email = "test@naver.com";
         String password = "testPassword";
         String nickname = "테스트닉네임";
-
-        User user = User.join(email, password, nickname);
         String newPassword = "newPassword";
+
+        // given
+        // 사용자 정보가 존재
+        User user = User.join(email, password, nickname);
 
         // when
         user.changePassword(newPassword);
@@ -51,13 +51,14 @@ public class UserTest {
     @Test
     @DisplayName("닉네임 변경")
     void changeNicknameTest() {
-        // given
         String email = "test@naver.com";
         String password = "testPassword";
         String nickname = "테스트닉네임";
-
-        User user = User.join(email, password, nickname);
         String newNickname = "새로운닉네임";
+
+        // given
+        // 사용자 정보가 존재
+        User user = User.join(email, password, nickname);
 
         // when
         user.changeNickname(newNickname);
@@ -69,11 +70,12 @@ public class UserTest {
     @Test
     @DisplayName("수정일시 갱신")
     void updateUpdatedAtTest() {
-        // given
         String email = "test@naver.com";
         String password = "testPassword";
         String nickname = "테스트닉네임";
 
+        // given
+        // 사용자 정보가 존재
         User user = User.join(email, password, nickname);
         LocalDateTime updatedAtBefore = user.getUserTimeInfo().getUpdatedAt();
 
