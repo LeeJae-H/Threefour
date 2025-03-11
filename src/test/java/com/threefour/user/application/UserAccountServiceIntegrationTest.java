@@ -339,6 +339,37 @@ public class UserAccountServiceIntegrationTest {
         assertThat(tokenCount).isEqualTo(0);
     }
 
+    @Test
+    @DisplayName("회원 탈퇴 실패 - 다른 사용자가 탈퇴하려고 할 때 예외 발생")
+    void deleteUser_FromAnotherUser_Then_Exception() {
+        // given
+        // 사용자 저장
+        String email = "test@naver.com";
+        String encodedPassword = "testEncodedPassword";
+        String nickname = "테스트닉네임";
+        User savedUser = saveUser(email, encodedPassword, nickname);
+        Long userId = savedUser.getId();
+
+        // 사용자(다른 사용자) 저장
+        String anotherUserEmail = email + "a";
+        String anotherEncodedPassword = "testEncodedPassword1";
+        String anotherNickname = "테스트닉네임1";
+        User savedAnotherUser = saveUser(anotherUserEmail, anotherEncodedPassword, anotherNickname);
+
+        String refreshToken = jwtUtil.createJwt("refresh", anotherUserEmail, savedAnotherUser.getRole(), AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+        String insertQuery = "INSERT INTO refresh_token (user_email, refresh_token, expiration) VALUES (?, ?, ?)";
+        jdbcTemplate.update(insertQuery, email, refreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+        String refreshTokenHeader = "Bearer " + refreshToken;
+
+        // when & then
+        assertThatThrownBy(() -> userAccountService.deleteUser(userId, refreshTokenHeader, anotherUserEmail))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
+                });
+    }
+
     private User saveUser(String email, String password, String nickname) {
         User user = User.join(email, password, nickname);
 
