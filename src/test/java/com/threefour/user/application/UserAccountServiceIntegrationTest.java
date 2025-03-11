@@ -62,10 +62,9 @@ public class UserAccountServiceIntegrationTest {
         String inputEmail = "test@naver.com";
         String inputPassword = "testPassword";
         String inputNickname = " 테스트닉네임 ";
-        JoinRequest joinRequest = new JoinRequest(inputEmail, inputPassword, inputNickname);
 
         // when
-        String response = userAccountService.join(joinRequest);
+        String response = userAccountService.join(new JoinRequest(inputEmail, inputPassword, inputNickname));
 
         // then
         // 1. return 값 확인
@@ -86,14 +85,13 @@ public class UserAccountServiceIntegrationTest {
     void join_ByExistingEmail_Then_Exception() {
         User user = createTestUserInstance();
         String inputEmail = user.getEmail();
-        JoinRequest existingEmailRequest = new JoinRequest(inputEmail, "testPassword1", "테스트닉네임1");
 
         // given
         // DB에 해당 이메일을 사용 중인 사용자가 존재
         saveUser(user);
 
         // when & then
-        assertThatThrownBy(() -> userAccountService.join(existingEmailRequest))
+        assertThatThrownBy(() -> userAccountService.join(new JoinRequest(inputEmail, "testPassword1", "테스트닉네임1")))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
@@ -107,27 +105,24 @@ public class UserAccountServiceIntegrationTest {
         String inputNullPassword = null;
         String inputShortPassword = "1234";
         String inputWhiteSpacePassword = "12 34 56 78";
-        JoinRequest nullPasswordRequest = new JoinRequest("test@naver.com", inputNullPassword, "테스트닉네임");
-        JoinRequest shortPasswordRequest = new JoinRequest("test@naver.com", inputShortPassword, "테스트닉네임");
-        JoinRequest whitespacePasswordRequest = new JoinRequest("test@naver.com", inputWhiteSpacePassword, "테스트닉네임");
 
         // when & then
         // 1. null 값의 비밀번호
-        assertThatThrownBy(() -> userAccountService.join(nullPasswordRequest))
+        assertThatThrownBy(() -> userAccountService.join(new JoinRequest("test@naver.com", inputNullPassword, "테스트닉네임")))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
                     assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD_LENGTH);
                 });
         // 2. 8자 미만인 비밀번호
-        assertThatThrownBy(() -> userAccountService.join(shortPasswordRequest))
+        assertThatThrownBy(() -> userAccountService.join(new JoinRequest("test@naver.com", inputShortPassword, "테스트닉네임")))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
                     assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD_LENGTH);
                 });
         // 3. 공백이 포함된 비밀번호
-        assertThatThrownBy(() -> userAccountService.join(whitespacePasswordRequest))
+        assertThatThrownBy(() -> userAccountService.join(new JoinRequest("test@naver.com", inputWhiteSpacePassword, "테스트닉네임")))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
@@ -143,43 +138,38 @@ public class UserAccountServiceIntegrationTest {
         String inputLongNickname = "너무너무너무너무긴닉네임";
         String inputSpecialCharNickname = "닉!네@임";
         String inputWhiteSpaceNickname = "   닉   ";
-        JoinRequest inputNullNicknameRequest = new JoinRequest("test@naver.com", "testPassword", inputNullNickname);
-        JoinRequest inputShortNicknameRequest = new JoinRequest("test@naver.com", "testPassword", inputShortNickname);
-        JoinRequest inputLongNicknameRequest = new JoinRequest("test@naver.com", "testPassword", inputLongNickname);
-        JoinRequest inputSpecialCharNicknameRequest = new JoinRequest("test@naver.com", "testPassword", inputSpecialCharNickname);
-        JoinRequest inputWhiteSpaceNicknameRequest = new JoinRequest("test@naver.com", "testPassword", inputWhiteSpaceNickname);
 
         // when & then
         // 1. null 값의 닉네임
-        assertThatThrownBy(() -> userAccountService.join(inputNullNicknameRequest))
+        assertThatThrownBy(() -> userAccountService.join(new JoinRequest("test@naver.com", "testPassword", inputNullNickname)))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
                     assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME_LENGTH);
                 });
         // 2. 2자 미만인 닉네임
-        assertThatThrownBy(() -> userAccountService.join(inputShortNicknameRequest))
+        assertThatThrownBy(() -> userAccountService.join(new JoinRequest("test@naver.com", "testPassword", inputShortNickname)))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
                     assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME_LENGTH);
                 });
         // 3. 10자 이상인 닉네임
-        assertThatThrownBy(() -> userAccountService.join(inputLongNicknameRequest))
+        assertThatThrownBy(() -> userAccountService.join(new JoinRequest("test@naver.com", "testPassword", inputLongNickname)))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
                     assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME_LENGTH);
                 });
         // 4. 특수문자가 포함된 닉네임
-        assertThatThrownBy(() -> userAccountService.join(inputSpecialCharNicknameRequest))
+        assertThatThrownBy(() -> userAccountService.join(new JoinRequest("test@naver.com", "testPassword", inputSpecialCharNickname)))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
                     assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME_FORMAT);
                 });
         // 5. 공백이 포함된 닉네임
-        assertThatThrownBy(() -> userAccountService.join(inputWhiteSpaceNicknameRequest))
+        assertThatThrownBy(() -> userAccountService.join(new JoinRequest("test@naver.com", "testPassword", inputWhiteSpaceNickname)))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
@@ -193,7 +183,6 @@ public class UserAccountServiceIntegrationTest {
         User user = createTestUserInstance();
         String newPassword = "newPassword";
         String newNickname = " 새로운닉네임 ";
-        UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest(newPassword, newNickname);
 
         // given
         // DB에 사용자가 존재
@@ -202,7 +191,7 @@ public class UserAccountServiceIntegrationTest {
         Long userId = savedUser.getId();
 
         // when
-        userAccountService.updateUserInfo(userId, updateRequest, savedUser.getEmail());
+        userAccountService.updateUserInfo(userId, new UpdateUserInfoRequest(newPassword, newNickname), savedUser.getEmail());
 
         // then
         String foundUserQuery = "SELECT email, password, nickname FROM user WHERE email = ?";  // email은 unique 제약 조건
@@ -225,7 +214,6 @@ public class UserAccountServiceIntegrationTest {
     void updateUserInfo_ByValidInput_OnlyPassword_Then_Success() {
         User user = createTestUserInstance();
         String newPassword = "newPassword";
-        UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest(newPassword, null);
 
         // given
         // DB에 사용자가 존재
@@ -234,7 +222,7 @@ public class UserAccountServiceIntegrationTest {
         Long userId = savedUser.getId();
 
         // when
-        userAccountService.updateUserInfo(userId, updateRequest, savedUser.getEmail());
+        userAccountService.updateUserInfo(userId, new UpdateUserInfoRequest(newPassword, null), savedUser.getEmail());
 
         // then
         String getUserQuery = "SELECT email, password, nickname FROM user WHERE email = ?";
@@ -260,7 +248,6 @@ public class UserAccountServiceIntegrationTest {
         String anotherEncodedPassword = "testEncodedPassword1";
         String anotherNickname = "테스트닉네임1";
         User anotherUser = User.join(anotherUserEmail, anotherEncodedPassword, anotherNickname);
-        UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest("newPassword", "새로운닉네임");
 
         // given
         // DB에 사용자(본인)가 존재
@@ -270,7 +257,7 @@ public class UserAccountServiceIntegrationTest {
         saveUser(anotherUser);
 
         // when & then
-        assertThatThrownBy(() -> userAccountService.updateUserInfo(userId, updateRequest, anotherUserEmail))
+        assertThatThrownBy(() -> userAccountService.updateUserInfo(userId, new UpdateUserInfoRequest("newPassword", "새로운닉네임"), anotherUserEmail))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
