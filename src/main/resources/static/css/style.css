@@ -1,0 +1,10 @@
+.my-side-padding {
+    padding-left: 25rem !important;
+    padding-right: 25rem !important;
+}
+
+.my-category-design {
+    color: white;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
