@@ -13,6 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -40,6 +41,8 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
+        System.out.println("--------" + email);
+        System.out.println("--------" + password);
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password, null);
         return authenticationManager.authenticate(authToken);
     }
@@ -53,7 +56,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
      * 데이터베이스에 존재하는 RefreshToken은 삭제하지 않습니다.
      */
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException {
         // 사용자 정보(email, role) 추출
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         String email = customUserDetails.getUsername();
@@ -71,7 +74,10 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
         response.setHeader("AccessToken", "Bearer " + accessToken);
         response.setHeader("RefreshToken", "Bearer " + refreshToken);
+
+        // 클라이언트(axios)에서는 2xx 응답만을 성공으로 처리하기 때문에 302가 아닌 200을 응답으로 설정합니다.
         response.setStatus(HttpStatus.OK.value());
+        response.setHeader("Location", "/home");
     }
 
     /**

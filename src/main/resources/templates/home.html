@@ -15,5 +15,29 @@
     <!--  header  -->
     <div th:replace="~{fragment/header :: header}"></div>
 
+    <div class="container-fluid my-side-padding">
+        <div class="row mt-3">
+            <div class="col-md-4 offset-md-8">
+                <!-- js를 실행합니다.-->
+                <form class="my-login-form-border" id="loginForm">
+                    <div class="mb-3">
+                        <label>이메일</label>
+                        <input type="email" name="email" id="email" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label>비밀번호</label>
+                        <input type="password" name="password" id="password" class="form-control">
+                    </div>
+                    <div class="row align-items-center">
+                        <button type="submit" class="col-md-3 offset-md-1 btn btn-primary">로그인</button>
+                        <a href="/users/join" class="col-md-3 offset-md-4">회원가입</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/login.js"></script>
 </body>
 </html>

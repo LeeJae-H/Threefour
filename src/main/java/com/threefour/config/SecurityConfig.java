@@ -20,6 +20,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -63,9 +68,35 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * 정적 자원(/css, /images, /js 등)에 대해서 인증을 수행하지 않도록 합니다.
+     * permitAll()의 경우와 달리 필터를 거치지 않습니다.
+     */
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+    }
+
+    /**
+     * CORS 설정입니다.
+     * 서버로 들어오는 요청에 대해 다룹니다.
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        // 1. 허용 출처 (host + port)
+        config.addAllowedOrigin("http://localhost:8080");
+
+        // 2. 허용 HTTP Method
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"));
+
+        // 3. 허용 HTTP Header
+        config.setAllowedHeaders(List.of("AccessToken", "RefreshToken"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }
