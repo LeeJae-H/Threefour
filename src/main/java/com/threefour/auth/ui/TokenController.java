@@ -28,7 +28,7 @@ public class TokenController {
         TokenDTO tokenDTO = tokenService.reissueToken(refreshToken);
         response.setHeader("AccessToken", "Bearer " + tokenDTO.getAccessToken());
         response.setHeader("RefreshToken", "Bearer " + tokenDTO.getRefreshToken());
-        return ApiResponse.success("ok");
+        return ApiResponse.success("success");
     }
 
     /**

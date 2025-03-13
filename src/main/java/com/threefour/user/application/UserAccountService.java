@@ -5,7 +5,6 @@ import com.threefour.auth.RefreshTokenRepository;
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
 import com.threefour.post.domain.PostRepository;
-import com.threefour.user.domain.EncodePasswordService;
 import com.threefour.user.domain.User;
 import com.threefour.user.domain.UserRepository;
 import com.threefour.user.dto.JoinRequest;
@@ -15,15 +14,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Service
 @RequiredArgsConstructor
 public class UserAccountService {
 
     private final UserRepository userRepository;
-    private final EncodePasswordService encodePasswordService;
+    private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtUtil jwtUtil;
     private final PostRepository postRepository;
+    private final MailSender mailSender;
+    // todo 분산 서버를 고려하여 Redis로 변경해야 합니다.
+    private final Map<String, String> emailValidationCache = new ConcurrentHashMap<>();
 
     @Transactional
     public String join(JoinRequest joinRequest) {
@@ -36,10 +41,17 @@ public class UserAccountService {
         validateNickname(nickname);
 
         // 비밀번호는 암호화되어 저장되며, 닉네임은 양쪽 끝의 공백을 제거한 후 저장된다.
-        User newUser = User.join(email, encodePasswordService.encode(password), nickname.trim());
+        User newUser = User.join(email, passwordEncoder.encode(password), nickname.trim());
 
         User savedUser = userRepository.save(newUser);
         return savedUser.getNickname();
+    }
+
+    public void sendEmailAuthNumberForJoin(String email) {
+        validateEmail(email);
+
+        int authNumber = mailSender.sendMail(email);
+        emailValidationCache.put(email, String.valueOf(authNumber));
     }
 
     public void validateNicknameForJoin(String nickname) {
@@ -75,7 +87,7 @@ public class UserAccountService {
             String newPassword = updateUserInfoRequest.getPassword();
             validatePassword(newPassword);
             // 비밀번호는 암호화되어 저장된다.
-            foundUser.changePassword(encodePasswordService.encode(newPassword));
+            foundUser.changePassword(passwordEncoder.encode(newPassword));
             isUpdated = true;
         }
 

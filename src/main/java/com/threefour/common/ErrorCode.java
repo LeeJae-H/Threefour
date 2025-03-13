@@ -21,6 +21,9 @@ public enum ErrorCode {
     REFRESH_TOKEN_NOT_EXISTS_DATABASE(HttpStatus.BAD_REQUEST, "리프레시 토큰이 데이터베이스에 저장되어 있지 않습니다."),
     INVALID_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 엑세스 토큰입니다."),
 
+    // Mail
+    FAIL_SEND_MAIL(HttpStatus.BAD_REQUEST, "이메일 발송에 실패했습니다."),
+
     // 회원
     INVALID_PASSWORD_LENGTH(HttpStatus.BAD_REQUEST, "비밀번호는 최소 8자 이상이어야 합니다."),
     INVALID_NICKNAME_LENGTH(HttpStatus.BAD_REQUEST, "닉네임은 2~10자 이내여야 합니다."),
