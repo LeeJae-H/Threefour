@@ -1,4 +1,26 @@
-// 로그인
+// 홈 화면에서 로그인 여부 확인
+document.addEventListener("DOMContentLoaded", function() {
+    const accessToken = localStorage.getItem('AccessToken');
+
+    if (accessToken) {
+        axios.post('/api/token/validate', null, {
+            headers: {
+                'AccessToken': accessToken
+            }})
+            .then(response => {
+                const userNickname = response.data.data;
+                document.getElementById('userNickname').textContent = userNickname + "님 환영합니다!";
+                document.getElementById('logoutForm').style.display = 'block';
+            })
+            .catch(error => {
+                document.getElementById('loginForm').style.display = 'block';
+            });
+    } else {
+        document.getElementById('loginForm').style.display = 'block';
+    }
+});
+
+// 로그인 폼 제출
 document.getElementById('loginForm').addEventListener('submit', function (event) {
     event.preventDefault(); // 기본 폼 제출 방지
 
@@ -26,6 +48,6 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
             window.location.href = redirectUrl;
         })
         .catch(error => {
-            alert('이메일 또는 비밀번호가 일치하지 않습니다.' + error.message);
+            alert('이메일 또는 비밀번호가 일치하지 않습니다.');
         });
 });

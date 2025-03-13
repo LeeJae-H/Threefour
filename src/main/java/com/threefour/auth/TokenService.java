@@ -2,6 +2,8 @@ package com.threefour.auth;
 
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
+import com.threefour.user.domain.User;
+import com.threefour.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,13 +12,14 @@ import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
-public class ReissueService {
+public class TokenService {
 
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
 
     @Transactional
-    public TokenDTO reissue(String refreshToken) {
+    public TokenDTO reissueToken(String refreshToken) {
         // RefreshToken 헤더의 값이 유효한 지 검증
         if (refreshToken == null || !refreshToken.startsWith("Bearer ")) {
             throw new ExpectedException(ErrorCode.INVALID_REFRESH_TOKEN_FORMAT);
@@ -52,6 +55,32 @@ public class ReissueService {
 
         return new TokenDTO(newAccessToken, newRefreshToken);
     }
+
+    public String validateToken(String accessToken) {
+        // AccessToken 헤더의 값이 유효한 지 검증
+        if (accessToken == null || !accessToken.startsWith("Bearer ")) {
+            return null;
+        }
+
+        String token = accessToken.split(" ")[1];
+
+        // 토큰이 AccessToken인 지 검증
+        String category = jwtUtil.getCategory(token);
+        if (!category.equals("access")) {
+            return null;
+        }
+
+        // AccessToken이 만료되었는 지 검증
+        if (jwtUtil.isExpired(token)) {
+            return null;
+        }
+
+        String email = jwtUtil.getEmail(token);
+        User foundUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+        return foundUser.getNickname();
+    }
+
 
     private void saveRefreshToken(String email, String refresh, Long expirationTime) {
         Date date = new Date(System.currentTimeMillis() + expirationTime);

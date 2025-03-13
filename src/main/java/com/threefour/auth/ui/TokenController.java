@@ -1,6 +1,6 @@
 package com.threefour.auth.ui;
 
-import com.threefour.auth.ReissueService;
+import com.threefour.auth.TokenService;
 import com.threefour.auth.TokenDTO;
 import com.threefour.common.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
@@ -8,13 +8,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class ReissueController {
+@RequestMapping("/api/token")
+public class TokenController {
 
-    private final ReissueService reissueService;
+    private final TokenService tokenService;
 
     /**
      * AccessToken, RefreshToken 재발급(By RefreshToken) API
@@ -23,9 +25,25 @@ public class ReissueController {
      */
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<String>> reissue(@RequestHeader("RefreshToken") String refreshToken, HttpServletResponse response) {
-        TokenDTO tokenDTO = reissueService.reissue(refreshToken);
+        TokenDTO tokenDTO = tokenService.reissueToken(refreshToken);
         response.setHeader("AccessToken", "Bearer " + tokenDTO.getAccessToken());
         response.setHeader("RefreshToken", "Bearer " + tokenDTO.getRefreshToken());
         return ApiResponse.success("ok");
+    }
+
+    /**
+     * AccessToken 유효성 검증 API
+     *
+     * @param accessToken
+     * @return 성공 시 200 응답과 사용자 닉네임 / 실패 시 400 응답
+     */
+    @PostMapping("/validate")
+    public ResponseEntity<ApiResponse<String>> validateToken(@RequestHeader("AccessToken") String accessToken) {
+        String nickname = tokenService.validateToken(accessToken);
+        if (nickname == null) {
+            return ApiResponse.fail("fail");
+        } else {
+            return ApiResponse.success(nickname);
+        }
     }
 }
