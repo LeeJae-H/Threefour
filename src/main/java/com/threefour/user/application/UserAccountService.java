@@ -9,6 +9,7 @@ import com.threefour.user.domain.EncodePasswordService;
 import com.threefour.user.domain.User;
 import com.threefour.user.domain.UserRepository;
 import com.threefour.user.dto.JoinRequest;
+import com.threefour.user.dto.MyUserInfoResponse;
 import com.threefour.user.dto.UpdateUserInfoRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,8 +42,20 @@ public class UserAccountService {
         return savedUser.getNickname();
     }
 
+    public MyUserInfoResponse getMyUserInfo(Long userId, String email) {
+        User foundUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+
+        // 본인인 지 확인
+        if (!foundUser.getId().equals(userId)) {
+            throw new ExpectedException(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
+        }
+
+        return new MyUserInfoResponse(foundUser.getEmail(), foundUser.getNickname());
+    }
+
     @Transactional
-    public void updateUserInfo(Long userId, UpdateUserInfoRequest updateUserInfoRequest, String email) {
+    public void updateMyUserInfo(Long userId, UpdateUserInfoRequest updateUserInfoRequest, String email) {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
 

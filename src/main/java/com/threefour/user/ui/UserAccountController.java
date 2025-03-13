@@ -3,6 +3,7 @@ package com.threefour.user.ui;
 import com.threefour.common.ApiResponse;
 import com.threefour.user.application.UserAccountService;
 import com.threefour.user.dto.JoinRequest;
+import com.threefour.user.dto.MyUserInfoResponse;
 import com.threefour.user.dto.UpdateUserInfoRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,22 @@ public class UserAccountController {
     }
 
     /**
-     * 회원 정보 수정 API
+     * 내 정보 조회 API
+     *
+     * 본인만 가능합니다.
+     *
+     * @param userId
+     * @return MyUserInfoResponse
+     */
+    @GetMapping("/my/{userId}")
+    public ResponseEntity<ApiResponse<MyUserInfoResponse>> getMyUserInfo(@PathVariable Long userId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        MyUserInfoResponse myUserInfo = userAccountService.getMyUserInfo(userId, email);
+        return ApiResponse.success(myUserInfo);
+    }
+
+    /**
+     * 내 정보 수정 API
      *
      * 본인만 가능합니다.
      *
@@ -37,11 +53,11 @@ public class UserAccountController {
      * @param updateUserInfoRequest
      */
     @PutMapping("/my/{userId}")
-    public ResponseEntity<ApiResponse<String>> updateUserInfo(
+    public ResponseEntity<ApiResponse<String>> updateMyUserInfo(
             @PathVariable Long userId,
             @RequestBody UpdateUserInfoRequest updateUserInfoRequest) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        userAccountService.updateUserInfo(userId, updateUserInfoRequest, email);
+        userAccountService.updateMyUserInfo(userId, updateUserInfoRequest, email);
         return ApiResponse.success("ok");
     }
 

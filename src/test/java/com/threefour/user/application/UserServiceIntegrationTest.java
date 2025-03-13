@@ -3,7 +3,6 @@ package com.threefour.user.application;
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
 import com.threefour.user.domain.User;
-import com.threefour.user.dto.MyUserInfoResponse;
 import com.threefour.user.dto.OtherUserInfoResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,50 +31,6 @@ public class UserServiceIntegrationTest {
     @BeforeEach
     void setUp() {
         jdbcTemplate.update("truncate table user"); // 테스트 전 데이터를 초기화
-    }
-
-    @Test
-    @DisplayName("내 정보 조회 성공")
-    void getMyUserInfo_Success() {
-        User user = createTestUserInstance();
-
-        // given
-        // DB에 사용자가 존재
-        User savedUser = saveUser(user);
-        Long userId = savedUser.getId();
-
-        // when
-        MyUserInfoResponse response = userService.getMyUserInfo(userId, savedUser.getEmail());
-
-        // then
-        assertThat(response).isNotNull();
-        assertThat(response.getEmail()).isEqualTo(savedUser.getEmail());
-        assertThat(response.getNickname()).isEqualTo(savedUser.getNickname());
-    }
-
-    @Test
-    @DisplayName("내 정보 조회 실패 - 다른 사용자가 조회하려고 할 때 예외 발생")
-    void getMyUserInfo_FromAnotherUser_Then_Exception() {
-        User user = createTestUserInstance();
-        String anotherUserEmail = user.getEmail() + "a";
-        String anotherEncodedPassword = "testEncodedPassword1";
-        String anotherNickname = "테스트닉네임1";
-        User anotherUser = User.join(anotherUserEmail, anotherEncodedPassword, anotherNickname);
-
-        // given
-        // DB에 사용자(본인)가 존재
-        User savedUser = saveUser(user);
-        Long userId = savedUser.getId();
-        // DB에 사용자(다른 사용자)가 존재
-        saveUser(anotherUser);
-
-        // when & then
-        assertThatThrownBy(() -> userService.getMyUserInfo(userId, anotherUserEmail))
-                .isInstanceOf(ExpectedException.class)
-                .satisfies(e -> {
-                    ExpectedException ex = (ExpectedException) e;
-                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
-                });
     }
 
     @Test

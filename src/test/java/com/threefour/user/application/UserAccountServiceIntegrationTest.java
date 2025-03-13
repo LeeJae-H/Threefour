@@ -7,6 +7,7 @@ import com.threefour.common.ExpectedException;
 import com.threefour.post.domain.Post;
 import com.threefour.user.domain.User;
 import com.threefour.user.dto.JoinRequest;
+import com.threefour.user.dto.MyUserInfoResponse;
 import com.threefour.user.dto.UpdateUserInfoRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -191,6 +192,50 @@ public class UserAccountServiceIntegrationTest {
     }
 
     @Test
+    @DisplayName("내 정보 조회 성공")
+    void getMyUserInfo_Success() {
+        User user = createTestUserInstance();
+
+        // given
+        // DB에 사용자가 존재
+        User savedUser = saveUser(user);
+        Long userId = savedUser.getId();
+
+        // when
+        MyUserInfoResponse response = userAccountService.getMyUserInfo(userId, savedUser.getEmail());
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getEmail()).isEqualTo(savedUser.getEmail());
+        assertThat(response.getNickname()).isEqualTo(savedUser.getNickname());
+    }
+
+    @Test
+    @DisplayName("내 정보 조회 실패 - 다른 사용자가 조회하려고 할 때 예외 발생")
+    void getMyUserInfo_FromAnotherUser_Then_Exception() {
+        User user = createTestUserInstance();
+        String anotherUserEmail = user.getEmail() + "a";
+        String anotherEncodedPassword = "testEncodedPassword1";
+        String anotherNickname = "테스트닉네임1";
+        User anotherUser = User.join(anotherUserEmail, anotherEncodedPassword, anotherNickname);
+
+        // given
+        // DB에 사용자(본인)가 존재
+        User savedUser = saveUser(user);
+        Long userId = savedUser.getId();
+        // DB에 사용자(다른 사용자)가 존재
+        saveUser(anotherUser);
+
+        // when & then
+        assertThatThrownBy(() -> userAccountService.getMyUserInfo(userId, anotherUserEmail))
+                .isInstanceOf(ExpectedException.class)
+                .satisfies(e -> {
+                    ExpectedException ex = (ExpectedException) e;
+                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
+                });
+    }
+
+    @Test
     @DisplayName("회원 정보 수정 성공 - 모두 유효한 입력값, 모든 정보 수정")
     void updateUserInfo_ByValidInput_Then_Success() {
         User user = createTestUserInstance();
@@ -204,7 +249,7 @@ public class UserAccountServiceIntegrationTest {
         Long userId = savedUser.getId();
 
         // when
-        userAccountService.updateUserInfo(userId, new UpdateUserInfoRequest(newPassword, newNickname), savedUser.getEmail());
+        userAccountService.updateMyUserInfo(userId, new UpdateUserInfoRequest(newPassword, newNickname), savedUser.getEmail());
 
         // then
         String foundUserQuery = "SELECT email, password, nickname FROM user WHERE email = ?";  // email은 unique 제약 조건
@@ -235,7 +280,7 @@ public class UserAccountServiceIntegrationTest {
         Long userId = savedUser.getId();
 
         // when
-        userAccountService.updateUserInfo(userId, new UpdateUserInfoRequest(newPassword, null), savedUser.getEmail());
+        userAccountService.updateMyUserInfo(userId, new UpdateUserInfoRequest(newPassword, null), savedUser.getEmail());
 
         // then
         String getUserQuery = "SELECT email, password, nickname FROM user WHERE email = ?";
@@ -270,7 +315,7 @@ public class UserAccountServiceIntegrationTest {
         saveUser(anotherUser);
 
         // when & then
-        assertThatThrownBy(() -> userAccountService.updateUserInfo(userId, new UpdateUserInfoRequest("newPassword", "새로운닉네임"), anotherUserEmail))
+        assertThatThrownBy(() -> userAccountService.updateMyUserInfo(userId, new UpdateUserInfoRequest("newPassword", "새로운닉네임"), anotherUserEmail))
                 .isInstanceOf(ExpectedException.class)
                 .satisfies(e -> {
                     ExpectedException ex = (ExpectedException) e;
