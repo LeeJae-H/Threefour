@@ -5,6 +5,7 @@ import com.threefour.user.application.UserAccountService;
 import com.threefour.user.dto.JoinRequest;
 import com.threefour.user.dto.MyUserInfoResponse;
 import com.threefour.user.dto.UpdateUserInfoRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,10 +24,11 @@ public class UserAccountController {
      * @param joinRequest
      * @return 사용자 닉네임 (nickname)
      */
-    @PostMapping("/users/join")
+    @PostMapping("/api/users/join")
     @ResponseBody
-    public ResponseEntity<ApiResponse<String>> join(@RequestBody JoinRequest joinRequest) {
+    public ResponseEntity<ApiResponse<String>> join(@RequestBody JoinRequest joinRequest, HttpServletResponse response) {
         String nickname = userAccountService.join(joinRequest);
+        response.setHeader("Location", "/home");
         return ApiResponse.success(nickname);
     }
 
@@ -39,7 +41,6 @@ public class UserAccountController {
     @GetMapping("/api/users/validate-nickname")
     @ResponseBody
     public ResponseEntity<ApiResponse<String>> validateNicknameForJoin(@RequestParam String nickname) {
-        System.out.println("--------------" + nickname);
         userAccountService.validateNicknameForJoin(nickname);
         return ApiResponse.success("success");
     }

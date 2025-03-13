@@ -1,7 +1,32 @@
 let nicknameValidated = false;
 
+// 회원가입
+document.getElementById("joinForm").addEventListener("submit", function (event) {
+    event.preventDefault(); // 기본 폼 제출 방지
+
+    const joinData = {
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value,
+        nickname: document.getElementById("nickname").value
+    };
+
+    // 회원가입 요청 보내기
+    axios.post("/api/users/join", joinData)
+        .then(response => {
+            const userNickname = response.data.data;
+            alert(userNickname + "님 환영합니다!");
+
+            // 리다이렉션
+            const redirectUrl = response.headers['location'];
+            window.location.href = redirectUrl;
+        })
+        .catch(error => {
+            alert("잘못된 비밀번호입니다.");
+        });
+});
+
 // 닉네임 검증
-document.getElementById("validateNicknameButton").addEventListener("click", function (event) {
+document.getElementById("nicknameButton").addEventListener("click", function (event) {
     event.preventDefault(); // 기본 폼 제출 방지
 
     const nickname = document.getElementById("nickname").value;
