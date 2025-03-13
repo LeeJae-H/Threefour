@@ -51,3 +51,36 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
             alert('이메일 또는 비밀번호가 일치하지 않습니다.');
         });
 });
+
+// 로그아웃
+document.getElementById("logoutForm").addEventListener("submit", function (event) {
+    event.preventDefault(); // 기본 폼 제출 방지
+
+    const refreshToken = localStorage.getItem("RefreshToken");
+
+    if (refreshToken) {
+        axios.post("/logout", null, {
+            headers: {
+                "RefreshToken": refreshToken
+            }})
+            .then(response => {
+                localStorage.removeItem("AccessToken");
+                localStorage.removeItem("RefreshToken");
+
+                // 리다이렉션
+                const redirectUrl = response.headers['location'];
+                window.location.href = redirectUrl;
+            })
+            .catch(error => {
+                localStorage.removeItem("AccessToken");
+                localStorage.removeItem("RefreshToken");
+
+                // 리다이렉션
+                const redirectUrl = response.headers['location'];
+                window.location.href = redirectUrl;
+            });
+    } else {
+        localStorage.removeItem("AccessToken");
+        localStorage.removeItem("RefreshToken");
+    }
+});

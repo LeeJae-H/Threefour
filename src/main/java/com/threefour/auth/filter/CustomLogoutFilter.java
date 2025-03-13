@@ -45,7 +45,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         // RefreshToken 헤더의 값이 유효한 지 검증
         if (refreshToken == null || !refreshToken.startsWith("Bearer ")) {
-            // todo 예외 발생 로직 추가
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setHeader("Location", "/home");
             return;
         }
 
@@ -54,13 +55,15 @@ public class CustomLogoutFilter extends GenericFilterBean {
         // 토큰이 RefreshToken인 지 검증
         String category = jwtUtil.getCategory(token);
         if (!category.equals("refresh")) {
-            // todo 예외 발생 로직 추가
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setHeader("Location", "/home");
             return;
         }
 
         // DB에 저장되어 있는지 확인
         if (!refreshTokenRepository.existsByRefreshToken(token)) {
-            response.setStatus(HttpStatus.OK.value());
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setHeader("Location", "/home");
             return;
         }
 
@@ -69,7 +72,9 @@ public class CustomLogoutFilter extends GenericFilterBean {
         // DB에 존재하는 해당 사용자의 모든 RefreshToken 삭제
         refreshTokenRepository.deleteByUserEmail(userEmail);
 
+        // 클라이언트(axios)에서는 2xx 응답만을 성공으로 처리하기 때문에 302가 아닌 200을 응답으로 설정합니다.
         response.setStatus(HttpStatus.OK.value());
+        response.setHeader("Location", "/home");
     }
 
     private boolean isLogoutRequest(HttpServletRequest request) {
