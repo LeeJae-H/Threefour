@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-// 로그인 폼 제출
+// 로그인
 document.getElementById('loginForm').addEventListener('submit', function (event) {
     event.preventDefault(); // 기본 폼 제출 방지
 

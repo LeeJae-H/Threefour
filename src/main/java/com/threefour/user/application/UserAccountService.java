@@ -42,6 +42,10 @@ public class UserAccountService {
         return savedUser.getNickname();
     }
 
+    public void validateNicknameForJoin(String nickname) {
+        validateNickname(nickname);
+    }
+
     public MyUserInfoResponse getMyUserInfo(Long userId, String email) {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
