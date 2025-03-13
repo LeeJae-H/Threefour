@@ -23,6 +23,7 @@ public enum ErrorCode {
 
     // Mail
     FAIL_SEND_MAIL(HttpStatus.BAD_REQUEST, "이메일 발송에 실패했습니다."),
+    FAIL_VALIDATE_MAIL(HttpStatus.BAD_REQUEST, "이메일 인증에 실패했습니다."),
 
     // 회원
     INVALID_PASSWORD_LENGTH(HttpStatus.BAD_REQUEST, "비밀번호는 최소 8자 이상이어야 합니다."),

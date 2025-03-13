@@ -2,6 +2,7 @@ package com.threefour.user.ui;
 
 import com.threefour.common.ApiResponse;
 import com.threefour.user.application.UserAccountService;
+import com.threefour.user.dto.EmailValidationRequest;
 import com.threefour.user.dto.JoinRequest;
 import com.threefour.user.dto.MyUserInfoResponse;
 import com.threefour.user.dto.UpdateUserInfoRequest;
@@ -36,9 +37,21 @@ public class UserAccountController {
      * @param email
      * @return 성공 시 200 응답 / 실패 시 예외 응답
      */
-    @GetMapping("/api/users/send-email")
+    @PostMapping("/api/users/send-email")
     public ResponseEntity<ApiResponse<String>> sendEmailAuthNumberForJoin(@RequestParam String email) {
         userAccountService.sendEmailAuthNumberForJoin(email);
+        return ApiResponse.success("success");
+    }
+
+    /**
+     * 회원가입 시 사용 - 이메일 인증번호 확인 API
+     *
+     * @param emailValidationRequest
+     * @return 성공 시 200 응답 / 실패 시 예외 응답
+     */
+    @PostMapping("/api/users/validate-email")
+    public ResponseEntity<ApiResponse<String>> validateEmailForJoin(@RequestBody EmailValidationRequest emailValidationRequest) {
+        userAccountService.validateEmailForJoin(emailValidationRequest);
         return ApiResponse.success("success");
     }
 

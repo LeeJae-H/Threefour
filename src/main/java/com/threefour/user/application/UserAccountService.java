@@ -7,6 +7,7 @@ import com.threefour.common.ExpectedException;
 import com.threefour.post.domain.PostRepository;
 import com.threefour.user.domain.User;
 import com.threefour.user.domain.UserRepository;
+import com.threefour.user.dto.EmailValidationRequest;
 import com.threefour.user.dto.JoinRequest;
 import com.threefour.user.dto.MyUserInfoResponse;
 import com.threefour.user.dto.UpdateUserInfoRequest;
@@ -52,6 +53,20 @@ public class UserAccountService {
 
         int authNumber = mailSender.sendMail(email);
         emailValidationCache.put(email, String.valueOf(authNumber));
+    }
+
+    public void validateEmailForJoin(EmailValidationRequest emailValidationRequest) {
+        String storedAuthNumber = emailValidationCache.get(emailValidationRequest.getEmail());
+
+        if (storedAuthNumber == null) {
+            throw new ExpectedException(ErrorCode.FAIL_VALIDATE_MAIL);
+        }
+
+        if (!storedAuthNumber.equals(emailValidationRequest.getAuthNumber())) {
+            throw new ExpectedException(ErrorCode.FAIL_VALIDATE_MAIL);
+        }
+
+        emailValidationCache.remove(emailValidationRequest.getEmail());
     }
 
     public void validateNicknameForJoin(String nickname) {
