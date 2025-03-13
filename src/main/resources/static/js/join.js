@@ -31,6 +31,27 @@ document.getElementById("joinForm").addEventListener("submit", function (event) 
     }
 });
 
+// 이메일 인증번호 발송
+document.getElementById("emailButton").addEventListener("click", function (event) {
+    event.preventDefault(); // 기본 폼 제출 방지
+
+    const email = document.getElementById("email").value;
+
+    axios.post("/api/users/send-email", null, {
+        params: {
+            email: email
+        }})
+        .then(response => {
+            alert("인증번호를 발송하였습니다.");
+
+            document.getElementById("email").disabled = true;
+            document.getElementById("emailButton").disabled = true;
+        })
+        .catch(error => {
+            alert("이메일 형식이 올바르지 않거나, 이미 사용 중인 이메일입니다.");
+        });
+});
+
 // 닉네임 검증
 document.getElementById("nicknameButton").addEventListener("click", function (event) {
     event.preventDefault(); // 기본 폼 제출 방지
