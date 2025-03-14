@@ -16,7 +16,7 @@
     <div th:replace="~{fragment/header :: header}"></div>
 
     <div class="container-fluid text-center my-side-padding">
-        <form id="joinForm" class="my-join-form-border col-md-8 offset-md-2 mt-5">
+        <form id="updateForm" class="my-join-form-border col-md-8 offset-md-2 mt-5">
             <div class="row align-items-center mb-4">
                 <div class="col-md-10">
                     <div class="row align-items-center">
@@ -24,27 +24,9 @@
                             이메일
                         </div>
                         <div class="col-md-9">
-                            <input type="email" name="email" id="email" class="form-control">
+                            <input type="email" name="email" id="email" class="form-control" disabled>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-2">
-                    <button id="emailButton" class="btn btn-primary">인증</button>
-                </div>
-            </div>
-            <div class="row align-items-center mb-4">
-                <div class="col-md-10">
-                    <div class="row align-items-center">
-                        <div class="col-md-3">
-                            인증번호
-                        </div>
-                        <div class="col-md-9">
-                            <input type="email" name="emailNumber" id="emailNumber" class="form-control">
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <button id="emailNumberButton" class="btn btn-primary" disabled>확인</button>
                 </div>
             </div>
             <div class="row align-items-center mb-4">
@@ -54,7 +36,7 @@
                             비밀번호
                         </div>
                         <div class="col-md-9">
-                            <input type="password" name="password" id="password" class="form-control">
+                            <input type="password" name="password" id="password" class="form-control" placeholder="빈 칸이면 수정되지 않습니다.">
                         </div>
                     </div>
                 </div>
@@ -66,7 +48,7 @@
                             비밀번호 확인
                         </div>
                         <div class="col-md-9">
-                            <input type="password" name="password2" id="password2" class="form-control">
+                            <input type="password" name="password2" id="password2" class="form-control" placeholder="빈 칸이면 수정되지 않습니다.">
                         </div>
                     </div>
                 </div>
@@ -87,12 +69,12 @@
                 </div>
             </div>
             <div class="col-md-4 offset-md-4">
-                <button id="joinButton" type="submit" class="btn btn-primary" disabled>회원가입</button>
+                <button id="updateButton" type="submit" class="btn btn-primary">수정</button>
             </div>
         </form>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="/js/join.js"></script>
+    <script src="/js/myInfo.js"></script>
 </body>
 </html>

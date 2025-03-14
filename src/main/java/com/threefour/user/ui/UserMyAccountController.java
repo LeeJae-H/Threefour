@@ -18,49 +18,36 @@ public class UserMyAccountController {
     /**
      * 내 정보 조회 API
      *
-     * 본인만 가능합니다.
-     *
-     * @param userId
      * @return MyUserInfoResponse
      */
-    @GetMapping("/users/my/{userId}")
-    public ResponseEntity<ApiResponse<MyUserInfoResponse>> getMyUserInfo(@PathVariable Long userId) {
+    @GetMapping("/users/my/info")
+    public ResponseEntity<ApiResponse<MyUserInfoResponse>> getMyUserInfo() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        MyUserInfoResponse myUserInfo = userAccountService.getMyUserInfo(userId, email);
+        MyUserInfoResponse myUserInfo = userAccountService.getMyUserInfo(email);
         return ApiResponse.success(myUserInfo);
     }
 
     /**
      * 내 정보 수정 API
      *
-     * 본인만 가능합니다.
-     *
-     * @param userId
      * @param updateUserInfoRequest
      */
-    @PutMapping("/users/my/{userId}")
-    public ResponseEntity<ApiResponse<String>> updateMyUserInfo(
-            @PathVariable Long userId,
-            @RequestBody UpdateUserInfoRequest updateUserInfoRequest) {
+    @PutMapping("/users/my/info")
+    public ResponseEntity<ApiResponse<String>> updateMyUserInfo(@RequestBody UpdateUserInfoRequest updateUserInfoRequest) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        userAccountService.updateMyUserInfo(userId, updateUserInfoRequest, email);
+        userAccountService.updateMyUserInfo(updateUserInfoRequest, email);
         return ApiResponse.success("ok");
     }
 
     /**
      * 회원탈퇴 API
      *
-     * 본인만 가능합니다.
-     *
-     * @param userId
      * @param refreshToken
      */
     @DeleteMapping("/users/my/{userId}")
-    public ResponseEntity<ApiResponse<String>> deleteUser(
-            @PathVariable Long userId,
-            @RequestHeader("RefreshToken") String refreshToken) {
+    public ResponseEntity<ApiResponse<String>> deleteUser(@RequestHeader("RefreshToken") String refreshToken) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        userAccountService.deleteUser(userId, refreshToken, email);
+        userAccountService.deleteUser(refreshToken, email);
         return ApiResponse.success("ok");
     }
 }

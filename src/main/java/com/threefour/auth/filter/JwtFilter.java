@@ -9,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,7 +43,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // AccessToken 헤더의 값이 유효한 지 검증
         if (accessToken == null || !accessToken.startsWith("Bearer ")) {
-            // todo 예외 발생 로직 추가
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setHeader("Location", "/home");
             return;
         }
 
@@ -51,13 +53,15 @@ public class JwtFilter extends OncePerRequestFilter {
         // 토큰이 AccessToken인 지 검증
         String category = jwtUtil.getCategory(token);
         if (!category.equals("access")) {
-            // todo 예외 발생 로직 추가
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setHeader("Location", "/home");
             return;
         }
 
         // AccessToken이 만료되었는 지 검증
         if (jwtUtil.isExpired(token)) {
-            // todo 예외 발생 로직 추가
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setHeader("Location", "/home");
             return;
         }
 

@@ -23,27 +23,17 @@ public class UserAccountService {
     private final JwtUtil jwtUtil;
     private final PostRepository postRepository;
 
-    public MyUserInfoResponse getMyUserInfo(Long userId, String email) {
+    public MyUserInfoResponse getMyUserInfo(String email) {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
-
-        // 본인인 지 확인
-        if (!foundUser.getId().equals(userId)) {
-            throw new ExpectedException(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
-        }
 
         return new MyUserInfoResponse(foundUser.getEmail(), foundUser.getNickname());
     }
 
     @Transactional
-    public void updateMyUserInfo(Long userId, UpdateUserInfoRequest updateUserInfoRequest, String email) {
+    public void updateMyUserInfo(UpdateUserInfoRequest updateUserInfoRequest, String email) {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
-
-        // 본인인 지 확인
-        if (!foundUser.getId().equals(userId)) {
-            throw new ExpectedException(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
-        }
 
         // 회원 정보의 변경이 이루어졌는지 여부
         boolean isUpdated = false;
@@ -70,14 +60,9 @@ public class UserAccountService {
     }
 
     @Transactional
-    public void deleteUser(Long userId, String refreshToken, String email) {
+    public void deleteUser(String refreshToken, String email) {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
-
-        // 본인인 지 확인
-        if (!foundUser.getId().equals(userId)) {
-            throw new ExpectedException(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
-        }
 
         // 회원이 작성한 게시글 모두 삭제
         postRepository.deleteByAuthorNickname(foundUser.getNickname());
@@ -110,13 +95,6 @@ public class UserAccountService {
 
         // DB에 존재하는 해당 사용자의 모든 RefreshToken 삭제
         refreshTokenRepository.deleteByUserEmail(email);
-    }
-
-    // 이메일은 고유하다.
-    private void validateEmail(String email) {
-        if (userRepository.existsByEmail(email)) {
-            throw new ExpectedException(ErrorCode.ALREADY_USED_EMAIL);
-        }
     }
 
     // 비밀번호는 최소 8자 이상이어야 하며, 공백을 포함할 수 없다.

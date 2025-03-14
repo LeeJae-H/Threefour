@@ -64,10 +64,10 @@ public class UserMyAccountServiceIntegrationTest {
         // given
         // DB에 사용자가 존재
         User savedUser = saveUser(user);
-        Long userId = savedUser.getId();
+        savedUser.getId();
 
         // when
-        MyUserInfoResponse response = userAccountService.getMyUserInfo(userId, savedUser.getEmail());
+        MyUserInfoResponse response = userAccountService.getMyUserInfo(savedUser.getEmail());
 
         // then
         assertThat(response).isNotNull();
@@ -75,30 +75,30 @@ public class UserMyAccountServiceIntegrationTest {
         assertThat(response.getNickname()).isEqualTo(savedUser.getNickname());
     }
 
-    @Test
-    @DisplayName("내 정보 조회 실패 - 다른 사용자가 조회하려고 할 때 예외 발생")
-    void getMyUserInfo_FromAnotherUser_Then_Exception() {
-        User user = createTestUserInstance();
-        String anotherUserEmail = user.getEmail() + "a";
-        String anotherEncodedPassword = "testEncodedPassword1";
-        String anotherNickname = "테스트닉네임1";
-        User anotherUser = User.join(anotherUserEmail, anotherEncodedPassword, anotherNickname);
-
-        // given
-        // DB에 사용자(본인)가 존재
-        User savedUser = saveUser(user);
-        Long userId = savedUser.getId();
-        // DB에 사용자(다른 사용자)가 존재
-        saveUser(anotherUser);
-
-        // when & then
-        assertThatThrownBy(() -> userAccountService.getMyUserInfo(userId, anotherUserEmail))
-                .isInstanceOf(ExpectedException.class)
-                .satisfies(e -> {
-                    ExpectedException ex = (ExpectedException) e;
-                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
-                });
-    }
+//    @Test
+//    @DisplayName("내 정보 조회 실패 - 다른 사용자가 조회하려고 할 때 예외 발생")
+//    void getMyUserInfo_FromAnotherUser_Then_Exception() {
+//        User user = createTestUserInstance();
+//        String anotherUserEmail = user.getEmail() + "a";
+//        String anotherEncodedPassword = "testEncodedPassword1";
+//        String anotherNickname = "테스트닉네임1";
+//        User anotherUser = User.join(anotherUserEmail, anotherEncodedPassword, anotherNickname);
+//
+//        // given
+//        // DB에 사용자(본인)가 존재
+//        User savedUser = saveUser(user);
+//        Long userId = savedUser.getId();
+//        // DB에 사용자(다른 사용자)가 존재
+//        saveUser(anotherUser);
+//
+//        // when & then
+//        assertThatThrownBy(() -> userAccountService.getMyUserInfo(userId, anotherUserEmail))
+//                .isInstanceOf(ExpectedException.class)
+//                .satisfies(e -> {
+//                    ExpectedException ex = (ExpectedException) e;
+//                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
+//                });
+//    }
 
     @Test
     @DisplayName("회원 정보 수정 성공 - 모두 유효한 입력값, 모든 정보 수정")
@@ -111,10 +111,9 @@ public class UserMyAccountServiceIntegrationTest {
         // DB에 사용자가 존재
         User savedUser = saveUser(user);
         LocalDateTime updatedAtBefore = savedUser.getUserTimeInfo().getUpdatedAt();
-        Long userId = savedUser.getId();
 
         // when
-        userAccountService.updateMyUserInfo(userId, new UpdateUserInfoRequest(newPassword, newNickname), savedUser.getEmail());
+        userAccountService.updateMyUserInfo(new UpdateUserInfoRequest(newPassword, newNickname), savedUser.getEmail());
 
         // then
         String foundUserQuery = "SELECT email, password, nickname FROM user WHERE email = ?";  // email은 unique 제약 조건
@@ -142,10 +141,9 @@ public class UserMyAccountServiceIntegrationTest {
         // DB에 사용자가 존재
         User savedUser = saveUser(user);
         LocalDateTime updatedAtBefore = savedUser.getUserTimeInfo().getUpdatedAt();
-        Long userId = savedUser.getId();
 
         // when
-        userAccountService.updateMyUserInfo(userId, new UpdateUserInfoRequest(newPassword, null), savedUser.getEmail());
+        userAccountService.updateMyUserInfo(new UpdateUserInfoRequest(newPassword, null), savedUser.getEmail());
 
         // then
         String getUserQuery = "SELECT email, password, nickname FROM user WHERE email = ?";
@@ -163,30 +161,30 @@ public class UserMyAccountServiceIntegrationTest {
         assertThat(getUser.getUserTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
     }
 
-    @Test
-    @DisplayName("회원 정보 수정 실패 - 다른 사용자가 정보를 변경하려고 할 때 예외 발생")
-    void updateUserInfo_FromAnotherUser_Then_Exception() {
-        User user = createTestUserInstance();
-        String anotherUserEmail = user.getEmail() + "a";
-        String anotherEncodedPassword = "testEncodedPassword1";
-        String anotherNickname = "테스트닉네임1";
-        User anotherUser = User.join(anotherUserEmail, anotherEncodedPassword, anotherNickname);
-
-        // given
-        // DB에 사용자(본인)가 존재
-        User savedUser = saveUser(user);
-        Long userId = savedUser.getId();
-        // DB에 사용자(다른 사용자)가 존재
-        saveUser(anotherUser);
-
-        // when & then
-        assertThatThrownBy(() -> userAccountService.updateMyUserInfo(userId, new UpdateUserInfoRequest("newPassword", "새로운닉네임"), anotherUserEmail))
-                .isInstanceOf(ExpectedException.class)
-                .satisfies(e -> {
-                    ExpectedException ex = (ExpectedException) e;
-                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
-                });
-    }
+//    @Test
+//    @DisplayName("회원 정보 수정 실패 - 다른 사용자가 정보를 변경하려고 할 때 예외 발생")
+//    void updateUserInfo_FromAnotherUser_Then_Exception() {
+//        User user = createTestUserInstance();
+//        String anotherUserEmail = user.getEmail() + "a";
+//        String anotherEncodedPassword = "testEncodedPassword1";
+//        String anotherNickname = "테스트닉네임1";
+//        User anotherUser = User.join(anotherUserEmail, anotherEncodedPassword, anotherNickname);
+//
+//        // given
+//        // DB에 사용자(본인)가 존재
+//        User savedUser = saveUser(user);
+//        Long userId = savedUser.getId();
+//        // DB에 사용자(다른 사용자)가 존재
+//        saveUser(anotherUser);
+//
+//        // when & then
+//        assertThatThrownBy(() -> userAccountService.updateMyUserInfo(userId, new UpdateUserInfoRequest("newPassword", "새로운닉네임"), anotherUserEmail))
+//                .isInstanceOf(ExpectedException.class)
+//                .satisfies(e -> {
+//                    ExpectedException ex = (ExpectedException) e;
+//                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
+//                });
+//    }
 
     @Test
     @DisplayName("회원 탈퇴 성공 - 유효한 RefreshToken")
@@ -196,7 +194,6 @@ public class UserMyAccountServiceIntegrationTest {
         // given
         // DB에 사용자가 존재
         User savedUser = saveUser(user);
-        Long userId = savedUser.getId();
         // DB에 RefreshToken이 존재
         String refreshToken = jwtUtil.createJwt("refresh", savedUser.getEmail(), "ROLE_USER", AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
         String insertQuery = "INSERT INTO refresh_token (user_email, refresh_token, expiration) VALUES (?, ?, ?)";
@@ -214,7 +211,7 @@ public class UserMyAccountServiceIntegrationTest {
         );
 
         // when
-        userAccountService.deleteUser(userId, "Bearer " + refreshToken, savedUser.getEmail());
+        userAccountService.deleteUser("Bearer " + refreshToken, savedUser.getEmail());
 
         // then
         // 1. 회원이 작성한 게시글이 모두 삭제되었는지 확인
@@ -233,34 +230,34 @@ public class UserMyAccountServiceIntegrationTest {
         assertThat(tokenCount).isEqualTo(0);
     }
 
-    @Test
-    @DisplayName("회원 탈퇴 실패 - 다른 사용자가 탈퇴하려고 할 때 예외 발생")
-    void deleteUser_FromAnotherUser_Then_Exception() {
-        User user = createTestUserInstance();
-        String anotherUserEmail = user.getEmail() + "a";
-        String anotherEncodedPassword = "testEncodedPassword1";
-        String anotherNickname = "테스트닉네임1";
-        User anotherUser = User.join(anotherUserEmail, anotherEncodedPassword, anotherNickname);
-
-        // given
-        // DB에 사용자가 존재
-        User savedUser = saveUser(user);
-        Long userId = savedUser.getId();
-        // DB에 사용자(다른 사용자)가 존재
-        User savedAnotherUser = saveUser(anotherUser);
-        // DB에 RefreshToken이 존재
-        String refreshToken = jwtUtil.createJwt("refresh", savedAnotherUser.getEmail(), "ROLE_USER", AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
-        String insertQuery = "INSERT INTO refresh_token (user_email, refresh_token, expiration) VALUES (?, ?, ?)";
-        jdbcTemplate.update(insertQuery, savedAnotherUser.getEmail(), refreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
-
-        // when & then
-        assertThatThrownBy(() -> userAccountService.deleteUser(userId, "Bearer " + refreshToken, anotherUserEmail))
-                .isInstanceOf(ExpectedException.class)
-                .satisfies(e -> {
-                    ExpectedException ex = (ExpectedException) e;
-                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
-                });
-    }
+//    @Test
+//    @DisplayName("회원 탈퇴 실패 - 다른 사용자가 탈퇴하려고 할 때 예외 발생")
+//    void deleteUser_FromAnotherUser_Then_Exception() {
+//        User user = createTestUserInstance();
+//        String anotherUserEmail = user.getEmail() + "a";
+//        String anotherEncodedPassword = "testEncodedPassword1";
+//        String anotherNickname = "테스트닉네임1";
+//        User anotherUser = User.join(anotherUserEmail, anotherEncodedPassword, anotherNickname);
+//
+//        // given
+//        // DB에 사용자가 존재
+//        User savedUser = saveUser(user);
+//        Long userId = savedUser.getId();
+//        // DB에 사용자(다른 사용자)가 존재
+//        User savedAnotherUser = saveUser(anotherUser);
+//        // DB에 RefreshToken이 존재
+//        String refreshToken = jwtUtil.createJwt("refresh", savedAnotherUser.getEmail(), "ROLE_USER", AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+//        String insertQuery = "INSERT INTO refresh_token (user_email, refresh_token, expiration) VALUES (?, ?, ?)";
+//        jdbcTemplate.update(insertQuery, savedAnotherUser.getEmail(), refreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+//
+//        // when & then
+//        assertThatThrownBy(() -> userAccountService.deleteUser(userId, "Bearer " + refreshToken, anotherUserEmail))
+//                .isInstanceOf(ExpectedException.class)
+//                .satisfies(e -> {
+//                    ExpectedException ex = (ExpectedException) e;
+//                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.USER_ACCOUNT_ACCESS_DENIED);
+//                });
+//    }
 
     private User createTestUserInstance() {
         String email = "test@naver.com";

@@ -2,7 +2,6 @@ let isNicknameValidated = false;
 let validatedNickname;
 let isEmailValidated = false;
 
-
 // 회원가입
 document.getElementById("joinForm").addEventListener("submit", function (event) {
     event.preventDefault(); // 기본 폼 제출 방지
