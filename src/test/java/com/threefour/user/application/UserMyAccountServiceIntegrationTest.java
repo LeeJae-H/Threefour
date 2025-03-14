@@ -2,8 +2,6 @@ package com.threefour.user.application;
 
 import com.threefour.auth.AuthConstants;
 import com.threefour.auth.JwtUtil;
-import com.threefour.common.ErrorCode;
-import com.threefour.common.ExpectedException;
 import com.threefour.post.domain.Post;
 import com.threefour.user.domain.User;
 import com.threefour.user.dto.MyUserInfoResponse;
@@ -24,7 +22,6 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ActiveProfiles("test")
 @SpringBootTest
