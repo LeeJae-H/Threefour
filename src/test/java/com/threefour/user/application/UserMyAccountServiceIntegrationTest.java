@@ -6,7 +6,6 @@ import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
 import com.threefour.post.domain.Post;
 import com.threefour.user.domain.User;
-import com.threefour.user.dto.JoinRequest;
 import com.threefour.user.dto.MyUserInfoResponse;
 import com.threefour.user.dto.UpdateUserInfoRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ActiveProfiles("test")
 @SpringBootTest
-public class UserAccountServiceIntegrationTest {
+public class UserMyAccountServiceIntegrationTest {
 
     @Autowired
     private UserAccountService userAccountService;
@@ -55,140 +54,6 @@ public class UserAccountServiceIntegrationTest {
     @BeforeEach
     void setUp() {
         jdbcTemplate.update("truncate table user"); // 테스트 전 데이터를 초기화
-    }
-
-    @Test
-    @DisplayName("회원가입 성공 - 모두 유효한 입력값")
-    void join_ByValidInput_Then_Success() {
-        String inputEmail = "test@naver.com";
-        String inputPassword = "testPassword";
-        String inputNickname = " 테스트닉네임 ";
-
-        // when
-        String response = userAccountService.join(new JoinRequest(inputEmail, inputPassword, inputNickname));
-
-        // then
-        // 1. return 값 확인
-        assertThat(response).isNotNull();
-        assertThat(response).isEqualTo(inputNickname.trim());
-
-        // 2. DB에 데이터가 저장되었는지 확인
-        String query = "SELECT email, password, nickname FROM user WHERE email = ?";  // email은 unique 제약 조건
-        User savedUser = jdbcTemplate.queryForObject(query, new UserRowMapper(), inputEmail);
-        assertThat(savedUser).isNotNull();
-        assertThat(savedUser.getEmail()).isEqualTo(inputEmail);
-        assertThat(savedUser.getPassword()).isNotEqualTo(inputPassword); // 비밀번호가 암호화되었는지 확인
-        assertThat(savedUser.getNickname()).isEqualTo(inputNickname.trim()); // 닉네임이 양쪽 끝의 공백을 제거된 후 저장되었는지 확인
-    }
-
-    @Test
-    @DisplayName("회원가입 실패 - 이미 존재하는 이메일로 회원가입 시 예외 발생")
-    void join_ByExistingEmail_Then_Exception() {
-        User user = createTestUserInstance();
-        String inputAlreadyUsedEmail = user.getEmail();
-
-        // given
-        // DB에 해당 이메일을 사용 중인 사용자가 존재
-        saveUser(user);
-
-        // when & then
-        assertThatThrownBy(() -> userAccountService.join(new JoinRequest(inputAlreadyUsedEmail, "testPassword1", "테스트닉네임1")))
-                .isInstanceOf(ExpectedException.class)
-                .satisfies(e -> {
-                    ExpectedException ex = (ExpectedException) e;
-                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.ALREADY_USED_EMAIL);
-                });
-    }
-
-    @Test
-    @DisplayName("회원가입 실패 - 비밀번호 값 검증 실패 시 예외 발생")
-    void join_ByInvalidPassword_Then_Exception() {
-        String inputNullPassword = null;
-        String inputShortPassword = "1234";
-        String inputWhiteSpacePassword = "12 34 56 78";
-
-        // when & then
-        // 1. null 값의 비밀번호
-        assertThatThrownBy(() -> userAccountService.join(new JoinRequest("test@naver.com", inputNullPassword, "테스트닉네임")))
-                .isInstanceOf(ExpectedException.class)
-                .satisfies(e -> {
-                    ExpectedException ex = (ExpectedException) e;
-                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD_LENGTH);
-                });
-        // 2. 8자 미만인 비밀번호
-        assertThatThrownBy(() -> userAccountService.join(new JoinRequest("test@naver.com", inputShortPassword, "테스트닉네임")))
-                .isInstanceOf(ExpectedException.class)
-                .satisfies(e -> {
-                    ExpectedException ex = (ExpectedException) e;
-                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD_LENGTH);
-                });
-        // 3. 공백이 포함된 비밀번호
-        assertThatThrownBy(() -> userAccountService.join(new JoinRequest("test@naver.com", inputWhiteSpacePassword, "테스트닉네임")))
-                .isInstanceOf(ExpectedException.class)
-                .satisfies(e -> {
-                    ExpectedException ex = (ExpectedException) e;
-                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD_LENGTH);
-                });
-    }
-
-    @Test
-    @DisplayName("회원가입 실패 - 닉네임 값 검증 실패 시 예외 발생")
-    void join_ByInvalidNickname_Then_Exception() {
-        String inputNullNickname = null;
-        String inputShortNickname = "닉";
-        String inputLongNickname = "너무너무너무너무긴닉네임";
-        String inputSpecialCharNickname = "닉!네@임";
-        String inputWhiteSpaceNickname = "   닉   ";
-        User user = createTestUserInstance();
-        String inputAlreadyUsedNickname = user.getNickname();
-
-        // given
-        // DB에 해당 닉네임을 사용 중인 사용자가 존재
-        saveUser(user);
-
-        // when & then
-        // 1. null 값의 닉네임
-        assertThatThrownBy(() -> userAccountService.join(new JoinRequest(user.getEmail() + "a", "testPassword", inputNullNickname)))
-                .isInstanceOf(ExpectedException.class)
-                .satisfies(e -> {
-                    ExpectedException ex = (ExpectedException) e;
-                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME_LENGTH);
-                });
-        // 2. 2자 미만인 닉네임
-        assertThatThrownBy(() -> userAccountService.join(new JoinRequest(user.getEmail() + "a", "testPassword", inputShortNickname)))
-                .isInstanceOf(ExpectedException.class)
-                .satisfies(e -> {
-                    ExpectedException ex = (ExpectedException) e;
-                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME_LENGTH);
-                });
-        // 3. 10자 이상인 닉네임
-        assertThatThrownBy(() -> userAccountService.join(new JoinRequest(user.getEmail() + "a", "testPassword", inputLongNickname)))
-                .isInstanceOf(ExpectedException.class)
-                .satisfies(e -> {
-                    ExpectedException ex = (ExpectedException) e;
-                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME_LENGTH);
-                });
-        // 4. 특수문자가 포함된 닉네임
-        assertThatThrownBy(() -> userAccountService.join(new JoinRequest(user.getEmail() + "a", "testPassword", inputSpecialCharNickname)))
-                .isInstanceOf(ExpectedException.class)
-                .satisfies(e -> {
-                    ExpectedException ex = (ExpectedException) e;
-                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME_FORMAT);
-                });
-        // 5. 공백이 포함된 닉네임
-        assertThatThrownBy(() -> userAccountService.join(new JoinRequest(user.getEmail() + "a", "testPassword", inputWhiteSpaceNickname)))
-                .isInstanceOf(ExpectedException.class)
-                .satisfies(e -> {
-                    ExpectedException ex = (ExpectedException) e;
-                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME_LENGTH);
-                });
-        // 6. 이미 사용 중인 닉네임
-        assertThatThrownBy(() -> userAccountService.join(new JoinRequest(user.getEmail() + "a", "testPassword", inputAlreadyUsedNickname)))
-                .isInstanceOf(ExpectedException.class)
-                .satisfies(e -> {
-                    ExpectedException ex = (ExpectedException) e;
-                    assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.ALREADY_USED_NICKNAME);
-                });
     }
 
     @Test
