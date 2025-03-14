@@ -1,5 +1,7 @@
 let isNicknameValidated = false;
 let validatedNickname;
+let isEmailValidated = false;
+
 
 // 회원가입
 document.getElementById("joinForm").addEventListener("submit", function (event) {
@@ -36,6 +38,7 @@ document.getElementById("emailButton").addEventListener("click", function (event
     event.preventDefault(); // 기본 폼 제출 방지
 
     const email = document.getElementById("email").value;
+    const emailNumberButton = document.getElementById("emailNumberButton");
 
     axios.post("/api/users/send-email", null, {
         params: {
@@ -43,16 +46,38 @@ document.getElementById("emailButton").addEventListener("click", function (event
         }})
         .then(response => {
             alert("인증번호를 발송하였습니다.");
-
             document.getElementById("email").disabled = true;
             document.getElementById("emailButton").disabled = true;
+            emailNumberButton.removeAttribute("disabled");
         })
         .catch(error => {
             alert("이메일 형식이 올바르지 않거나, 이미 사용 중인 이메일입니다.");
         });
 });
 
-// 닉네임 검증
+// 이메일 인증번호 확인
+document.getElementById("emailNumberButton").addEventListener("click", function (event) {
+    event.preventDefault(); // 기본 폼 제출 방지
+
+    const emailData = {
+        email: document.getElementById("email").value,
+        authNumber: document.getElementById("emailNumber").value
+    };
+
+    axios.post("/api/users/validate-email", emailData)
+        .then(response => {
+            alert("인증에 성공했습니다.");
+            document.getElementById("emailNumber").disabled = true;
+            document.getElementById("emailNumberButton").disabled = true;
+            isEmailValidated = true;
+            activateJoinButton();
+        })
+        .catch(error => {
+            alert("인증에 실패했습니다.");
+        });
+});
+
+// 닉네임 확인
 document.getElementById("nicknameButton").addEventListener("click", function (event) {
     event.preventDefault(); // 기본 폼 제출 방지
 
@@ -76,7 +101,7 @@ document.getElementById("nicknameButton").addEventListener("click", function (ev
 // 회원가입 버튼 활성화 여부 확인
 function activateJoinButton() {
     const joinButton = document.getElementById("joinButton");
-    if (isNicknameValidated) {
+    if (isNicknameValidated && isEmailValidated) {
         joinButton.removeAttribute("disabled");
     }
 }
