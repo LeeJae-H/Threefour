@@ -43,10 +43,8 @@ document.addEventListener("DOMContentLoaded", function() {
             });
     } else {
         document.body.innerHTML = '';
-        const userConfirmed = window.confirm("로그인이 필요한 페이지입니다.");
-        if (userConfirmed) {
-            window.location.href = "/home";
-        }
+        window.confirm("로그인이 필요한 페이지입니다.");
+        window.location.href = "/home";
     }
 });
 
@@ -56,7 +54,13 @@ document.getElementById('updateForm').addEventListener('submit', function (event
 
     const accessToken = localStorage.getItem('AccessToken');
 
-    const password = document.getElementById('password').value;
+    const password = document.getElementById("password").value;
+    const password2 = document.getElementById("password2").value;
+    if (password !== password2) {
+        alert("비밀번호가 일치하지 않습니다.");
+        return;
+    }
+
     const nickname = document.getElementById('nickname').value;
 
     const updateData = {};
@@ -76,7 +80,8 @@ document.getElementById('updateForm').addEventListener('submit', function (event
             'AccessToken': accessToken
         }})
         .then(response => {
-            alert("수정이 완료됐습니다.");
+            window.confirm("수정이 완료됐습니다.");
+            window.location.href = "/home";
         })
         .catch(error => {
             alert("잘못된 비밀번호입니다.");

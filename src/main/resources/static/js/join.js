@@ -6,30 +6,39 @@ let isEmailValidated = false;
 document.getElementById("joinForm").addEventListener("submit", function (event) {
     event.preventDefault(); // 기본 폼 제출 방지
 
+    const password = document.getElementById("password").value;
+    const password2 = document.getElementById("password2").value;
+    if (password !== password2) {
+        alert("비밀번호가 일치하지 않습니다.");
+        return;
+    }
+
     const nickname = document.getElementById("nickname").value;
 
     const joinData = {
         email: document.getElementById("email").value,
-        password: document.getElementById("password").value,
+        password: password,
         nickname: nickname
     };
 
     if (nickname != validatedNickname) {
         alert("닉네임 확인이 필요합니다.");
-    } else {
-        axios.post("/api/users/join", joinData)
-            .then(response => {
-                const userNickname = response.data.data;
-                alert(userNickname + "님 환영합니다!");
-
-                // 리다이렉션
-                const redirectUrl = response.headers['location'];
-                window.location.href = redirectUrl;
-            })
-            .catch(error => {
-                alert("잘못된 비밀번호입니다.");
-            });
+        return;
     }
+
+    axios.post("/api/users/join", joinData)
+        .then(response => {
+            const userNickname = response.data.data;
+            alert(userNickname + "님 환영합니다!");
+
+            // 리다이렉션
+            const redirectUrl = response.headers['location'];
+            window.location.href = redirectUrl;
+        })
+        .catch(error => {
+            alert("잘못된 비밀번호입니다.");
+        });
+
 });
 
 // 이메일 인증번호 발송
