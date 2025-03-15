@@ -1,6 +1,6 @@
 // 홈 화면에서 로그인 여부 확인
 document.addEventListener("DOMContentLoaded", function() {
-    loadPosts(1); // 첫 번째 페이지 호출
+    loadPosts();
 
     const accessToken = localStorage.getItem('AccessToken');
 
@@ -87,10 +87,10 @@ document.getElementById("logoutForm").addEventListener("submit", function (event
     }
 });
 
-function loadPosts(page) {
+function loadPosts() {
     axios.get("/api/posts", {
         params: {
-            page: page,
+            page: 1,
             size: 15
         }})
         .then(response => {
@@ -111,6 +111,52 @@ function loadPosts(page) {
                     `;
                 tbody.innerHTML += row;
             });
+
+            const pageInt = 1;
+            const totalPages = response.data.data.totalPages;
+            const ul = document.querySelector("ul");
+            ul.innerHTML = '';
+
+            // Previous 버튼
+            if (pageInt <= 10) {
+                ul.innerHTML += `
+                <li class="page-item disabled">
+                    <a class="page-link">Previous</a>
+                </li>  
+                `;
+            } else {
+                ul.innerHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="/home/${pageInt - 1}">Previous</a>
+                </li>  
+                `;
+            }
+
+            // 페이지 번호들
+            const startPage = Math.floor((pageInt - 1) / 10) * 10 + 1;
+            const endPage = Math.min(startPage + 9, totalPages);
+            for (let i = startPage; i <= endPage; i++) {
+                ul.innerHTML += `
+                <li class="page-item ${parseInt(i) === pageInt ? 'active' : ''}">
+                    <a class="page-link" href="/home/${i}">${i}</a>
+                </li>
+                `;
+            }
+
+            // Next 버튼
+            if (endPage >= totalPages) {
+                ul.innerHTML += `
+                <li class="page-item disabled">
+                    <a class="page-link">Next</a>
+                </li>
+                `;
+            } else {
+                ul.innerHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="/home/${pageInt + 1}">Next</a>
+                </li>
+                `;
+            }
         })
         .catch(error => {
         });

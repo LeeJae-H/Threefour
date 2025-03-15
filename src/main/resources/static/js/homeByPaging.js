@@ -92,7 +92,7 @@ function loadPosts(page) {
     axios.get("/api/posts", {
         params: {
             page: page,
-            size: 3
+            size: 15
         }})
         .then(response => {
             const posts = response.data.data.postSummaryList;
