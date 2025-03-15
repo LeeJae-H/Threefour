@@ -4,7 +4,7 @@ public class AuthConstants {
 
     public static final String[] WHITELIST_URLS = {
             // 화면
-            "/home", "/users/join", "/users/my/info", "/posts/*",
+            "/home", "/home/*", "/users/join", "/users/my/info", "/posts/*",
             // 회원가입
             "/api/users/join", "/api/users/join/send-email", "/api/users/join/validate-nickname", "/api/users/join/validate-email",
             // 로그인

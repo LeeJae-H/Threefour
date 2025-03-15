@@ -16,15 +16,24 @@ public class ViewController {
      * 홈 화면 API
      */
     @GetMapping("/home")
-    public String getHomePage() {
+    public String getHome() {
         return "home";
+    }
+
+    /**
+     * 페이징 홈 화면 API
+     */
+    @GetMapping("/home/{page}")
+    public String getHomeByPaging(@PathVariable int page, Model model) {
+        model.addAttribute("page", page);
+        return "homeByPaging";
     }
 
     /**
      * 회원가입 화면 API
      */
     @GetMapping("/users/join")
-    public String getJoinPage() {
+    public String getJoin() {
         return "join";
     }
 
@@ -34,7 +43,7 @@ public class ViewController {
      * 회원만 가능합니다.
      */
     @GetMapping("/users/my/info")
-    public String getMyInfoPage() {
+    public String getMyInfo() {
         return "user/myInfo";
     }
 
@@ -42,7 +51,7 @@ public class ViewController {
      * 게시글 상세 화면 API
      */
     @GetMapping("/posts/{postId}")
-    public String getMyInfoPage(@PathVariable Long postId, Model model) {
+    public String getPostDetails(@PathVariable Long postId, Model model) {
         model.addAttribute("postId", postId);
         return "post/details";
     }
