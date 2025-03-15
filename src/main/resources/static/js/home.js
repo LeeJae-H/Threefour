@@ -1,5 +1,7 @@
 // 홈 화면에서 로그인 여부 확인
 document.addEventListener("DOMContentLoaded", function() {
+    loadPosts(1); // 첫 번째 페이지 호출
+
     const accessToken = localStorage.getItem('AccessToken');
 
     if (accessToken) {
@@ -84,3 +86,32 @@ document.getElementById("logoutForm").addEventListener("submit", function (event
         localStorage.removeItem("RefreshToken");
     }
 });
+
+function loadPosts(page) {
+    axios.get("/api/posts", {
+        params: {
+            page: page,
+            size: 15
+        }})
+        .then(response => {
+            const posts = response.data.data;
+            const tbody = document.querySelector("table tbody");
+
+            posts.forEach((post) => {
+                const createdAt = new Date(post.createdAt);
+                const formattedCreatedAt = `${createdAt.getFullYear()}/${(createdAt.getMonth() + 1).toString().padStart(2, '0')}/${createdAt.getDate().toString().padStart(2, '0')} ${createdAt.getHours().toString().padStart(2, '0')}:${createdAt.getMinutes().toString().padStart(2, '0')}`;
+                const row =
+                    `
+                    <tr>
+                        <td>${post.id}</td>
+                        <td><a href="/posts/${post.id}" style="text-decoration: none;">${post.title}</a></td>
+                        <td>${post.authorNickname}</td>
+                        <td>${formattedCreatedAt}</td>
+                    </tr>
+                    `;
+                tbody.innerHTML += row;
+            });
+        })
+        .catch(error => {
+        });
+}

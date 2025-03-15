@@ -10,11 +10,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostSummaryResponse {
 
+    private Long id;
     private String title;
     private String authorNickname;
     private LocalDateTime createdAt;
 
-    public PostSummaryResponse(String title, String authorNickname, LocalDateTime createdAt) {
+    public PostSummaryResponse(Long id, String title, String authorNickname, LocalDateTime createdAt) {
+        this.id = id;
         this.title = title;
         this.authorNickname = authorNickname;
         this.createdAt = createdAt;

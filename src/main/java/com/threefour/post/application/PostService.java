@@ -126,7 +126,7 @@ public class PostService {
         Page<Post> posts = postRepository.findAll(pageable);
 
         return posts.stream()
-                .map(post -> new PostSummaryResponse(post.getTitle(), post.getAuthorNickname(), post.getPostTimeInfo().getCreatedAt()))
+                .map(post -> new PostSummaryResponse(post.getId(), post.getTitle(), post.getAuthorNickname(), post.getPostTimeInfo().getCreatedAt()))
                 .collect(Collectors.toList());
     }
 }

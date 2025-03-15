@@ -17,7 +17,36 @@
 
     <div class="container-fluid my-side-padding">
         <div class="row mt-3">
-            <div class="col-md-4 offset-md-8">
+            <!--  왼쪽 화면 : 게시글 목록  -->
+            <div class="col-md-8">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td style="width: 10%;">번호</td>
+                            <td>제목</td>
+                            <td style="width: 20%;">글쓴이</td>
+                            <td style="width: 20%;">등록일</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link">Previous</a>
+                        </li>
+                        <li class="page-item"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <!--  오른쪽 화면 : 로그인 폼  -->
+            <div class="col-md-4">
                 <!--  1. 로그인되지 않은 사용자 화면 -> accessToken이 localStorage에 존재하지 않거나 유효하지 않을 때 보여지는 화면입니다.  -->
                 <form id="loginForm" style="display: none;" class="my-login-form-border">
                     <div class="mb-3">
