@@ -4,10 +4,7 @@ import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
 import com.threefour.post.domain.Post;
 import com.threefour.post.domain.PostRepository;
-import com.threefour.post.dto.EditPostRequest;
-import com.threefour.post.dto.PostDetailsResponse;
-import com.threefour.post.dto.PostSummaryResponse;
-import com.threefour.post.dto.WritePostReqeust;
+import com.threefour.post.dto.*;
 import com.threefour.user.domain.User;
 import com.threefour.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -122,11 +119,13 @@ public class PostService {
         return new PostDetailsResponse(foundPost.getTitle(), foundPost.getContent(), foundPost.getAuthorNickname(), foundPost.getPostTimeInfo(), foundUser.getId(), isMine);
     }
 
-    public List<PostSummaryResponse> getPostsList(Pageable pageable) {
+    public PostSummaryResponse getPostsList(Pageable pageable) {
         Page<Post> posts = postRepository.findAll(pageable);
 
-        return posts.stream()
-                .map(post -> new PostSummaryResponse(post.getId(), post.getTitle(), post.getAuthorNickname(), post.getPostTimeInfo().getCreatedAt()))
+        List<PostSummary> postSummaryList = posts.stream()
+                .map(post -> new PostSummary(post.getId(), post.getTitle(), post.getAuthorNickname(), post.getPostTimeInfo().getCreatedAt()))
                 .collect(Collectors.toList());
+
+        return new PostSummaryResponse(postSummaryList, posts.getTotalPages());
     }
 }

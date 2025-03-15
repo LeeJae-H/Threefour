@@ -94,7 +94,7 @@ function loadPosts(page) {
             size: 15
         }})
         .then(response => {
-            const posts = response.data.data;
+            const posts = response.data.data.postSummaryList;
             const tbody = document.querySelector("table tbody");
 
             posts.forEach((post) => {

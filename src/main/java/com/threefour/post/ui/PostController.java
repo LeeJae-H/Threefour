@@ -89,11 +89,11 @@ public class PostController {
      * @param size
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PostSummaryResponse>>> getPostsList(
+    public ResponseEntity<ApiResponse<PostSummaryResponse>> getPostsList(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        List<PostSummaryResponse> postsList = postService.getPostsList(pageable);
+        PostSummaryResponse postsList = postService.getPostsList(pageable);
         return ApiResponse.success(postsList);
     }
 }
