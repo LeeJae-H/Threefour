@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(response => {
 
 
-                axios.get("/users/my/info", {
+                axios.get("/api/users/my/info", {
                     headers: {
                         'AccessToken': accessToken
                     }})
@@ -75,7 +75,7 @@ document.getElementById('updateForm').addEventListener('submit', function (event
         updateData.nickname = nickname;
     }
 
-    axios.put('/users/my/info', updateData, {
+    axios.put('/api/users/my/info', updateData, {
         headers: {
             'AccessToken': accessToken
         }})
@@ -95,7 +95,7 @@ document.getElementById("nicknameButton").addEventListener("click", function (ev
 
     const nickname = document.getElementById("nickname").value;
 
-    axios.get("/api/users/validate-nickname", {
+    axios.get("/api/users/join/validate-nickname", {
         params: {
             nickname: nickname
         }})

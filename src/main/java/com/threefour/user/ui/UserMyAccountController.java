@@ -1,9 +1,9 @@
 package com.threefour.user.ui;
 
 import com.threefour.common.ApiResponse;
-import com.threefour.user.application.UserAccountService;
-import com.threefour.user.dto.MyUserInfoResponse;
-import com.threefour.user.dto.UpdateUserInfoRequest;
+import com.threefour.user.application.UserMyAccountService;
+import com.threefour.user.dto.MyInfoResponse;
+import com.threefour.user.dto.UpdateMyInfoRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,32 +11,33 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/users/my")
 public class UserMyAccountController {
 
-    private final UserAccountService userAccountService;
+    private final UserMyAccountService userMyAccountService;
 
     /**
      * 내 정보 조회 API
      *
-     * @return MyUserInfoResponse
+     * @return 내 정보 (email, nickname)
      */
-    @GetMapping("/users/my/info")
-    public ResponseEntity<ApiResponse<MyUserInfoResponse>> getMyUserInfo() {
+    @GetMapping("/info")
+    public ResponseEntity<ApiResponse<MyInfoResponse>> getMyInfo() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        MyUserInfoResponse myUserInfo = userAccountService.getMyUserInfo(email);
-        return ApiResponse.success(myUserInfo);
+        MyInfoResponse myInfo = userMyAccountService.getMyInfo(email);
+        return ApiResponse.success(myInfo);
     }
 
     /**
      * 내 정보 수정 API
      *
-     * @param updateUserInfoRequest
+     * @param updateMyInfoRequest
      */
-    @PutMapping("/users/my/info")
-    public ResponseEntity<ApiResponse<String>> updateMyUserInfo(@RequestBody UpdateUserInfoRequest updateUserInfoRequest) {
+    @PutMapping("/info")
+    public ResponseEntity<ApiResponse<String>> updateMyInfo(@RequestBody UpdateMyInfoRequest updateMyInfoRequest) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        userAccountService.updateMyUserInfo(updateUserInfoRequest, email);
-        return ApiResponse.success("ok");
+        userMyAccountService.updateMyInfo(updateMyInfoRequest, email);
+        return ApiResponse.success("success");
     }
 
     /**
@@ -44,10 +45,10 @@ public class UserMyAccountController {
      *
      * @param refreshToken
      */
-    @DeleteMapping("/users/my/{userId}")
+    @DeleteMapping
     public ResponseEntity<ApiResponse<String>> deleteUser(@RequestHeader("RefreshToken") String refreshToken) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        userAccountService.deleteUser(refreshToken, email);
-        return ApiResponse.success("ok");
+        userMyAccountService.deleteUser(refreshToken, email);
+        return ApiResponse.success("success");
     }
 }

@@ -7,15 +7,15 @@ import com.threefour.common.ExpectedException;
 import com.threefour.post.domain.PostRepository;
 import com.threefour.user.domain.User;
 import com.threefour.user.domain.UserRepository;
-import com.threefour.user.dto.MyUserInfoResponse;
-import com.threefour.user.dto.UpdateUserInfoRequest;
+import com.threefour.user.dto.MyInfoResponse;
+import com.threefour.user.dto.UpdateMyInfoRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserAccountService {
+public class UserMyAccountService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -23,34 +23,33 @@ public class UserAccountService {
     private final JwtUtil jwtUtil;
     private final PostRepository postRepository;
 
-    public MyUserInfoResponse getMyUserInfo(String email) {
+    public MyInfoResponse getMyInfo(String email) {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
 
-        return new MyUserInfoResponse(foundUser.getEmail(), foundUser.getNickname());
+        return new MyInfoResponse(foundUser.getEmail(), foundUser.getNickname());
     }
 
     @Transactional
-    public void updateMyUserInfo(UpdateUserInfoRequest updateUserInfoRequest, String email) {
+    public void updateMyInfo(UpdateMyInfoRequest updateMyInfoRequest, String email) {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
 
-        // 회원 정보의 변경이 이루어졌는지 여부
+        // 회원 정보 변경이 이루어졌는지 여부
         boolean isUpdated = false;
 
-        if (updateUserInfoRequest.getPassword() != null) {
-            String newPassword = updateUserInfoRequest.getPassword();
+        if (updateMyInfoRequest.getPassword() != null) {
+            String newPassword = updateMyInfoRequest.getPassword();
             validatePassword(newPassword);
-            // 비밀번호는 암호화되어 저장된다.
+            // 비밀번호는 암호화한 후 전달
             foundUser.changePassword(passwordEncoder.encode(newPassword));
             isUpdated = true;
         }
 
-        if (updateUserInfoRequest.getNickname() != null) {
-            String newNickname = updateUserInfoRequest.getNickname();
+        if (updateMyInfoRequest.getNickname() != null) {
+            String newNickname = updateMyInfoRequest.getNickname();
             validateNickname(newNickname);
-            // 닉네임은 양쪽 끝의 공백을 제거한 후 저장된다.
-            foundUser.changeNickname(newNickname.trim());
+            foundUser.changeNickname(newNickname);
             isUpdated = true;
         }
 

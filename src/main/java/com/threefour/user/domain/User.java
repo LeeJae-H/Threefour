@@ -59,7 +59,7 @@ public class User {
     }
 
     public void changeNickname(String nickname) {
-        this.nickname = nickname;
+        this.nickname = nickname.trim(); // 양 옆 공백 제거
     }
 
     public void updateUpdatedAt() {

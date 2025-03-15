@@ -6,13 +6,14 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MyUserInfoResponse {
+public class UpdateMyInfoRequest {
 
-    private String email;
+    private String password;
     private String nickname;
 
-    public MyUserInfoResponse(String email, String nickname) {
-        this.email = email;
+    // 테스트를 위해 추가한 생성자입니다.
+    public UpdateMyInfoRequest(String password, String nickname) {
+        this.password = password;
         this.nickname = nickname;
     }
 }

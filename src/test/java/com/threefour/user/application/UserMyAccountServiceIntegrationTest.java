@@ -4,8 +4,8 @@ import com.threefour.auth.AuthConstants;
 import com.threefour.auth.JwtUtil;
 import com.threefour.post.domain.Post;
 import com.threefour.user.domain.User;
-import com.threefour.user.dto.MyUserInfoResponse;
-import com.threefour.user.dto.UpdateUserInfoRequest;
+import com.threefour.user.dto.MyInfoResponse;
+import com.threefour.user.dto.UpdateMyInfoRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class UserMyAccountServiceIntegrationTest {
 
     @Autowired
-    private UserAccountService userAccountService;
+    private UserMyAccountService userMyAccountService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -64,7 +64,7 @@ public class UserMyAccountServiceIntegrationTest {
         savedUser.getId();
 
         // when
-        MyUserInfoResponse response = userAccountService.getMyUserInfo(savedUser.getEmail());
+        MyInfoResponse response = userMyAccountService.getMyInfo(savedUser.getEmail());
 
         // then
         assertThat(response).isNotNull();
@@ -110,7 +110,7 @@ public class UserMyAccountServiceIntegrationTest {
         LocalDateTime updatedAtBefore = savedUser.getUserTimeInfo().getUpdatedAt();
 
         // when
-        userAccountService.updateMyUserInfo(new UpdateUserInfoRequest(newPassword, newNickname), savedUser.getEmail());
+        userMyAccountService.updateMyInfo(new UpdateMyInfoRequest(newPassword, newNickname), savedUser.getEmail());
 
         // then
         String foundUserQuery = "SELECT email, password, nickname FROM user WHERE email = ?";  // email은 unique 제약 조건
@@ -140,7 +140,7 @@ public class UserMyAccountServiceIntegrationTest {
         LocalDateTime updatedAtBefore = savedUser.getUserTimeInfo().getUpdatedAt();
 
         // when
-        userAccountService.updateMyUserInfo(new UpdateUserInfoRequest(newPassword, null), savedUser.getEmail());
+        userMyAccountService.updateMyInfo(new UpdateMyInfoRequest(newPassword, null), savedUser.getEmail());
 
         // then
         String getUserQuery = "SELECT email, password, nickname FROM user WHERE email = ?";
@@ -208,7 +208,7 @@ public class UserMyAccountServiceIntegrationTest {
         );
 
         // when
-        userAccountService.deleteUser("Bearer " + refreshToken, savedUser.getEmail());
+        userMyAccountService.deleteUser("Bearer " + refreshToken, savedUser.getEmail());
 
         // then
         // 1. 회원이 작성한 게시글이 모두 삭제되었는지 확인

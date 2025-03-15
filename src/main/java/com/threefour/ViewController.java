@@ -31,7 +31,7 @@ public class ViewController {
      *
      * 회원만 가능합니다.
      */
-    @GetMapping("/users/my-info")
+    @GetMapping("/users/my/info")
     public String getMyInfoPage() {
         return "user/myInfo";
     }

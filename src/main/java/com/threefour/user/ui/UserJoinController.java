@@ -30,7 +30,7 @@ public class UserJoinController {
     }
 
     /**
-     * 회원가입 시 사용 - 이메일 인증번호 발송 API
+     * 이메일 인증번호 발송 API - 회원가입 시 사용
      *
      * @param emailMap
      */
@@ -41,7 +41,7 @@ public class UserJoinController {
     }
 
     /**
-     * 회원가입 시 사용 - 이메일 인증번호 확인 API
+     * 이메일 인증번호 확인 API - 회원가입 시 사용
      *
      * @param emailValidationRequest
      */
@@ -52,7 +52,7 @@ public class UserJoinController {
     }
 
     /**
-     * 회원가입 시 사용 - 닉네임 사용 가능 여부 확인 API
+     * 닉네임 사용 가능 여부 확인 API - 회원가입 시, 내 정보 수정 시 사용
      *
      * @param nickname
      */
