@@ -20,7 +20,7 @@ public class UserJoinService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final MailSender mailSender;
-    // todo 분산 서버를 고려하여 Redis로 변경해야 합니다.
+    // todo 추후 분산 서버를 고려한다면 Redis로 변경해야 합니다.
     private final Map<String, String> emailValidationCache = new ConcurrentHashMap<>();
 
     @Transactional
@@ -33,9 +33,8 @@ public class UserJoinService {
         validatePassword(password);
         validateNickname(nickname);
 
-        // 비밀번호는 암호화되어 저장되며, 닉네임은 양쪽 끝의 공백을 제거한 후 저장된다.
-        User newUser = User.join(email, passwordEncoder.encode(password), nickname.trim());
-
+        // 비밀번호는 암호화한 후 전달
+        User newUser = User.join(email, passwordEncoder.encode(password), nickname);
         User savedUser = userRepository.save(newUser);
         return savedUser.getNickname();
     }
@@ -43,21 +42,19 @@ public class UserJoinService {
     public void sendEmailAuthNumberForJoin(String email) {
         validateEmail(email);
 
+        // todo 사용자 경험을 위해 메일 발송 자체는 이벤트(도메인 이벤트)로 처리
         int authNumber = mailSender.sendMail(email);
         emailValidationCache.put(email, String.valueOf(authNumber));
     }
 
     public void validateEmailForJoin(EmailValidationRequest emailValidationRequest) {
-        String storedAuthNumber = emailValidationCache.get(emailValidationRequest.getEmail());
+        String email = emailValidationRequest.getEmail();
+        String authNumber = emailValidationRequest.getAuthNumber();
 
-        if (storedAuthNumber == null) {
+        String storedAuthNumber = emailValidationCache.get(email);
+        if (storedAuthNumber == null || !storedAuthNumber.equals(authNumber)) {
             throw new ExpectedException(ErrorCode.FAIL_VALIDATE_MAIL);
         }
-
-        if (!storedAuthNumber.equals(emailValidationRequest.getAuthNumber())) {
-            throw new ExpectedException(ErrorCode.FAIL_VALIDATE_MAIL);
-        }
-
         emailValidationCache.remove(emailValidationRequest.getEmail());
     }
 

@@ -30,10 +30,7 @@ document.getElementById("joinForm").addEventListener("submit", function (event) 
         .then(response => {
             const userNickname = response.data.data;
             alert(userNickname + "님 환영합니다!");
-
-            // 리다이렉션
-            const redirectUrl = response.headers['location'];
-            window.location.href = redirectUrl;
+            window.location.href = "/home";
         })
         .catch(error => {
             alert("잘못된 비밀번호입니다.");
@@ -48,10 +45,7 @@ document.getElementById("emailButton").addEventListener("click", function (event
     const email = document.getElementById("email").value;
     const emailNumberButton = document.getElementById("emailNumberButton");
 
-    axios.post("/api/users/send-email", null, {
-        params: {
-            email: email
-        }})
+    axios.post("/api/users/join/send-email", { email: email })
         .then(response => {
             alert("인증번호를 발송하였습니다.");
             document.getElementById("email").disabled = true;
@@ -72,7 +66,7 @@ document.getElementById("emailNumberButton").addEventListener("click", function 
         authNumber: document.getElementById("emailNumber").value
     };
 
-    axios.post("/api/users/validate-email", emailData)
+    axios.post("/api/users/join/validate-email", emailData)
         .then(response => {
             alert("인증에 성공했습니다.");
             document.getElementById("emailNumber").disabled = true;
@@ -91,7 +85,7 @@ document.getElementById("nicknameButton").addEventListener("click", function (ev
 
     const nickname = document.getElementById("nickname").value;
 
-    axios.get("/api/users/validate-nickname", {
+    axios.get("/api/users/join/validate-nickname", {
         params: {
             nickname: nickname
         }})

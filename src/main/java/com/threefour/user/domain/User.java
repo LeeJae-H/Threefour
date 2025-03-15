@@ -42,13 +42,14 @@ public class User {
     }
 
     public static User join(String email, String password, String nickname) {
+        // password 인자는 암호화된 상태로 넘어와야 합니다.
         return new User(email, password, nickname, "ROLE_USER", new UserTimeInfo(LocalDateTime.now(), LocalDateTime.now()));
     }
 
     private User(String email, String password, String nickname, String role, UserTimeInfo userTimeInfo) {
         this.email = email;
         this.password = password;
-        this.nickname = nickname;
+        this.nickname = nickname.trim(); // 양 옆 공백 제거
         this.role = role;
         this.userTimeInfo = userTimeInfo;
     }
