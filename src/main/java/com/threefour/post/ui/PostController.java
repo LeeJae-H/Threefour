@@ -4,7 +4,7 @@ import com.threefour.common.ApiResponse;
 import com.threefour.post.application.PostService;
 import com.threefour.post.dto.EditPostRequest;
 import com.threefour.post.dto.PostDetailsResponse;
-import com.threefour.post.dto.PostSummaryResponse;
+import com.threefour.post.dto.PostsListResponse;
 import com.threefour.post.dto.WritePostReqeust;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -12,8 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -87,13 +85,14 @@ public class PostController {
      *
      * @param page
      * @param size
+     * @return PostSummaryResponse
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<PostSummaryResponse>> getPostsList(
+    public ResponseEntity<ApiResponse<PostsListResponse>> getPostsList(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        PostSummaryResponse postsList = postService.getPostsList(pageable);
+        PostsListResponse postsList = postService.getPostsList(pageable);
         return ApiResponse.success(postsList);
     }
 }

@@ -119,13 +119,13 @@ public class PostService {
         return new PostDetailsResponse(foundPost.getTitle(), foundPost.getContent(), foundPost.getAuthorNickname(), foundPost.getPostTimeInfo(), foundUser.getId(), isMine);
     }
 
-    public PostSummaryResponse getPostsList(Pageable pageable) {
+    public PostsListResponse getPostsList(Pageable pageable) {
         Page<Post> posts = postRepository.findAll(pageable);
 
         List<PostSummary> postSummaryList = posts.stream()
                 .map(post -> new PostSummary(post.getId(), post.getTitle(), post.getAuthorNickname(), post.getPostTimeInfo().getCreatedAt()))
                 .collect(Collectors.toList());
 
-        return new PostSummaryResponse(postSummaryList, posts.getTotalPages());
+        return new PostsListResponse(postSummaryList, posts.getTotalPages());
     }
 }

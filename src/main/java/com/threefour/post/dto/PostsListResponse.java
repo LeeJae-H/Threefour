@@ -8,12 +8,12 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostSummaryResponse {
+public class PostsListResponse {
 
     private List<PostSummary> postSummaryList;
     private int totalPages;
 
-    public PostSummaryResponse(List<PostSummary> postSummaryList, int totalPages) {
+    public PostsListResponse(List<PostSummary> postSummaryList, int totalPages) {
         this.postSummaryList = postSummaryList;
         this.totalPages = totalPages;
     }
