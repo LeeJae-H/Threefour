@@ -1,15 +1,13 @@
 document.addEventListener("DOMContentLoaded", function() {
     const category = document.getElementById("category").value;
-    const writePostButton = document.getElementById("writePostButton");
-    writePostButton.href = `/posts/write/${category}`;
-
-    loadPosts(category);
+    const page = document.getElementById("page").value;
+    loadPosts(category, page);
 });
 
-function loadPosts(category) {
+function loadPosts(category, page) {
     axios.get(`/api/posts/category/${category}`, {
         params: {
-            page: 1,
+            page: page,
             size: 15
         }})
         .then(response => {
@@ -19,8 +17,7 @@ function loadPosts(category) {
             posts.forEach((post) => {
                 const createdAt = new Date(post.createdAt);
                 const formattedCreatedAt = `${createdAt.getFullYear()}/${(createdAt.getMonth() + 1).toString().padStart(2, '0')}/${createdAt.getDate().toString().padStart(2, '0')} ${createdAt.getHours().toString().padStart(2, '0')}:${createdAt.getMinutes().toString().padStart(2, '0')}`;
-                const row =
-                    `
+                const row = `
                     <tr>
                         <td>${post.id}</td>
                         <td><a href="/posts/${post.id}" style="text-decoration: none;">${post.title}</a></td>
@@ -31,7 +28,7 @@ function loadPosts(category) {
                 tbody.innerHTML += row;
             });
 
-            const pageInt = 1;
+            const pageInt = parseInt(page);
             const totalPages = response.data.data.totalPages;
             const ul = document.querySelector("ul");
             ul.innerHTML = '';

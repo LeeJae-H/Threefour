@@ -82,4 +82,18 @@ public class ViewController {
         model.addAttribute("category", category);
         return "post/category";
     }
+
+    /**
+     * 페이징 게시판(category) 화면 API
+     */
+    @GetMapping("/posts/category/{category}/{page}")
+    public String getPostCategoryByPaging(
+            @PathVariable String category,
+            @PathVariable int page,
+            Model model
+    ) {
+        model.addAttribute("category", category);
+        model.addAttribute("page", page);
+        return "post/categoryByPaging";
+    }
 }

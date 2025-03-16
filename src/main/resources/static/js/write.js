@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     const accessToken = localStorage.getItem('AccessToken');
-    const categoryValue = document.getElementById("categoryValue").value;
 
     if (accessToken) {
         axios.post('/api/token/validate', null, {
