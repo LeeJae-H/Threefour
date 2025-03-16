@@ -55,4 +55,13 @@ public class ViewController {
         model.addAttribute("postId", postId);
         return "post/details";
     }
+
+    /**
+     * 게시글 수정 화면 API
+     */
+    @GetMapping("/posts/edit/{postId}")
+    public String getEditPost(@PathVariable Long postId, Model model) {
+        model.addAttribute("postId", postId);
+        return "post/edit";
+    }
 }

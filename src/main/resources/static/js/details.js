@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function loadPostDetails(postId) {
-    axios.get(`/api/posts/${postId}`)
+    axios.get(`/api/posts/id/${postId}`)
         .then(response => {
             const post = response.data.data;
 
@@ -28,15 +28,22 @@ function loadPostDetails(postId) {
             document.getElementById("authorNickname").innerText = post.authorNickname;
             document.getElementById("content").innerText = post.content;
             const createdAt = new Date(post.postTimeInfo.createdAt);
-            const formattedCreatedAt = `${createdAt.getFullYear()}/${(createdAt.getMonth() + 1).toString().padStart(2, '0')}/${createdAt.getDate().toString().padStart(2, '0')} ${createdAt.getHours().toString().padStart(2, '0')}:${createdAt.getMinutes().toString().padStart(2, '0')}`;
-            document.getElementById("createdAt").innerText = formattedCreatedAt;
+            const updatedAt = new Date(post.postTimeInfo.updatedAt);
+
+            if (createdAt !== updatedAt) {
+                const formattedUpdatedAt = `${updatedAt.getFullYear()}/${(updatedAt.getMonth() + 1).toString().padStart(2, '0')}/${updatedAt.getDate().toString().padStart(2, '0')} ${updatedAt.getHours().toString().padStart(2, '0')}:${updatedAt.getMinutes().toString().padStart(2, '0')}`;
+                document.getElementById("createdAt").innerText = `(수정됨) ${formattedUpdatedAt}`;
+            } else {
+                const formattedCreatedAt = `${createdAt.getFullYear()}/${(createdAt.getMonth() + 1).toString().padStart(2, '0')}/${createdAt.getDate().toString().padStart(2, '0')} ${createdAt.getHours().toString().padStart(2, '0')}:${createdAt.getMinutes().toString().padStart(2, '0')}`;
+                document.getElementById("createdAt").innerText = formattedCreatedAt;
+            }
         })
         .catch(error => {
         });
 }
 
 function loadPostDetailsWithAccessToken(postId, accessToken) {
-    axios.get(`/api/posts/${postId}`, {
+    axios.get(`/api/posts/id/${postId}`, {
         headers: {
             "AccessToken": accessToken
         }})
@@ -48,12 +55,20 @@ function loadPostDetailsWithAccessToken(postId, accessToken) {
             document.getElementById("authorNickname").innerText = post.authorNickname;
             document.getElementById("content").innerText = post.content;
             const createdAt = new Date(post.postTimeInfo.createdAt);
-            const formattedCreatedAt = `${createdAt.getFullYear()}/${(createdAt.getMonth() + 1).toString().padStart(2, '0')}/${createdAt.getDate().toString().padStart(2, '0')} ${createdAt.getHours().toString().padStart(2, '0')}:${createdAt.getMinutes().toString().padStart(2, '0')}`;
-            document.getElementById("createdAt").innerText = formattedCreatedAt;
+            const updatedAt = new Date(post.postTimeInfo.updatedAt);
+
+            if (createdAt !== updatedAt) {
+                const formattedUpdatedAt = `${updatedAt.getFullYear()}/${(updatedAt.getMonth() + 1).toString().padStart(2, '0')}/${updatedAt.getDate().toString().padStart(2, '0')} ${updatedAt.getHours().toString().padStart(2, '0')}:${updatedAt.getMinutes().toString().padStart(2, '0')}`;
+                document.getElementById("createdAt").innerText = `(수정됨) ${formattedUpdatedAt}`;
+            } else {
+                const formattedCreatedAt = `${createdAt.getFullYear()}/${(createdAt.getMonth() + 1).toString().padStart(2, '0')}/${createdAt.getDate().toString().padStart(2, '0')} ${createdAt.getHours().toString().padStart(2, '0')}:${createdAt.getMinutes().toString().padStart(2, '0')}`;
+                document.getElementById("createdAt").innerText = formattedCreatedAt;
+            }
 
             if (post.isMine) {
                 const editPostButton = document.getElementById("editPostButton");
                 editPostButton.style.display = 'block';
+                editPostButton.href = `/posts/edit/${postId}`;
 
                 const deletePostButton = document.getElementById("deletePostButton");
                 deletePostButton.style.display = 'block';

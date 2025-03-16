@@ -67,11 +67,13 @@ public class PostController {
     /**
      * 게시글 세부 사항 조회 API
      *
+     * todo Spring Security에서 HTTP Method에 따른 인가 처리가 안되어 임시로 엔드포인트 앞에 /id를 붙혔습니다.
+     *
      * @param accessToken
      * @param postId
      * @return PostDetailsResponse
      */
-    @GetMapping("/{postId}")
+    @GetMapping("/id/{postId}")
     public ResponseEntity<ApiResponse<PostDetailsResponse>> getPostDetails(
             @PathVariable Long postId,
             @RequestHeader(value = "AccessToken", required = false) String accessToken

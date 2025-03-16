@@ -57,9 +57,7 @@ public class SecurityConfig {
 
                 // 경로별 인가 작업
                 .authorizeHttpRequests((auth) -> auth       // -> Authorization 필터 활성화
-                        .requestMatchers(HttpMethod.GET, "/api/posts/*").permitAll()
                         .requestMatchers(AuthConstants.WHITELIST_URLS).permitAll()
-                        .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated())
 
                 // 필터 추가
