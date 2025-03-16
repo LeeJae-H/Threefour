@@ -52,15 +52,34 @@ function loadPostDetailsWithAccessToken(postId, accessToken) {
             document.getElementById("createdAt").innerText = formattedCreatedAt;
 
             if (post.isMine) {
-                const editPost = document.getElementById("editPost");
-                editPost.style.display = 'block';
-                editPost.setAttribute('href', `/home`);
+                const editPostButton = document.getElementById("editPostButton");
+                editPostButton.style.display = 'block';
 
-                const deletePost = document.getElementById("deletePost");
-                deletePost.style.display = 'block';
-                deletePost.setAttribute('href', `/home`);
+                const deletePostButton = document.getElementById("deletePostButton");
+                deletePostButton.style.display = 'block';
             }
         })
         .catch(error => {
         });
 }
+
+// 게시글 삭제하기
+document.getElementById("deletePostButton").addEventListener("click", function (event) {
+    event.preventDefault(); // 기본 폼 제출 방지
+
+    const accessToken = localStorage.getItem('AccessToken');
+    const postId = document.getElementById("postId").value;
+
+    axios.delete(`/api/posts/${postId}`, {
+        headers: {
+            'AccessToken': accessToken
+        }})
+        .then(response => {
+            alert("삭제가 완료됐습니다.");
+            window.location.href = "/home";
+        })
+        .catch(error => {
+            alert("삭제에 실패했습니다.");
+            window.location.href = "/home";
+        });
+});

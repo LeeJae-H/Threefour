@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -56,6 +57,7 @@ public class SecurityConfig {
 
                 // 경로별 인가 작업
                 .authorizeHttpRequests((auth) -> auth       // -> Authorization 필터 활성화
+                        .requestMatchers(HttpMethod.GET, "/api/posts/*").permitAll()
                         .requestMatchers(AuthConstants.WHITELIST_URLS).permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated())

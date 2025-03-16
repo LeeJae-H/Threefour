@@ -12,7 +12,7 @@ public class AuthConstants {
             // 토큰
             "/api/token/reissue", "/api/token/validate",
             // 게시글
-            "/api/posts", "/api/posts/*"
+            "/api/posts"
     };
     public static final Long ACCESS_TOKEN_EXPIRATION_TIME = 1000*60*10L; // 10분
     public static final Long REFRESH_TOKEN_EXPIRATION_TIME = 1000*60*60*24L; // 24시간
