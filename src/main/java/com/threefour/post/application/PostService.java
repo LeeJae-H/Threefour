@@ -1,5 +1,6 @@
 package com.threefour.post.application;
 
+import com.threefour.auth.JwtUtil;
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
 import com.threefour.post.domain.Post;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +24,7 @@ public class PostService {
 
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final JwtUtil jwtUtil;
 
     @Transactional
     public Long writePost(WritePostReqeust writePostReqeust, String email) {
@@ -106,17 +109,26 @@ public class PostService {
         }
     }
 
-    public PostDetailsResponse getPostDetails(Long postId, String email) {
-        User foundUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
-
+    public PostDetailsResponse getPostDetails(Long postId, String accessToken) {
         Post foundPost = postRepository.findById(postId)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
 
-        // 본인 게시글 여부
-        boolean isMine = foundPost.getAuthorNickname().equals(foundUser.getNickname());
+        boolean isMine = false;
 
-        return new PostDetailsResponse(foundPost.getTitle(), foundPost.getContent(), foundPost.getAuthorNickname(), foundPost.getPostTimeInfo(), foundUser.getId(), isMine);
+        // AccessToken 헤더의 값이 유효하면
+        if (accessToken != null && accessToken.startsWith("Bearer ")) {
+            String token = accessToken.split(" ")[1];
+            String category = jwtUtil.getCategory(token);
+            if (category.equals("access") && !jwtUtil.isExpired(token)) {
+                String email = jwtUtil.getEmail(token);
+                Optional<User> foundUser = userRepository.findByEmail(email);
+                if (foundUser.isPresent()) {
+                    isMine = foundPost.getAuthorNickname().equals(foundUser.get().getNickname());
+                }
+            }
+        }
+
+        return new PostDetailsResponse(foundPost.getAuthorNickname(), foundPost.getCategory(), foundPost.getTitle(), foundPost.getContent(), foundPost.getPostTimeInfo(), isMine);
     }
 
     public PostsListResponse getPostsList(Pageable pageable) {

@@ -67,13 +67,16 @@ public class PostController {
     /**
      * 게시글 세부 사항 조회 API
      *
+     * @param accessToken
      * @param postId
      * @return PostDetailsResponse
      */
     @GetMapping("/{postId}")
-    public ResponseEntity<ApiResponse<PostDetailsResponse>> getPostDetails(@PathVariable Long postId) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        PostDetailsResponse postDetailsResponse = postService.getPostDetails(postId, email);
+    public ResponseEntity<ApiResponse<PostDetailsResponse>> getPostDetails(
+            @PathVariable Long postId,
+            @RequestHeader(value = "AccessToken", required = false) String accessToken
+    ) {
+        PostDetailsResponse postDetailsResponse = postService.getPostDetails(postId, accessToken);
         return ApiResponse.success(postDetailsResponse);
     }
 
