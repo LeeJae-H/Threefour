@@ -64,4 +64,13 @@ public class ViewController {
         model.addAttribute("postId", postId);
         return "post/edit";
     }
+
+    /**
+     * 게시판(category) 화면 API
+     */
+    @GetMapping("/posts/category/{category}")
+    public String getPostCategory(@PathVariable String category, Model model) {
+        model.addAttribute("category", category);
+        return "post/category";
+    }
 }

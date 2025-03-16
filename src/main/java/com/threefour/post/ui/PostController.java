@@ -90,7 +90,7 @@ public class PostController {
      *
      * @param page
      * @param size
-     * @return PostSummaryResponse
+     * @return PostsListResponse
      */
     @GetMapping
     public ResponseEntity<ApiResponse<PostsListResponse>> getPostsList(
@@ -98,6 +98,25 @@ public class PostController {
             @RequestParam(value = "size", defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         PostsListResponse postsList = postService.getPostsList(pageable);
+        return ApiResponse.success(postsList);
+    }
+
+    /**
+     * 게시판의 게시글 목록 조회 API
+     *
+     * 페이지 단위로 조회합니다.
+     *
+     * @param page
+     * @param size
+     * @return PostsListResponse
+     */
+    @GetMapping("/category/{category}")
+    public ResponseEntity<ApiResponse<PostsListResponse>> getPostsListByCategory(
+            @PathVariable String category,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        PostsListResponse postsList = postService.getPostsListByCategory(category, pageable);
         return ApiResponse.success(postsList);
     }
 }

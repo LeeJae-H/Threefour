@@ -140,4 +140,14 @@ public class PostService {
 
         return new PostsListResponse(postSummaryList, posts.getTotalPages());
     }
+
+    public PostsListResponse getPostsListByCategory(String category, Pageable pageable) {
+        Page<Post> posts = postRepository.findAllByCategory(category, pageable);
+
+        List<PostSummary> postSummaryList = posts.stream()
+                .map(post -> new PostSummary(post.getId(), post.getTitle(), post.getAuthorNickname(), post.getPostTimeInfo().getCreatedAt()))
+                .collect(Collectors.toList());
+
+        return new PostsListResponse(postSummaryList, posts.getTotalPages());
+    }
 }

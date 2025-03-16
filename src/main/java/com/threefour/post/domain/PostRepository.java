@@ -11,6 +11,7 @@ public interface PostRepository extends Repository<Post, Long> {
     Post save(Post post);
     Optional<Post> findById(Long id);
     Page<Post> findAll(Pageable pageable);
+    Page<Post> findAllByCategory(String category, Pageable pageable);
     void delete(Post post);
     void deleteByAuthorNickname(String authorNickname);
 }
