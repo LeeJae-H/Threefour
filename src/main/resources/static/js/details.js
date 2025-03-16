@@ -55,6 +55,10 @@ function loadPostDetailsWithAccessToken(postId, accessToken) {
                 const editPost = document.getElementById("editPost");
                 editPost.style.display = 'block';
                 editPost.setAttribute('href', `/home`);
+
+                const deletePost = document.getElementById("deletePost");
+                deletePost.style.display = 'block';
+                deletePost.setAttribute('href', `/home`);
             }
         })
         .catch(error => {
