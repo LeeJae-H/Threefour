@@ -30,7 +30,7 @@ function loadPostDetails(postId) {
             const createdAt = new Date(post.postTimeInfo.createdAt);
             const updatedAt = new Date(post.postTimeInfo.updatedAt);
 
-            if (createdAt !== updatedAt) {
+            if (createdAt.getTime() !== updatedAt.getTime()) {
                 const formattedUpdatedAt = `${updatedAt.getFullYear()}/${(updatedAt.getMonth() + 1).toString().padStart(2, '0')}/${updatedAt.getDate().toString().padStart(2, '0')} ${updatedAt.getHours().toString().padStart(2, '0')}:${updatedAt.getMinutes().toString().padStart(2, '0')}`;
                 document.getElementById("createdAt").innerText = `(수정됨) ${formattedUpdatedAt}`;
             } else {
@@ -57,7 +57,7 @@ function loadPostDetailsWithAccessToken(postId, accessToken) {
             const createdAt = new Date(post.postTimeInfo.createdAt);
             const updatedAt = new Date(post.postTimeInfo.updatedAt);
 
-            if (createdAt !== updatedAt) {
+            if (createdAt.getTime() !== updatedAt.getTime()) {
                 const formattedUpdatedAt = `${updatedAt.getFullYear()}/${(updatedAt.getMonth() + 1).toString().padStart(2, '0')}/${updatedAt.getDate().toString().padStart(2, '0')} ${updatedAt.getHours().toString().padStart(2, '0')}:${updatedAt.getMinutes().toString().padStart(2, '0')}`;
                 document.getElementById("createdAt").innerText = `(수정됨) ${formattedUpdatedAt}`;
             } else {

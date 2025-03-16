@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     const category = document.getElementById("category").value;
+    const writePostButton = document.getElementById("writePostButton");
+    writePostButton.href = `/posts/write/${category}`;
     const page = document.getElementById("page").value;
     loadPosts(category, page);
 });
