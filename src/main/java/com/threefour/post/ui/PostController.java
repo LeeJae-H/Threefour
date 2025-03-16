@@ -26,7 +26,7 @@ public class PostController {
      * @param writePostReqeust
      * @return 게시글 id
      */
-    @PostMapping
+    @PostMapping("/write")
     public ResponseEntity<ApiResponse<Long>> writePost(@RequestBody WritePostReqeust writePostReqeust) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Long postId = postService.writePost(writePostReqeust, email);

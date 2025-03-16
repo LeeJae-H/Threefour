@@ -66,6 +66,15 @@ public class ViewController {
     }
 
     /**
+     * 게시글 작성 화면 API
+     */
+    @GetMapping("/posts/write/{category}")
+    public String getWritePost(@PathVariable String category, Model model) {
+        model.addAttribute("category", category);
+        return "post/write";
+    }
+
+    /**
      * 게시판(category) 화면 API
      */
     @GetMapping("/posts/category/{category}")
