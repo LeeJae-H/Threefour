@@ -21,7 +21,7 @@ public class UserMyAccountController {
      *
      * @return 내 정보 (email, nickname)
      */
-    @GetMapping("/info")
+    @GetMapping
     public ResponseEntity<ApiResponse<MyInfoResponse>> getMyInfo() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         MyInfoResponse myInfo = userMyAccountService.getMyInfo(email);
@@ -33,7 +33,7 @@ public class UserMyAccountController {
      *
      * @param updateMyInfoRequest
      */
-    @PutMapping("/info")
+    @PutMapping
     public ResponseEntity<ApiResponse<String>> updateMyInfo(@RequestBody UpdateMyInfoRequest updateMyInfoRequest) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         userMyAccountService.updateMyInfo(updateMyInfoRequest, email);

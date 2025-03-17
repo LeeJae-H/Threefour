@@ -26,11 +26,27 @@ public class PostController {
      * @param writePostReqeust
      * @return 게시글 id
      */
-    @PostMapping("/write")
+    @PostMapping
     public ResponseEntity<ApiResponse<Long>> writePost(@RequestBody WritePostReqeust writePostReqeust) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Long postId = postService.writePost(writePostReqeust, email);
         return ApiResponse.success(postId);
+    }
+
+    /**
+     * 게시글 상세 조회 API
+     **
+     * @param accessToken
+     * @param postId
+     * @return PostDetailsResponse
+     */
+    @GetMapping("/{postId}/details")
+    public ResponseEntity<ApiResponse<PostDetailsResponse>> getPostDetails(
+            @PathVariable Long postId,
+            @RequestHeader(value = "AccessToken", required = false) String accessToken
+    ) {
+        PostDetailsResponse postDetailsResponse = postService.getPostDetails(postId, accessToken);
+        return ApiResponse.success(postDetailsResponse);
     }
 
     /**
@@ -48,7 +64,7 @@ public class PostController {
     ) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         postService.editPost(postId, editPostRequest, email);
-        return ApiResponse.success("ok");
+        return ApiResponse.success("success");
     }
 
     /**
@@ -62,25 +78,7 @@ public class PostController {
     public ResponseEntity<ApiResponse<String>> deletePost(@PathVariable Long postId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         postService.deletePost(postId, email);
-        return ApiResponse.success("ok");
-    }
-
-    /**
-     * 게시글 세부 사항 조회 API
-     *
-     * todo Spring Security에서 HTTP Method에 따른 인가 처리가 안되어 임시로 엔드포인트 앞에 /id를 붙혔습니다.
-     *
-     * @param accessToken
-     * @param postId
-     * @return PostDetailsResponse
-     */
-    @GetMapping("/id/{postId}")
-    public ResponseEntity<ApiResponse<PostDetailsResponse>> getPostDetails(
-            @PathVariable Long postId,
-            @RequestHeader(value = "AccessToken", required = false) String accessToken
-    ) {
-        PostDetailsResponse postDetailsResponse = postService.getPostDetails(postId, accessToken);
-        return ApiResponse.success(postDetailsResponse);
+        return ApiResponse.success("success");
     }
 
     /**
@@ -93,7 +91,7 @@ public class PostController {
      * @param size
      * @return PostsListResponse
      */
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<ApiResponse<PostsListResponse>> getPostsList(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
@@ -111,7 +109,7 @@ public class PostController {
      * @param size
      * @return PostsListResponse
      */
-    @GetMapping("/category/{category}")
+    @GetMapping("/all/{category}")
     public ResponseEntity<ApiResponse<PostsListResponse>> getPostsListByCategory(
             @PathVariable String category,
             @RequestParam(value = "page", defaultValue = "1") int page,
