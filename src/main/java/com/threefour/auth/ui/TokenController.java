@@ -40,10 +40,6 @@ public class TokenController {
     @PostMapping("/validate")
     public ResponseEntity<ApiResponse<String>> validateToken(@RequestHeader("AccessToken") String accessToken) {
         String nickname = tokenService.validateToken(accessToken);
-        if (nickname == null) {
-            return ApiResponse.fail("fail");
-        } else {
-            return ApiResponse.success(nickname);
-        }
+        return ApiResponse.success(nickname);
     }
 }

@@ -59,7 +59,7 @@ public class TokenService {
     public String validateToken(String accessToken) {
         // AccessToken 헤더의 값이 유효한 지 검증
         if (accessToken == null || !accessToken.startsWith("Bearer ")) {
-            return null;
+            throw new ExpectedException(ErrorCode.INVALID_ACCESS_TOKEN);
         }
 
         String token = accessToken.split(" ")[1];
@@ -67,12 +67,12 @@ public class TokenService {
         // 토큰이 AccessToken인 지 검증
         String category = jwtUtil.getCategory(token);
         if (!category.equals("access")) {
-            return null;
+            throw new ExpectedException(ErrorCode.INVALID_ACCESS_TOKEN);
         }
 
         // AccessToken이 만료되었는 지 검증
         if (jwtUtil.isExpired(token)) {
-            return null;
+            throw new ExpectedException(ErrorCode.INVALID_ACCESS_TOKEN);
         }
 
         String email = jwtUtil.getEmail(token);

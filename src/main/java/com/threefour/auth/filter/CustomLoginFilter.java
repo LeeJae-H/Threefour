@@ -41,8 +41,6 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        System.out.println("--------" + email);
-        System.out.println("--------" + password);
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password, null);
         return authenticationManager.authenticate(authToken);
     }

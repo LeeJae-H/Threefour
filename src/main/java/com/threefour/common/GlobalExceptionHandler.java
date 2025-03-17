@@ -20,31 +20,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<?>> handleExpectedException(ExpectedException ex) {
         ErrorCode errorCode = ex.getErrorCode();
 
-        String errorMessage = errorCode.getMessage();
+        String code = errorCode.getCode();
+        String message = errorCode.getMessage();
         HttpStatus status = errorCode.getHttpStatus();
-        return ApiResponse.error(errorMessage, status);
-    }
 
-    /**
-     * Validation 관련 예외가 발생했을 때 동작합니다.
-     */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<?>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        BindingResult bindingResult = ex.getBindingResult();
-        StringBuilder builder = new StringBuilder();
-        for (FieldError fieldError : bindingResult.getFieldErrors()) {
-            builder.append("[");
-            builder.append(fieldError.getField());
-            builder.append("](은)는 ");
-            builder.append(fieldError.getDefaultMessage());
-            builder.append(" 입력된 값: [");
-            builder.append(fieldError.getRejectedValue());
-            builder.append("]");
-        }
-
-        String errorMessage = ErrorCode.FAIL_VALIDATION.getMessage(builder.toString());
-        HttpStatus status = ErrorCode.FAIL_VALIDATION.getHttpStatus();
-        return ApiResponse.error(errorMessage, status);
+        return ApiResponse.error(code, message, status);
     }
 
     /**
@@ -52,10 +32,14 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handleUnExpectedException(Exception ex) {
-        log.error("에러 발생 :", ex);
+        log.error("서버 내부 오류 발생 :", ex);
 
-        String errorMessage = ErrorCode.INTERNAL_SERVER_ERROR.getMessage(ex.getMessage());
-        HttpStatus status = ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus();
-        return ApiResponse.error(errorMessage, status);
+        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+
+        String code = errorCode.getCode();
+        String message = errorCode.getMessage(ex.getMessage());
+        HttpStatus status = errorCode.getHttpStatus();
+
+        return ApiResponse.error(code, message, status);
     }
 }
