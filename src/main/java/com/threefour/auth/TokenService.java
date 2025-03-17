@@ -33,8 +33,14 @@ public class TokenService {
             throw new ExpectedException(ErrorCode.NOT_REFRESH_TOKEN);
         }
 
-        // 3. RefreshToken이 만료되었는 지 검증 -> 데이터베이스에 저장되어 있는지 여부로 확인
+        // 3. RefreshToken이 만료되었는 지 검증 1 -> 데이터베이스에 저장되어 있는지 여부로 확인
         if (!refreshTokenRepository.existsByRefreshToken(token)) {
+            throw new ExpectedException(ErrorCode.EXPIRED_REFRESH_TOKEN);
+        }
+
+        // 4. RefreshToken이 만료되었는 지 검증 2 -> 토큰의 만료기간 확인
+        // todo 추후 RefreshToken을 Redis에 저장한다면, 삭제해도 될 코드입니다.
+        if (jwtUtil.isExpired(token)) {
             throw new ExpectedException(ErrorCode.EXPIRED_REFRESH_TOKEN);
         }
 

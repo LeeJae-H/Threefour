@@ -11,13 +11,9 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "00", "서버 내부 오류가 발생했습니다 : %s"),
 
     // JWT
-    INVALID_REFRESH_TOKEN_FORMAT(HttpStatus.BAD_REQUEST, "00", "유효하지 않은 리포레시 토큰 형식입니다."),
-    INVALID_REFRESH_TOKEN_TYPE(HttpStatus.BAD_REQUEST, "00", "리프레시 토큰이 아닙니다."),
-    REFRESH_TOKEN_IS_EXPIRED(HttpStatus.BAD_REQUEST, "00", "만료된 리프레시 토큰입니다."),
-    REFRESH_TOKEN_NOT_EXISTS_DATABASE(HttpStatus.BAD_REQUEST, "00", "리프레시 토큰이 데이터베이스에 저장되어 있지 않습니다."),
     NOT_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "00", "엑세스 토큰이 아닙니다."),
-    EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "00", "만료된 엑세스 토큰입니다."),
     NOT_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "00", "리프레시 토큰이 아닙니다."),
+    EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "00", "만료된 엑세스 토큰입니다."),
     EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "00", "만료된 리프레시 토큰입니다."),
 
     // 회원(User)
