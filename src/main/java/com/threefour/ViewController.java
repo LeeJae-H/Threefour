@@ -34,7 +34,7 @@ public class ViewController {
     /**
      * 게시판(category) 화면 API
      */
-    @GetMapping("/posts/category/{category}")
+    @GetMapping("/posts/{category}")
     public String getPostCategory(@PathVariable String category, Model model) {
         model.addAttribute("category", category);
         return "post/category";
@@ -43,7 +43,7 @@ public class ViewController {
     /**
      * 페이징 게시판(category) 화면 API
      */
-    @GetMapping("/posts/category/{category}/{page}")
+    @GetMapping("/posts/{category}/{page}")
     public String getPostCategoryByPaging(@PathVariable String category, @PathVariable int page, Model model) {
         model.addAttribute("category", category);
         model.addAttribute("page", page);
@@ -53,7 +53,7 @@ public class ViewController {
     /**
      * 게시글 상세 화면 API
      */
-    @GetMapping("/posts/details/{postId}")
+    @GetMapping("/posts/{postId}/details")
     public String getPostDetails(@PathVariable Long postId, Model model) {
         model.addAttribute("postId", postId);
         return "post/details";
@@ -64,7 +64,7 @@ public class ViewController {
      *
      * 회원만 가능합니다. (로드하는 시점에 /api/token/validate API 호출 필요)
      */
-    @GetMapping("/posts/edit/{postId}")
+    @GetMapping("/posts/{postId}/edit")
     public String getEditPost(@PathVariable Long postId, Model model) {
         model.addAttribute("postId", postId);
         return "post/edit";
@@ -75,7 +75,7 @@ public class ViewController {
      *
      * 회원만 가능합니다. (로드하는 시점에 /api/token/validate API 호출 필요)
      */
-    @GetMapping("/posts/write/{category}")
+    @GetMapping("/posts/{category}/write")
     public String getWritePost(@PathVariable String category, Model model) {
         model.addAttribute("category", category);
         return "post/write";

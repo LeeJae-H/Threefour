@@ -35,7 +35,7 @@ public class PostController {
 
     /**
      * 게시글 상세 조회 API
-     **
+     *
      * @param accessToken
      * @param postId
      * @return PostDetailsResponse
@@ -91,7 +91,7 @@ public class PostController {
      * @param size
      * @return PostsListResponse
      */
-    @GetMapping("/all")
+    @GetMapping("/list/all")
     public ResponseEntity<ApiResponse<PostsListResponse>> getPostsList(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
@@ -109,7 +109,7 @@ public class PostController {
      * @param size
      * @return PostsListResponse
      */
-    @GetMapping("/all/{category}")
+    @GetMapping("/list/all/{category}")
     public ResponseEntity<ApiResponse<PostsListResponse>> getPostsListByCategory(
             @PathVariable String category,
             @RequestParam(value = "page", defaultValue = "1") int page,
