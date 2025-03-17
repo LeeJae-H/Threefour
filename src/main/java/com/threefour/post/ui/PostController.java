@@ -24,13 +24,12 @@ public class PostController {
      * 게시글 작성 API
      *
      * @param writePostReqeust
-     * @return 게시글 id
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<Long>> writePost(@RequestBody WritePostReqeust writePostReqeust) {
+    public ResponseEntity<ApiResponse<String>> writePost(@RequestBody WritePostReqeust writePostReqeust) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long postId = postService.writePost(writePostReqeust, email);
-        return ApiResponse.success(postId);
+        postService.writePost(writePostReqeust, email);
+        return ApiResponse.success("success");
     }
 
     /**

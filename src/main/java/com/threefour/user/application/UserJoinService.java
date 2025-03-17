@@ -24,7 +24,7 @@ public class UserJoinService {
     private final Map<String, String> emailValidationCache = new ConcurrentHashMap<>();
 
     @Transactional
-    public String join(JoinRequest joinRequest) {
+    public void join(JoinRequest joinRequest) {
         String email = joinRequest.getEmail();
         String password = joinRequest.getPassword();
         String nickname = joinRequest.getNickname();
@@ -35,8 +35,7 @@ public class UserJoinService {
 
         // 비밀번호는 암호화한 후 전달
         User newUser = User.join(email, passwordEncoder.encode(password), nickname);
-        User savedUser = userRepository.save(newUser);
-        return savedUser.getNickname();
+        userRepository.save(newUser);
     }
 
     public void sendEmailAuthNumberForJoin(String email) {

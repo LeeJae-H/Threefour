@@ -21,12 +21,11 @@ public class UserJoinController {
      * 회원가입 API
      *
      * @param joinRequest
-     * @return 사용자 닉네임
      */
     @PostMapping
     public ResponseEntity<ApiResponse<String>> join(@RequestBody JoinRequest joinRequest) {
-        String nickname = userJoinService.join(joinRequest);
-        return ApiResponse.success(nickname);
+        userJoinService.join(joinRequest);
+        return ApiResponse.success("success");
     }
 
     /**
