@@ -48,4 +48,16 @@ public class ApiResponse<T> {
     public static ResponseEntity<ApiResponse<?>> error(String errorCode, String errorMessage, HttpStatus status) {
         return new ResponseEntity<>(new ApiResponse<>(false, null, errorCode, errorMessage), status);
     }
+
+
+    /**
+     * 예외 응답 객체를 생성할 때 사용합니다.
+     * CustomAuthenticationEntryPoint에서 사용됩니다.
+     *
+     * @param errorCode
+     * @param errorMessage
+     */
+    public static ApiResponse<?> error(String errorCode, String errorMessage) {
+        return new ApiResponse<>(false, null, errorCode, errorMessage);
+    }
 }

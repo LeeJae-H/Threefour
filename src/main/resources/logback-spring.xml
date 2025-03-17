@@ -20,12 +20,7 @@
 
     <!-- 로컬 환경 -->
     <springProfile name="local">
-        <!-- 내 프로젝트의 로그는 DEBUG 레벨로 설정하며 콘솔, 파일에 출력한다. -->
-        <logger name="com.threefour" level="DEBUG">
-            <appender-ref ref="CONSOLE" />
-            <appender-ref ref="FILE" />
-        </logger>
-        <!-- 내 프로젝트의 로그를 제외한 모든 로그는 콘솔, 파일에 출력한다. -->
+        <!-- 모든 로그는 콘솔, 파일에 출력한다. -->
         <root level="INFO">
             <appender-ref ref="CONSOLE" />
             <appender-ref ref="FILE" />

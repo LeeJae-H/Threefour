@@ -43,7 +43,7 @@ public class MailSenderImpl implements MailSender {
             body += "<h1>" + authNumber + "</h1>";
             message.setText(body,"UTF-8", "html");
         } catch (MessagingException e) {
-            throw new ExpectedException(ErrorCode.FAIL_SEND_MAIL);
+            throw new ExpectedException(ErrorCode.FAIL_SEND_EMAIL);
         }
 
         return message;

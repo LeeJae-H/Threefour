@@ -53,7 +53,7 @@ public class UserJoinService {
 
         String storedAuthNumber = emailValidationCache.get(email);
         if (storedAuthNumber == null || !storedAuthNumber.equals(authNumber)) {
-            throw new ExpectedException(ErrorCode.FAIL_VALIDATE_MAIL);
+            throw new ExpectedException(ErrorCode.FAIL_VALIDATE_EMAIL);
         }
         emailValidationCache.remove(emailValidationRequest.getEmail());
     }
