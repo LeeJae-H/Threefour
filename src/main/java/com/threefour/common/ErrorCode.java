@@ -15,7 +15,6 @@ public enum ErrorCode {
     INVALID_REFRESH_TOKEN_TYPE(HttpStatus.BAD_REQUEST, "00", "리프레시 토큰이 아닙니다."),
     REFRESH_TOKEN_IS_EXPIRED(HttpStatus.BAD_REQUEST, "00", "만료된 리프레시 토큰입니다."),
     REFRESH_TOKEN_NOT_EXISTS_DATABASE(HttpStatus.BAD_REQUEST, "00", "리프레시 토큰이 데이터베이스에 저장되어 있지 않습니다."),
-    INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "00", "유효하지 않은 엑세스 토큰입니다."),
     NOT_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "00", "엑세스 토큰이 아닙니다."),
     EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "00", "만료된 엑세스 토큰입니다."),
     NOT_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "00", "리프레시 토큰이 아닙니다."),

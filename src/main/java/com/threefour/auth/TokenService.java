@@ -20,38 +20,34 @@ public class TokenService {
 
     @Transactional
     public TokenDTO reissueToken(String refreshToken) {
-        // RefreshToken 헤더의 값이 유효한 지 검증
+        // 1. RefreshToken 헤더의 값이 올바른 형태인지 검증
         if (refreshToken == null || !refreshToken.startsWith("Bearer ")) {
-            throw new ExpectedException(ErrorCode.INVALID_REFRESH_TOKEN_FORMAT);
+            throw new ExpectedException(ErrorCode.NOT_REFRESH_TOKEN);
         }
 
         String token = refreshToken.split(" ")[1];
 
-        // 토큰이 RefreshToken인 지 검증
+        // 2. 토큰이 RefreshToken인 지 검증
         String category = jwtUtil.getCategory(token);
         if (!category.equals("refresh")) {
-            throw new ExpectedException(ErrorCode.INVALID_REFRESH_TOKEN_TYPE);
+            throw new ExpectedException(ErrorCode.NOT_REFRESH_TOKEN);
         }
 
-        // RefreshToken이 만료되었는 지 검증
-        if (jwtUtil.isExpired(token)) {
-            throw new ExpectedException(ErrorCode.REFRESH_TOKEN_IS_EXPIRED);
-        }
-
-        // DB에 저장되어 있는지 확인
+        // 3. RefreshToken이 만료되었는 지 검증 -> 데이터베이스에 저장되어 있는지 여부로 확인
         if (!refreshTokenRepository.existsByRefreshToken(token)) {
-            throw new ExpectedException(ErrorCode.REFRESH_TOKEN_NOT_EXISTS_DATABASE);
+            throw new ExpectedException(ErrorCode.EXPIRED_REFRESH_TOKEN);
         }
 
         String email = jwtUtil.getEmail(token);
         String role = jwtUtil.getRole(token);
 
+        // 토큰 생성
         String newAccessToken = jwtUtil.createJwt("access", email, role, AuthConstants.ACCESS_TOKEN_EXPIRATION_TIME);
         String newRefreshToken = jwtUtil.createJwt("refresh", email, role, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
 
-        // DB에 존재하는 RefreshToken 삭제 후 새 RefreshToken 저장
+        // 데이터베이스에 존재하는 해당 RefreshToken 삭제 후 새로운 RefreshToken 저장
         refreshTokenRepository.deleteByRefreshToken(token);
-        saveRefreshToken(email, newRefreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+        saveRefreshToken(email, newRefreshToken);
 
         return new TokenDTO(newAccessToken, newRefreshToken);
     }
@@ -62,8 +58,8 @@ public class TokenService {
         return foundUser.getNickname();
     }
 
-    private void saveRefreshToken(String email, String refresh, Long expirationTime) {
-        Date date = new Date(System.currentTimeMillis() + expirationTime);
+    private void saveRefreshToken(String email, String refresh) {
+        Date date = new Date(System.currentTimeMillis() + AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
         RefreshToken refreshToken = new RefreshToken(email, refresh, date.toString());
         refreshTokenRepository.save(refreshToken);
     }

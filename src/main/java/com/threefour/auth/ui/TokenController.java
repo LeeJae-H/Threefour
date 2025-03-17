@@ -20,13 +20,13 @@ public class TokenController {
     private final TokenService tokenService;
 
     /**
-     * AccessToken, RefreshToken 재발급(By RefreshToken) API
+     * AccessToken, RefreshToken 재발급 API
      * Refresh Token Rotation 방식입니다.
      *
      * @param refreshToken
      */
     @PostMapping("/reissue")
-    public ResponseEntity<ApiResponse<String>> reissue(
+    public ResponseEntity<ApiResponse<String>> reissueToken(
             @RequestHeader("RefreshToken") String refreshToken,
             HttpServletResponse response
     ) {
