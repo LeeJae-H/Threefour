@@ -8,7 +8,7 @@ public class AuthConstants {
             // 회원가입
             "/api/users/join", "/api/users/join/send-email", "/api/users/join/validate-nickname", "/api/users/join/validate-email",
             // 토큰
-            "/api/token/reissue", "/api/token/validate",
+            "/api/token/reissue",
             // 게시글
             "/api/posts", "/api/posts/id/*", "/api/posts/category/*"
     };

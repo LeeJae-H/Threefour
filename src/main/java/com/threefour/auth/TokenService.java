@@ -56,31 +56,11 @@ public class TokenService {
         return new TokenDTO(newAccessToken, newRefreshToken);
     }
 
-    public String validateToken(String accessToken) {
-        // AccessToken 헤더의 값이 유효한 지 검증
-        if (accessToken == null || !accessToken.startsWith("Bearer ")) {
-            throw new ExpectedException(ErrorCode.INVALID_ACCESS_TOKEN);
-        }
-
-        String token = accessToken.split(" ")[1];
-
-        // 토큰이 AccessToken인 지 검증
-        String category = jwtUtil.getCategory(token);
-        if (!category.equals("access")) {
-            throw new ExpectedException(ErrorCode.INVALID_ACCESS_TOKEN);
-        }
-
-        // AccessToken이 만료되었는 지 검증
-        if (jwtUtil.isExpired(token)) {
-            throw new ExpectedException(ErrorCode.INVALID_ACCESS_TOKEN);
-        }
-
-        String email = jwtUtil.getEmail(token);
+    public String getUserNickname(String email) {
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
         return foundUser.getNickname();
     }
-
 
     private void saveRefreshToken(String email, String refresh, Long expirationTime) {
         Date date = new Date(System.currentTimeMillis() + expirationTime);

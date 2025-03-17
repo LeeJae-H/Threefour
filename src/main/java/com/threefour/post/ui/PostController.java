@@ -44,7 +44,8 @@ public class PostController {
     @PutMapping("/{postId}")
     public ResponseEntity<ApiResponse<String>> editPost(
             @PathVariable Long postId,
-            @RequestBody EditPostRequest editPostRequest) {
+            @RequestBody EditPostRequest editPostRequest
+    ) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         postService.editPost(postId, editPostRequest, email);
         return ApiResponse.success("ok");
