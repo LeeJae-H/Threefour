@@ -18,6 +18,8 @@ public enum ErrorCode {
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "00", "유효하지 않은 엑세스 토큰입니다."),
     NOT_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "00", "엑세스 토큰이 아닙니다."),
     EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "00", "만료된 엑세스 토큰입니다."),
+    NOT_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "00", "리프레시 토큰이 아닙니다."),
+    EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "00", "만료된 리프레시 토큰입니다."),
 
     // 회원(User)
     FAIL_SEND_EMAIL(HttpStatus.BAD_REQUEST, "00", "이메일 인증번호 발송에 실패했습니다."),
