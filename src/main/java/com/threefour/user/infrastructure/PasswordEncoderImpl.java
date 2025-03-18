@@ -1,6 +1,6 @@
 package com.threefour.user.infrastructure;
 
-import com.threefour.user.application.PasswordEncoder;
+import com.threefour.user.domain.PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 

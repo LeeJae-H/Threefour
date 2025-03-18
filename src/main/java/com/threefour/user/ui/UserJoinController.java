@@ -34,8 +34,8 @@ public class UserJoinController {
      * @param emailMap
      */
     @PostMapping("/send-email")
-    public ResponseEntity<ApiResponse<String>> sendEmailAuthNumberForJoin(@RequestBody Map<String, String> emailMap) {
-        userJoinService.sendEmailAuthNumberForJoin(emailMap.get("email"));
+    public ResponseEntity<ApiResponse<String>> sendEmailAuthNumber(@RequestBody Map<String, String> emailMap) {
+        userJoinService.sendEmailAuthNumber(emailMap.get("email"));
         return ApiResponse.success("success");
     }
 
@@ -45,8 +45,8 @@ public class UserJoinController {
      * @param emailValidationRequest
      */
     @PostMapping("/validate-email")
-    public ResponseEntity<ApiResponse<String>> validateEmailForJoin(@RequestBody EmailValidationRequest emailValidationRequest) {
-        userJoinService.validateEmailForJoin(emailValidationRequest);
+    public ResponseEntity<ApiResponse<String>> validateEmailAuthNumber(@RequestBody EmailValidationRequest emailValidationRequest) {
+        userJoinService.validateEmailAuthNumber(emailValidationRequest);
         return ApiResponse.success("success");
     }
 
@@ -56,8 +56,8 @@ public class UserJoinController {
      * @param nickname
      */
     @GetMapping("/validate-nickname")
-    public ResponseEntity<ApiResponse<String>> validateNicknameForJoin(@RequestParam String nickname) {
-        userJoinService.validateNicknameForJoin(nickname);
+    public ResponseEntity<ApiResponse<String>> validateNickname(@RequestParam String nickname) {
+        userJoinService.validateNickname(nickname);
         return ApiResponse.success("success");
     }
 }

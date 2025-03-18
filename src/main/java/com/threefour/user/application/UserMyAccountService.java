@@ -5,6 +5,7 @@ import com.threefour.auth.RefreshTokenRepository;
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
 import com.threefour.post.domain.PostRepository;
+import com.threefour.user.domain.PasswordEncoder;
 import com.threefour.user.domain.User;
 import com.threefour.user.domain.UserRepository;
 import com.threefour.user.dto.MyInfoResponse;
@@ -17,10 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserMyAccountService {
 
-    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final UserInfoValidator userInfoValidator;
     private final JwtProvider jwtProvider;
+    private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PostRepository postRepository;
 
     public MyInfoResponse getMyInfo(String email) {
@@ -40,7 +42,7 @@ public class UserMyAccountService {
 
         if (updateMyInfoRequest.getPassword() != null) {
             String newPassword = updateMyInfoRequest.getPassword();
-            validatePassword(newPassword);
+            userInfoValidator.validatePassword(newPassword);
             // 비밀번호는 암호화한 후 전달
             foundUser.changePassword(passwordEncoder.encode(newPassword));
             isUpdated = true;
@@ -48,7 +50,7 @@ public class UserMyAccountService {
 
         if (updateMyInfoRequest.getNickname() != null) {
             String newNickname = updateMyInfoRequest.getNickname();
-            validateNickname(newNickname);
+            userInfoValidator.validateNickname(newNickname);
             foundUser.changeNickname(newNickname);
             isUpdated = true;
         }
@@ -95,29 +97,5 @@ public class UserMyAccountService {
 
         // DB에 존재하는 해당 사용자의 모든 RefreshToken 삭제
         refreshTokenRepository.deleteByUserEmail(email);
-    }
-
-    // 비밀번호는 최소 8자 이상이어야 하며, 공백을 포함할 수 없다.
-    private void validatePassword(String password) {
-        if (password == null || password.contains(" ") || password.length() < 8) {
-            throw new ExpectedException(ErrorCode.INVALID_PASSWORD_LENGTH);
-        }
-    }
-
-    // 닉네임은 (양쪽 끝의 공백 제거 후) 2~10자 이내여야 하며, 특수문자를 포함할 수 없다. 또한, 닉네임은 고유하다.
-    private void validateNickname(String nickname) {
-        if (nickname == null) {
-            throw new ExpectedException(ErrorCode.INVALID_NICKNAME_LENGTH);
-        }
-        String trimmedNickname = nickname.trim();
-        if (trimmedNickname.length() < 2 || trimmedNickname.length() > 10) {
-            throw new ExpectedException(ErrorCode.INVALID_NICKNAME_LENGTH);
-        }
-        if (!trimmedNickname.matches("^[a-zA-Z0-9가-힣]+$")) {
-            throw new ExpectedException(ErrorCode.INVALID_NICKNAME_FORMAT);
-        }
-        if (userRepository.existsByNickname(trimmedNickname)) {
-            throw new ExpectedException(ErrorCode.ALREADY_USED_NICKNAME);
-        }
     }
 }

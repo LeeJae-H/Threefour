@@ -2,7 +2,7 @@ package com.threefour.user.infrastructure;
 
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
-import com.threefour.user.application.MailSender;
+import com.threefour.user.domain.MailSender;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.threefour.user.application;
+package com.threefour.user.domain;
 
 public interface PasswordEncoder {
 
