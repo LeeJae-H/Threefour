@@ -35,8 +35,12 @@ public class PostController {
     /**
      * 게시글 상세 조회 API
      *
-     * @param accessToken
+     * 작성자가 본인 게시글을 상세 조회하는 경우에,
+     * isMine을 true로 응답합니다. 이를 위해,
+     * 선택적으로 AccessToken을 요청으로 받습니다.
+     *
      * @param postId
+     * @param accessToken
      * @return PostDetailsResponse
      */
     @GetMapping("/{postId}/details")
@@ -50,7 +54,6 @@ public class PostController {
 
     /**
      * 게시글 수정 API
-     *
      * 작성자 본인만 가능합니다.
      *
      * @param postId
@@ -68,7 +71,6 @@ public class PostController {
 
     /**
      * 게시글 삭제 API
-     *
      * 작성자 본인만 가능합니다.
      *
      * @param postId
@@ -83,8 +85,7 @@ public class PostController {
     /**
      * 게시글 목록 조회 API
      *
-     * 홈 화면에서 보여지는 게시글 목록입니다.
-     * 페이지 단위로 조회합니다.
+     * 홈 화면에서 보여지는 게시글 목록으로, 페이지 단위로 조회합니다.
      *
      * @param page
      * @param size

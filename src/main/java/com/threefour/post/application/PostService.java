@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,16 +27,15 @@ public class PostService {
 
     @Transactional
     public void writePost(WritePostReqeust writePostReqeust, String email) {
-        User foundUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
-
+        User foundUser = getUserByEmail(email);
         String authorNickname = foundUser.getNickname();
         String category = writePostReqeust.getCategory();
         String title = writePostReqeust.getTitle();
         String content = writePostReqeust.getContent();
 
-        validateTitle(title);
-        validateContent(content);
+        // 값 검증
+        PostValidator.validateTitle(title);
+        PostValidator.validateContent(content);
 
         Post newPost = Post.writePost(authorNickname, category, title, content);
         postRepository.save(newPost);
@@ -45,89 +43,75 @@ public class PostService {
 
     @Transactional
     public void editPost(Long postId, EditPostRequest editPostRequest, String email) {
-        User foundUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
-
-        Post foundPost = postRepository.findById(postId)
-                .orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
+        User foundUser = getUserByEmail(email);
+        Post foundPost = getPostById(postId);
 
         // 작성자 본인인 지 확인
-        if (!foundPost.getAuthorNickname().equals(foundUser.getNickname())) {
-            throw new ExpectedException(ErrorCode.POST_ACCESS_DENIED);
-        }
+        foundPost.checkAuthor(foundUser.getNickname());
 
-        // 게시글 수정이 이루어졌는지 여부
-        boolean isUpdated = false;
+        String newTitle = editPostRequest.getTitle();
+        String newContent = editPostRequest.getContent();
 
-        if (editPostRequest.getTitle() != null) {
-            String newTitle = editPostRequest.getTitle();
-            validateTitle(newTitle);
+        // 제목을 변경할 때
+        if (newTitle != null) {
+            // 값 검증
+            PostValidator.validateTitle(newTitle);
+            // 제목 변경
             foundPost.editTitle(newTitle);
-            isUpdated = true;
         }
 
-        if (editPostRequest.getContent() != null) {
-            String newContent = editPostRequest.getContent();
-            validateContent(newContent);
+        // 내용을 변경할 때
+        if (newContent != null) {
+            // 값 검증
+            PostValidator.validateContent(newContent);
+            // 내용 변경
             foundPost.editContent(newContent);
-            isUpdated = true;
-        }
-
-        if (isUpdated) {
-            foundPost.updateUpdatedAt();
         }
     }
 
     @Transactional
     public void deletePost(Long postId, String email) {
-        User foundUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
-
-        Post foundPost = postRepository.findById(postId)
-                .orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
+        User foundUser = getUserByEmail(email);
+        Post foundPost = getPostById(postId);
 
         // 작성자 본인인 지 확인
-        if (!foundPost.getAuthorNickname().equals(foundUser.getNickname())) {
-            throw new ExpectedException(ErrorCode.POST_ACCESS_DENIED);
-        }
+        foundPost.checkAuthor(foundUser.getNickname());
 
         postRepository.delete(foundPost);
     }
 
-    // 게시글 제목은 (양쪽 끝의 공백 제거 후) 1~50자 이내여야 한다.
-    private void validateTitle(String title) {
-        if (title == null || title.trim().isEmpty() || title.length() > 50) {
-            throw new ExpectedException(ErrorCode.INVALID_TITLE_LENGTH);
-        }
-    }
-
-    // 게시글 내용은 (양쪽 끝의 공백 제거 후) 최소 1자 이상이어야 한다.
-    private void validateContent(String content) {
-        if (content == null || content.trim().isEmpty()) {
-            throw new ExpectedException(ErrorCode.INVALID_CONTENT_LENGTH);
-        }
-    }
-
     public PostDetailsResponse getPostDetails(Long postId, String accessToken) {
-        Post foundPost = postRepository.findById(postId)
-                .orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
+        Post foundPost = getPostById(postId);
 
-        boolean isMine = false;
-
-        // AccessToken 헤더의 값이 유효하면
-        if (accessToken != null && accessToken.startsWith("Bearer ")) {
-            String token = accessToken.split(" ")[1];
-            String category = jwtProvider.getCategory(token);
-            if (category.equals("access") && !jwtProvider.isExpired(token)) {
-                String email = jwtProvider.getEmail(token);
-                Optional<User> foundUser = userRepository.findByEmail(email);
-                if (foundUser.isPresent()) {
-                    isMine = foundPost.getAuthorNickname().equals(foundUser.get().getNickname());
-                }
-            }
-        }
+        // 조회한 사람이 게시글 작성자인지 여부
+        boolean isMine = checkIfUserIsAuthor(foundPost, accessToken);
 
         return new PostDetailsResponse(foundPost.getAuthorNickname(), foundPost.getCategory(), foundPost.getTitle(), foundPost.getContent(), foundPost.getPostTimeInfo(), isMine);
+    }
+
+    private boolean checkIfUserIsAuthor(Post foundPost, String accessToken) {
+        // 1. AccessToken 헤더의 값이 올바른 형태인지 검증
+        if (accessToken == null || !accessToken.startsWith("Bearer ")) {
+            return false;
+        }
+
+        String token = accessToken.split(" ")[1];
+
+        // 2. 토큰이 AccessToken인 지 검증
+        String category = jwtProvider.getCategory(token);
+        if (!category.equals("access")) {
+            return false;
+        }
+
+        // 3. AccessToken이 만료되었는 지 검증
+        if (jwtProvider.isExpired(token)) {
+            return false;
+        }
+
+        String email = jwtProvider.getEmail(token);
+        User foundUser = getUserByEmail(email);
+
+        return foundPost.getAuthorNickname().equals(foundUser.getNickname());
     }
 
     public PostsListResponse getPostsList(Pageable pageable) {
@@ -148,5 +132,15 @@ public class PostService {
                 .collect(Collectors.toList());
 
         return new PostsListResponse(postSummaryList, posts.getTotalPages());
+    }
+
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private Post getPostById(Long id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
     }
 }

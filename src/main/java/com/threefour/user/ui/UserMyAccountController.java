@@ -41,6 +41,17 @@ public class UserMyAccountController {
     }
 
     /**
+     * 닉네임 사용 가능 여부 확인 API - 내 정보 수정 시 사용
+     *
+     * @param nickname
+     */
+    @GetMapping("/validate-nickname")
+    public ResponseEntity<ApiResponse<String>> validateNickname(@RequestParam String nickname) {
+        userMyAccountService.validateNickname(nickname);
+        return ApiResponse.success("success");
+    }
+
+    /**
      * 회원탈퇴 API
      *
      * @param refreshToken

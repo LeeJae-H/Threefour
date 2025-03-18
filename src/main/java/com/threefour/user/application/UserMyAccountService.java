@@ -19,55 +19,54 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserMyAccountService {
 
     private final PasswordEncoder passwordEncoder;
-    private final UserInfoValidator userInfoValidator;
+    private final UserValidator userValidator;
     private final JwtProvider jwtProvider;
     private final UserRepository userRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final PostRepository postRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public MyInfoResponse getMyInfo(String email) {
-        User foundUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
-
+        User foundUser = getUserByEmail(email);
         return new MyInfoResponse(foundUser.getEmail(), foundUser.getNickname());
     }
 
     @Transactional
     public void updateMyInfo(UpdateMyInfoRequest updateMyInfoRequest, String email) {
-        User foundUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+        User foundUser = getUserByEmail(email);
 
-        // 회원 정보 변경이 이루어졌는지 여부
-        boolean isUpdated = false;
+        String newPassword = updateMyInfoRequest.getPassword();
+        String newNickname = updateMyInfoRequest.getNickname();
 
-        if (updateMyInfoRequest.getPassword() != null) {
-            String newPassword = updateMyInfoRequest.getPassword();
-            userInfoValidator.validatePassword(newPassword);
-            // 비밀번호는 암호화한 후 전달
-            foundUser.changePassword(passwordEncoder.encode(newPassword));
-            isUpdated = true;
+        // 비밀번호를 변경할 때
+        if (newPassword != null) {
+            // 값 검증
+            userValidator.validatePassword(newPassword);
+            // 비밀번호 암호화
+            String encodedPassword = passwordEncoder.encode(newPassword);
+            // 비밀번호 변경
+            foundUser.changePassword(encodedPassword);
         }
 
-        if (updateMyInfoRequest.getNickname() != null) {
-            String newNickname = updateMyInfoRequest.getNickname();
-            userInfoValidator.validateNickname(newNickname);
+        // 닉네임을 변경할 때
+        if (newNickname != null) {
+            // 값 검증
+            userValidator.validateNickname(newNickname);
+            // 닉네임 변경
             foundUser.changeNickname(newNickname);
-            isUpdated = true;
         }
+    }
 
-        if (isUpdated) {
-            foundUser.updateUpdatedAt();
-        }
+    public void validateNickname(String nickname) {
+        // 값 검증
+        userValidator.validateNickname(nickname);
     }
 
     @Transactional
     public void deleteUser(String refreshToken, String email) {
-        User foundUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+        User foundUser = getUserByEmail(email);
 
         // 회원이 작성한 게시글 모두 삭제
         postRepository.deleteByAuthorNickname(foundUser.getNickname());
-
         // DB에서 회원 삭제
         userRepository.delete(foundUser);
 
@@ -95,7 +94,12 @@ public class UserMyAccountService {
             throw new ExpectedException(ErrorCode.EXPIRED_REFRESH_TOKEN);
         }
 
-        // DB에 존재하는 해당 사용자의 모든 RefreshToken 삭제
+        // 데이터베이스에 존재하는 해당 사용자의 모든 RefreshToken 삭제
         refreshTokenRepository.deleteByUserEmail(email);
+    }
+
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
     }
 }

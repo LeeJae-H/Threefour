@@ -1,5 +1,7 @@
 package com.threefour.post.domain;
 
+import com.threefour.common.ErrorCode;
+import com.threefour.common.ExpectedException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -46,14 +48,22 @@ public class Post {
 
     public void editTitle(String title) {
         this.title = title;
+        updateUpdatedAt();
     }
 
     public void editContent(String content) {
         this.content = content;
+        updateUpdatedAt();
     }
 
-    public void updateUpdatedAt() {
+    private void updateUpdatedAt() {
         LocalDateTime createdAt = postTimeInfo.getCreatedAt();
         this.postTimeInfo = new PostTimeInfo(createdAt, LocalDateTime.now());
+    }
+
+    public void checkAuthor(String nickname) {
+        if (!this.authorNickname.equals(nickname)) {
+            throw new ExpectedException(ErrorCode.POST_ACCESS_DENIED);
+        }
     }
 }

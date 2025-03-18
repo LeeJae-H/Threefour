@@ -2,7 +2,7 @@ package com.threefour.user.ui;
 
 import com.threefour.common.ApiResponse;
 import com.threefour.user.application.UserJoinService;
-import com.threefour.user.dto.EmailValidationRequest;
+import com.threefour.user.dto.EmailAuthNumberRequest;
 import com.threefour.user.dto.JoinRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +29,7 @@ public class UserJoinController {
     }
 
     /**
-     * 이메일 인증번호 발송 API - 회원가입 시 사용
+     * 이메일 인증번호 발송 API
      *
      * @param emailMap
      */
@@ -40,18 +40,18 @@ public class UserJoinController {
     }
 
     /**
-     * 이메일 인증번호 확인 API - 회원가입 시 사용
+     * 이메일 인증번호 확인 API
      *
-     * @param emailValidationRequest
+     * @param emailAuthNumberRequest
      */
     @PostMapping("/validate-email")
-    public ResponseEntity<ApiResponse<String>> validateEmailAuthNumber(@RequestBody EmailValidationRequest emailValidationRequest) {
-        userJoinService.validateEmailAuthNumber(emailValidationRequest);
+    public ResponseEntity<ApiResponse<String>> validateEmailAuthNumber(@RequestBody EmailAuthNumberRequest emailAuthNumberRequest) {
+        userJoinService.validateEmailAuthNumber(emailAuthNumberRequest);
         return ApiResponse.success("success");
     }
 
     /**
-     * 닉네임 사용 가능 여부 확인 API - 회원가입 시, 내 정보 수정 시 사용
+     * 닉네임 사용 가능 여부 확인 API
      *
      * @param nickname
      */

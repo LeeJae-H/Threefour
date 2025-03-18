@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class EmailValidationRequest {
+public class EmailAuthNumberRequest {
 
     private String email;
     private String authNumber;

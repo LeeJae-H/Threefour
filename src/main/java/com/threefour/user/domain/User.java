@@ -56,13 +56,15 @@ public class User {
 
     public void changePassword(String password) {
         this.password = password;
+        updateUpdatedAt();
     }
 
     public void changeNickname(String nickname) {
         this.nickname = nickname.trim(); // 양 옆 공백 제거
+        updateUpdatedAt();
     }
 
-    public void updateUpdatedAt() {
+    private void updateUpdatedAt() {
         LocalDateTime createdAt = userTimeInfo.getCreatedAt();
         this.userTimeInfo = new UserTimeInfo(createdAt, LocalDateTime.now());
     }
