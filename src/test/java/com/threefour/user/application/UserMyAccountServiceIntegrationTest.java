@@ -1,7 +1,7 @@
 package com.threefour.user.application;
 
 import com.threefour.auth.AuthConstants;
-import com.threefour.auth.JwtUtil;
+import com.threefour.auth.JwtProvider;
 import com.threefour.post.domain.Post;
 import com.threefour.user.domain.User;
 import com.threefour.user.dto.MyInfoResponse;
@@ -31,7 +31,7 @@ public class UserMyAccountServiceIntegrationTest {
     private UserMyAccountService userMyAccountService;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private JwtProvider jwtProvider;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -192,7 +192,7 @@ public class UserMyAccountServiceIntegrationTest {
         // DB에 사용자가 존재
         User savedUser = saveUser(user);
         // DB에 RefreshToken이 존재
-        String refreshToken = jwtUtil.createJwt("refresh", savedUser.getEmail(), "ROLE_USER", AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+        String refreshToken = jwtProvider.createJwt("refresh", savedUser.getEmail(), "ROLE_USER", AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
         String insertQuery = "INSERT INTO refresh_token (user_email, refresh_token, expiration) VALUES (?, ?, ?)";
         jdbcTemplate.update(insertQuery, savedUser.getEmail(), refreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
         // DB에 사용자가 작성한 게시글 존재
@@ -243,7 +243,7 @@ public class UserMyAccountServiceIntegrationTest {
 //        // DB에 사용자(다른 사용자)가 존재
 //        User savedAnotherUser = saveUser(anotherUser);
 //        // DB에 RefreshToken이 존재
-//        String refreshToken = jwtUtil.createJwt("refresh", savedAnotherUser.getEmail(), "ROLE_USER", AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+//        String refreshToken = jwtProvider.createJwt("refresh", savedAnotherUser.getEmail(), "ROLE_USER", AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
 //        String insertQuery = "INSERT INTO refresh_token (user_email, refresh_token, expiration) VALUES (?, ?, ?)";
 //        jdbcTemplate.update(insertQuery, savedAnotherUser.getEmail(), refreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
 //

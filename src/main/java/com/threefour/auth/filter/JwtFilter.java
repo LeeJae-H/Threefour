@@ -1,7 +1,7 @@
 package com.threefour.auth.filter;
 
 import com.threefour.auth.CustomUserDetails;
-import com.threefour.auth.JwtUtil;
+import com.threefour.auth.JwtProvider;
 import com.threefour.auth.AuthConstants;
 import com.threefour.common.ErrorCode;
 import com.threefour.user.domain.User;
@@ -25,7 +25,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
 
     /**
      * JwtFilter의 실행 여부를 판단하는 메서드입니다.
@@ -55,7 +55,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = accessToken.split(" ")[1];
 
         // 2. 토큰이 AccessToken인 지 검증
-        String category = jwtUtil.getCategory(token);
+        String category = jwtProvider.getCategory(token);
         if (!category.equals("access")) {
             request.setAttribute("exception", ErrorCode.NOT_ACCESS_TOKEN);
             filterChain.doFilter(request, response);
@@ -63,14 +63,14 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         // 3. AccessToken이 만료되었는 지 검증
-        if (jwtUtil.isExpired(token)) {
+        if (jwtProvider.isExpired(token)) {
             request.setAttribute("exception", ErrorCode.EXPIRED_ACCESS_TOKEN);
             filterChain.doFilter(request, response);
             return;
         }
 
-        String email = jwtUtil.getEmail(token);
-        String role = jwtUtil.getRole(token);
+        String email = jwtProvider.getEmail(token);
+        String role = jwtProvider.getRole(token);
         User user = new User(email, "temppassword", role);
         CustomUserDetails customUserDetails = new CustomUserDetails(user);
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());

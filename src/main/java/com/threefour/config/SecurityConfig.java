@@ -1,6 +1,6 @@
 package com.threefour.config;
 
-import com.threefour.auth.JwtUtil;
+import com.threefour.auth.JwtProvider;
 import com.threefour.auth.AuthConstants;
 import com.threefour.auth.RefreshTokenRepository;
 import com.threefour.auth.exception.CustomAuthenticationEntryPoint;
@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -34,7 +33,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Bean
@@ -69,9 +68,9 @@ public class SecurityConfig {
                         .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
 
                 // 필터 추가
-                .addFilterAt(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class)
-                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenRepository), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JwtFilter(jwtUtil), CustomLoginFilter.class)
+                .addFilterAt(new CustomLogoutFilter(jwtProvider, refreshTokenRepository), LogoutFilter.class)
+                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), jwtProvider, refreshTokenRepository), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(jwtProvider), CustomLoginFilter.class)
 
                 .build();
     }

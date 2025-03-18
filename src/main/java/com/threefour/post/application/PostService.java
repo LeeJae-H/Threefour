@@ -1,6 +1,6 @@
 package com.threefour.post.application;
 
-import com.threefour.auth.JwtUtil;
+import com.threefour.auth.JwtProvider;
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
 import com.threefour.post.domain.Post;
@@ -24,7 +24,7 @@ public class PostService {
 
     private final UserRepository userRepository;
     private final PostRepository postRepository;
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
 
     @Transactional
     public void writePost(WritePostReqeust writePostReqeust, String email) {
@@ -117,9 +117,9 @@ public class PostService {
         // AccessToken 헤더의 값이 유효하면
         if (accessToken != null && accessToken.startsWith("Bearer ")) {
             String token = accessToken.split(" ")[1];
-            String category = jwtUtil.getCategory(token);
-            if (category.equals("access") && !jwtUtil.isExpired(token)) {
-                String email = jwtUtil.getEmail(token);
+            String category = jwtProvider.getCategory(token);
+            if (category.equals("access") && !jwtProvider.isExpired(token)) {
+                String email = jwtProvider.getEmail(token);
                 Optional<User> foundUser = userRepository.findByEmail(email);
                 if (foundUser.isPresent()) {
                     isMine = foundPost.getAuthorNickname().equals(foundUser.get().getNickname());

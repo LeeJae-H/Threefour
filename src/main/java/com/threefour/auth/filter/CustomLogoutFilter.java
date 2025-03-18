@@ -1,9 +1,8 @@
 package com.threefour.auth.filter;
 
-import com.threefour.auth.JwtUtil;
+import com.threefour.auth.JwtProvider;
 import com.threefour.auth.RefreshTokenRepository;
 import com.threefour.common.ErrorCode;
-import com.threefour.common.ExpectedException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -26,7 +25,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends GenericFilterBean {
 
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
@@ -59,7 +58,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         String token = refreshToken.split(" ")[1];
 
         // 2. 토큰이 RefreshToken인 지 검증
-        String category = jwtUtil.getCategory(token);
+        String category = jwtProvider.getCategory(token);
         if (!category.equals("refresh")) {
             ErrorCode errorCode = ErrorCode.NOT_REFRESH_TOKEN;
             response.setStatus(errorCode.getHttpStatus().value());
@@ -75,13 +74,13 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         // 4. RefreshToken이 만료되었는 지 검증 2 -> 토큰의 만료기간 확인
         // todo 추후 RefreshToken을 Redis에 저장한다면, 삭제해도 될 코드입니다.
-        if (jwtUtil.isExpired(token)) {
+        if (jwtProvider.isExpired(token)) {
             ErrorCode errorCode = ErrorCode.EXPIRED_REFRESH_TOKEN;
             response.setStatus(errorCode.getHttpStatus().value());
             return;
         }
 
-        String userEmail = jwtUtil.getEmail(token);
+        String userEmail = jwtProvider.getEmail(token);
 
         // 데이터베이스에 존재하는 해당 사용자의 모든 RefreshToken 삭제
         refreshTokenRepository.deleteByUserEmail(userEmail);

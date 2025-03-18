@@ -30,7 +30,7 @@ import java.util.Iterator;
 public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
 
     /**
@@ -70,8 +70,8 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         String role = auth.getAuthority();
 
         // 토큰 생성
-        String accessToken = jwtUtil.createJwt("access", email, role, AuthConstants.ACCESS_TOKEN_EXPIRATION_TIME);
-        String refreshToken = jwtUtil.createJwt("refresh", email, role, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+        String accessToken = jwtProvider.createJwt("access", email, role, AuthConstants.ACCESS_TOKEN_EXPIRATION_TIME);
+        String refreshToken = jwtProvider.createJwt("refresh", email, role, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
 
         // 데이터베이스에 RefreshToken 저장
         saveRefreshToken(email, refreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);

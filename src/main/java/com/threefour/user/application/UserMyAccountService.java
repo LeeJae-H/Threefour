@@ -1,6 +1,6 @@
 package com.threefour.user.application;
 
-import com.threefour.auth.JwtUtil;
+import com.threefour.auth.JwtProvider;
 import com.threefour.auth.RefreshTokenRepository;
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
@@ -20,7 +20,7 @@ public class UserMyAccountService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
     private final PostRepository postRepository;
 
     public MyInfoResponse getMyInfo(String email) {
@@ -77,7 +77,7 @@ public class UserMyAccountService {
         String token = refreshToken.split(" ")[1];
 
         // 2. 토큰이 RefreshToken인 지 검증
-        String category = jwtUtil.getCategory(token);
+        String category = jwtProvider.getCategory(token);
         if (!category.equals("refresh")) {
             throw new ExpectedException(ErrorCode.NOT_REFRESH_TOKEN);
         }
@@ -89,7 +89,7 @@ public class UserMyAccountService {
 
         // 4. RefreshToken이 만료되었는 지 검증 2 -> 토큰의 만료기간 확인
         // todo 추후 RefreshToken을 Redis에 저장한다면, 삭제해도 될 코드입니다.
-        if (jwtUtil.isExpired(token)) {
+        if (jwtProvider.isExpired(token)) {
             throw new ExpectedException(ErrorCode.EXPIRED_REFRESH_TOKEN);
         }
 

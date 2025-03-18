@@ -14,7 +14,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class TokenService {
 
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
 
@@ -28,7 +28,7 @@ public class TokenService {
         String token = refreshToken.split(" ")[1];
 
         // 2. 토큰이 RefreshToken인 지 검증
-        String category = jwtUtil.getCategory(token);
+        String category = jwtProvider.getCategory(token);
         if (!category.equals("refresh")) {
             throw new ExpectedException(ErrorCode.NOT_REFRESH_TOKEN);
         }
@@ -40,16 +40,16 @@ public class TokenService {
 
         // 4. RefreshToken이 만료되었는 지 검증 2 -> 토큰의 만료기간 확인
         // todo 추후 RefreshToken을 Redis에 저장한다면, 삭제해도 될 코드입니다.
-        if (jwtUtil.isExpired(token)) {
+        if (jwtProvider.isExpired(token)) {
             throw new ExpectedException(ErrorCode.EXPIRED_REFRESH_TOKEN);
         }
 
-        String email = jwtUtil.getEmail(token);
-        String role = jwtUtil.getRole(token);
+        String email = jwtProvider.getEmail(token);
+        String role = jwtProvider.getRole(token);
 
         // 토큰 생성
-        String newAccessToken = jwtUtil.createJwt("access", email, role, AuthConstants.ACCESS_TOKEN_EXPIRATION_TIME);
-        String newRefreshToken = jwtUtil.createJwt("refresh", email, role, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+        String newAccessToken = jwtProvider.createJwt("access", email, role, AuthConstants.ACCESS_TOKEN_EXPIRATION_TIME);
+        String newRefreshToken = jwtProvider.createJwt("refresh", email, role, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
 
         // 데이터베이스에 존재하는 해당 RefreshToken 삭제 후 새로운 RefreshToken 저장
         refreshTokenRepository.deleteByRefreshToken(token);
