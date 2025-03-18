@@ -12,8 +12,11 @@ public class UserValidator {
 
     private final UserRepository userRepository;
 
-    // 이메일은 고유하다.
+    // 이메일은 올바른 형식이어야 한다. 또한, 이메일은 고유하다.
     public void validateEmail(String email) {
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            throw new ExpectedException(ErrorCode.INVALID_EMAIL_FORMAT);
+        }
         if (userRepository.existsByEmail(email)) {
             throw new ExpectedException(ErrorCode.ALREADY_USED_EMAIL);
         }

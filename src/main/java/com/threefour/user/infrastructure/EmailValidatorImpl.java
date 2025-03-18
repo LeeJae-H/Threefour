@@ -2,7 +2,7 @@ package com.threefour.user.infrastructure;
 
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
-import com.threefour.user.domain.MailSender;
+import com.threefour.user.domain.EmailValidator;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -10,29 +10,49 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Component
 @RequiredArgsConstructor
-public class MailSenderImpl implements MailSender {
+public class EmailValidatorImpl implements EmailValidator {
 
     private final JavaMailSender mailSender;
-    private static int authNumber;
+    // todo 추후 분산 서버를 고려한다면 Redis로 변경해야 합니다.
+    private final Map<String, String> emailValidationCache = new ConcurrentHashMap<>();
+
+    private static String authNumber;
+
     @Value("${spring.mail.username}")
     private String sender;
 
+    // todo 사용자 경험을 위해 이메일 인증번호 발송은 이벤트(도메인 이벤트)로 처리
     @Override
-    public int sendMail(String email) {
+    public void sendEmailAuthNumber(String email) {
+        // 인증번호 생성
+        authNumber = createNumber();
+        // 이메일 메세지 생성
         MimeMessage message = createMessage(email);
+        // 이메일 인증번호 발송
         mailSender.send(message);
-        return authNumber;
+        // cache에 저장
+        emailValidationCache.put(email, String.valueOf(authNumber));
     }
 
-    private int createNumber() {
-        return (int)(Math.random() * (90000)) + 100000; // 6자리 숫자
+    @Override
+    public void validateEmailAuthNumber(String email, String authNumber) {
+        String storedAuthNumber = emailValidationCache.get(email);
+        if (storedAuthNumber == null || !storedAuthNumber.equals(authNumber)) {
+            throw new ExpectedException(ErrorCode.FAIL_VALIDATE_EMAIL);
+        }
+        emailValidationCache.remove(email);
+    }
+
+    private String createNumber() {
+        return String.valueOf((int)(Math.random() * 900000) + 100000);
     }
 
     private MimeMessage createMessage(String mail) {
-        authNumber = createNumber();
-
         MimeMessage message = mailSender.createMimeMessage();
         try {
             message.setFrom(sender);
@@ -45,7 +65,6 @@ public class MailSenderImpl implements MailSender {
         } catch (MessagingException e) {
             throw new ExpectedException(ErrorCode.FAIL_SEND_EMAIL);
         }
-
         return message;
     }
 }

@@ -60,10 +60,4 @@ public class Post {
         LocalDateTime createdAt = postTimeInfo.getCreatedAt();
         this.postTimeInfo = new PostTimeInfo(createdAt, LocalDateTime.now());
     }
-
-    public void checkAuthor(String nickname) {
-        if (!this.authorNickname.equals(nickname)) {
-            throw new ExpectedException(ErrorCode.POST_ACCESS_DENIED);
-        }
-    }
 }

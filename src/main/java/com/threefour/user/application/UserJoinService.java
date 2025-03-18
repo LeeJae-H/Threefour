@@ -2,7 +2,7 @@ package com.threefour.user.application;
 
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
-import com.threefour.user.domain.MailSender;
+import com.threefour.user.domain.EmailValidator;
 import com.threefour.user.domain.PasswordEncoder;
 import com.threefour.user.domain.User;
 import com.threefour.user.domain.UserRepository;
@@ -12,19 +12,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 @Service
 @RequiredArgsConstructor
 public class UserJoinService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserValidator userValidator;
-    private final MailSender mailSender;
+    private final EmailValidator emailValidator;
     private final UserRepository userRepository;
-    // todo 추후 분산 서버를 고려한다면 Redis로 변경해야 합니다.
-    private final Map<String, String> emailValidationCache = new ConcurrentHashMap<>();
 
     @Transactional
     public void join(JoinRequest joinRequest) {
@@ -40,6 +35,7 @@ public class UserJoinService {
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(password);
 
+        // 회원가입
         User newUser = User.join(email, encodedPassword, nickname);
         userRepository.save(newUser);
     }
@@ -48,20 +44,16 @@ public class UserJoinService {
         // 값 검증
         userValidator.validateEmail(email);
 
-        // todo 사용자 경험을 위해 메일 발송 자체는 이벤트(도메인 이벤트)로 처리
-        int authNumber = mailSender.sendMail(email);
-        emailValidationCache.put(email, String.valueOf(authNumber));
+        // 이메일 인증번호 발송
+        emailValidator.sendEmailAuthNumber(email);
     }
 
     public void validateEmailAuthNumber(EmailAuthNumberRequest emailAuthNumberRequest) {
         String email = emailAuthNumberRequest.getEmail();
         String authNumber = emailAuthNumberRequest.getAuthNumber();
 
-        String storedAuthNumber = emailValidationCache.get(email);
-        if (storedAuthNumber == null || !storedAuthNumber.equals(authNumber)) {
-            throw new ExpectedException(ErrorCode.FAIL_VALIDATE_EMAIL);
-        }
-        emailValidationCache.remove(emailAuthNumberRequest.getEmail());
+        // 이메일 인증번호 확인
+        emailValidator.validateEmailAuthNumber(email, authNumber);
     }
 
     public void validateNickname(String nickname) {

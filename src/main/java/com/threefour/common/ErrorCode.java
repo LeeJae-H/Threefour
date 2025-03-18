@@ -19,6 +19,7 @@ public enum ErrorCode {
     // 회원(User)
     ALREADY_USED_EMAIL(HttpStatus.BAD_REQUEST, "ALREADY_USED_EMAIL", "이미 사용 중인 이메일입니다."),
     ALREADY_USED_NICKNAME(HttpStatus.BAD_REQUEST, "ALREADY_USED_NICKNAME", "이미 사용 중인 닉네임입니다."),
+    INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "INVALID_EMAIL_FORMAT", "올바른 이메일 형식이 아닙니다."),
     INVALID_PASSWORD_LENGTH(HttpStatus.BAD_REQUEST, "INVALID_PASSWORD_LENGTH", "비밀번호는 최소 8자 이상이어야 합니다."),
     INVALID_NICKNAME_LENGTH(HttpStatus.BAD_REQUEST, "INVALID_NICKNAME_LENGTH", "닉네임은 2~10자 이내여야 합니다."),
     INVALID_NICKNAME_FORMAT(HttpStatus.BAD_REQUEST, "INVALID_NICKNAME_FORMAT", "닉네임은 특수문자를 포함할 수 없습니다."),

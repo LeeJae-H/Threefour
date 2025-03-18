@@ -37,6 +37,7 @@ public class PostService {
         PostValidator.validateTitle(title);
         PostValidator.validateContent(content);
 
+        // 게시글 작성
         Post newPost = Post.writePost(authorNickname, category, title, content);
         postRepository.save(newPost);
     }
@@ -47,7 +48,7 @@ public class PostService {
         Post foundPost = getPostById(postId);
 
         // 작성자 본인인 지 확인
-        foundPost.checkAuthor(foundUser.getNickname());
+        checkAuthor(foundUser, foundPost);
 
         String newTitle = editPostRequest.getTitle();
         String newContent = editPostRequest.getContent();
@@ -75,9 +76,16 @@ public class PostService {
         Post foundPost = getPostById(postId);
 
         // 작성자 본인인 지 확인
-        foundPost.checkAuthor(foundUser.getNickname());
+        checkAuthor(foundUser, foundPost);
 
+        // 게시글 삭제
         postRepository.delete(foundPost);
+    }
+
+    private void checkAuthor(User user, Post post) {
+        if (!post.getAuthorNickname().equals(user.getNickname())) {
+            throw new ExpectedException(ErrorCode.POST_ACCESS_DENIED);
+        }
     }
 
     public PostDetailsResponse getPostDetails(Long postId, String accessToken) {

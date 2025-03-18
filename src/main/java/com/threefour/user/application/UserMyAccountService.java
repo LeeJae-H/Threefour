@@ -67,9 +67,18 @@ public class UserMyAccountService {
 
         // 회원이 작성한 게시글 모두 삭제
         postRepository.deleteByAuthorNickname(foundUser.getNickname());
-        // DB에서 회원 삭제
+
+        // 데이터베이스에서 회원 삭제
         userRepository.delete(foundUser);
 
+        // 값 검증
+        validateRefreshToken(refreshToken);
+
+        // 데이터베이스에 존재하는 해당 사용자의 모든 RefreshToken 삭제
+        refreshTokenRepository.deleteByUserEmail(email);
+    }
+
+    private void validateRefreshToken(String refreshToken) {
         // 1. RefreshToken 헤더의 값이 올바른 형태인지 검증
         if (refreshToken == null || !refreshToken.startsWith("Bearer ")) {
             throw new ExpectedException(ErrorCode.NOT_REFRESH_TOKEN);
@@ -93,9 +102,6 @@ public class UserMyAccountService {
         if (jwtProvider.isExpired(token)) {
             throw new ExpectedException(ErrorCode.EXPIRED_REFRESH_TOKEN);
         }
-
-        // 데이터베이스에 존재하는 해당 사용자의 모든 RefreshToken 삭제
-        refreshTokenRepository.deleteByUserEmail(email);
     }
 
     private User getUserByEmail(String email) {
