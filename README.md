@@ -12,17 +12,16 @@
 <div align="center">
     <img src="https://github.com/user-attachments/assets/c96a4de2-996b-4c38-bd39-ef7c8c76c271" width="680" height="410">
 </div>
-<br>
 
 ## 도메인 모델
 <div align="center">
     <img src="https://github.com/user-attachments/assets/432b4310-1bec-44e7-93ca-a14340d1994f" width="600" height="300">
 </div>
 <br>
+<br>
 <div align="center">
     <img src="https://github.com/user-attachments/assets/705fd997-778c-4a78-abf4-39129c12b9c5" width="650" height="300">
 </div>
-<br>
 <br>
 
 ## 소프트웨어 아키텍처 - 계층 구조
