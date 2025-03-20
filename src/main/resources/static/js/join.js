@@ -1,10 +1,12 @@
-let isNicknameValidated = false;
 let validatedNickname;
+let isNicknameValidated = false;
 let isEmailValidated = false;
 
 // 회원가입
 document.getElementById("joinForm").addEventListener("submit", function (event) {
-    event.preventDefault(); // 기본 폼 제출 방지
+    event.preventDefault();
+
+    const email = document.getElementById("email").value;
 
     const password = document.getElementById("password").value;
     const password2 = document.getElementById("password2").value;
@@ -14,23 +16,22 @@ document.getElementById("joinForm").addEventListener("submit", function (event) 
     }
 
     const nickname = document.getElementById("nickname").value;
-
-    const joinData = {
-        email: document.getElementById("email").value,
-        password: password,
-        nickname: nickname
-    };
-
-    if (nickname != validatedNickname) {
+    if (nickname !== validatedNickname) {
         alert("닉네임 확인이 필요합니다.");
         return;
     }
+
+    const joinData = {
+        email: email,
+        password: password,
+        nickname: nickname
+    };
 
     axios.post("/api/users/join", joinData)
         .then(response => {
             const userNickname = response.data.data;
             alert(userNickname + "님 환영합니다!");
-            window.location.href = "/home";
+            window.location.href = "/";
         })
         .catch(error => {
             alert("잘못된 비밀번호입니다.");
@@ -40,7 +41,7 @@ document.getElementById("joinForm").addEventListener("submit", function (event) 
 
 // 이메일 인증번호 발송
 document.getElementById("emailButton").addEventListener("click", function (event) {
-    event.preventDefault(); // 기본 폼 제출 방지
+    event.preventDefault();
 
     const email = document.getElementById("email").value;
     const emailNumberButton = document.getElementById("emailNumberButton");
@@ -59,7 +60,7 @@ document.getElementById("emailButton").addEventListener("click", function (event
 
 // 이메일 인증번호 확인
 document.getElementById("emailNumberButton").addEventListener("click", function (event) {
-    event.preventDefault(); // 기본 폼 제출 방지
+    event.preventDefault();
 
     const emailData = {
         email: document.getElementById("email").value,
@@ -81,7 +82,7 @@ document.getElementById("emailNumberButton").addEventListener("click", function 
 
 // 닉네임 확인
 document.getElementById("nicknameButton").addEventListener("click", function (event) {
-    event.preventDefault(); // 기본 폼 제출 방지
+    event.preventDefault();
 
     const nickname = document.getElementById("nickname").value;
 

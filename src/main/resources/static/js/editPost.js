@@ -11,14 +11,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 'AccessToken': accessToken
             }})
             .then(response => {
-
-
-                axios.get(`/api/posts/id/${postId}`)
+                axios.get(`/api/posts/${postId}/details`)
                     .then(response => {
                         const post = response.data.data;
 
                         document.getElementById("category").innerText = post.category;
-                        document.getElementById("authorNickname").innerText = post.authorNickname;
+                        document.getElementById("authorNickname").innerText = post.author.nickname;
                         const createdAt = new Date(post.postTimeInfo.createdAt);
                         const updatedAt = new Date(post.postTimeInfo.updatedAt);
 
@@ -36,44 +34,35 @@ document.addEventListener("DOMContentLoaded", function() {
                         beforeContent = post.content;
                     })
                     .catch(error => {
-                        document.body.innerHTML = '';
-                        const userConfirmed = window.confirm("로그인이 필요한 페이지입니다.");
-                        if (userConfirmed) {
-                            window.location.href = "/home";
-                        }
+                        window.confirm("로그인이 필요한 페이지입니다.");
+                        window.location.href = "/";
                     });
-
-
             })
             .catch(error => {
-                document.body.innerHTML = '';
-                const userConfirmed = window.confirm("로그인이 필요한 페이지입니다.");
-                if (userConfirmed) {
-                    window.location.href = "/home";
-                }
+                window.confirm("로그인이 필요한 페이지입니다.");
+                window.location.href = "/";
             });
     } else {
-        document.body.innerHTML = '';
         window.confirm("로그인이 필요한 페이지입니다.");
-        window.location.href = "/home";
+        window.location.href = "/";
     }
 });
 
 // 게시글 수정
 document.getElementById('editForm').addEventListener('submit', function (event) {
-    event.preventDefault(); // 기본 폼 제출 방지
+    event.preventDefault();
 
     const accessToken = localStorage.getItem('AccessToken');
     const postId = document.getElementById("postId").value;
 
-    const title = document.getElementById("title").value;
-    const content = document.getElementById("content").value;
-
     const editData = {};
 
+    const title = document.getElementById("title").value;
     if (title !== beforeTitle) {
         editData.title = title;
     }
+
+    const content = document.getElementById("content").value;
     if (content !== beforeContent) {
         editData.content = content;
     }
@@ -84,7 +73,7 @@ document.getElementById('editForm').addEventListener('submit', function (event) 
         }})
         .then(response => {
             window.confirm("수정이 완료됐습니다.");
-            window.location.href = `/posts/${postId}`;
+            window.location.href = `/view/posts/${postId}/details`;
         })
         .catch(error => {
             alert("제목은 1~50자 이내, 내용은 1자 이상어이야 합니다.");

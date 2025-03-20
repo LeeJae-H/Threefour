@@ -9,7 +9,7 @@ public class Constants {
             // JWT
             "/api/token/reissue",
             // 화면(HTML)
-            "/view/**",
+            "/view/**", "/",
             // 회원(User)
             "/api/users/join", "/api/users/join/*",
             // 게시글(Post)

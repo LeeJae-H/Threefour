@@ -9,22 +9,18 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(response => {
             })
             .catch(error => {
-                document.body.innerHTML = '';
-                const userConfirmed = window.confirm("로그인이 필요한 페이지입니다.");
-                if (userConfirmed) {
-                    window.location.href = "/home";
-                }
+                window.confirm("로그인이 필요한 페이지입니다.");
+                window.location.href = "/";
             });
     } else {
-        document.body.innerHTML = '';
         window.confirm("로그인이 필요한 페이지입니다.");
-        window.location.href = "/home";
+        window.location.href = "/";
     }
 });
 
 // 게시글 작성
 document.getElementById('writeForm').addEventListener('submit', function (event) {
-    event.preventDefault(); // 기본 폼 제출 방지
+    event.preventDefault();
 
     const accessToken = localStorage.getItem('AccessToken');
     const categoryValue = document.getElementById("categoryValue").value;
@@ -38,13 +34,13 @@ document.getElementById('writeForm').addEventListener('submit', function (event)
     writeData.content = content;
     writeData.category = categoryValue;
 
-    axios.post('/api/posts/write', writeData, {
+    axios.post('/api/posts', writeData, {
         headers: {
             'AccessToken': accessToken
         }})
         .then(response => {
             window.confirm("작성이 완료됐습니다.");
-            window.location.href = `/posts/category/${categoryValue}`;
+            window.location.href = `/view/posts/${categoryValue}`;
         })
         .catch(error => {
             alert("제목은 1~50자 이내, 내용은 1자 이상어이야 합니다.");

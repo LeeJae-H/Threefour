@@ -24,16 +24,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // 로그인
 document.getElementById('loginForm').addEventListener('submit', function (event) {
-    event.preventDefault(); // 기본 폼 제출 방지
+    event.preventDefault();
 
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-    const formData = new FormData();
-    formData.append('email', email);
-    formData.append('password', password);
+    const loginData = new FormData();
+    loginData.append('email', email);
+    loginData.append('password', password);
 
-    axios.post('/login', formData, {
+    axios.post('/login', loginData, {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         }})
@@ -41,13 +41,10 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
             // AccessToken, RefreshToken을 localStorage에 저장
             const accessToken = response.headers['accesstoken'];
             const refreshToken = response.headers['refreshtoken'];
-
             localStorage.setItem('AccessToken', accessToken);
             localStorage.setItem('RefreshToken', refreshToken);
 
-            // 리다이렉션
-            const redirectUrl = response.headers['location'];
-            window.location.href = redirectUrl;
+            window.location.href = "/";
         })
         .catch(error => {
             alert('이메일 또는 비밀번호가 일치하지 않습니다.');
@@ -56,7 +53,7 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
 
 // 로그아웃
 document.getElementById("logoutForm").addEventListener("submit", function (event) {
-    event.preventDefault(); // 기본 폼 제출 방지
+    event.preventDefault();
 
     const refreshToken = localStorage.getItem("RefreshToken");
 
@@ -69,51 +66,50 @@ document.getElementById("logoutForm").addEventListener("submit", function (event
                 localStorage.removeItem("AccessToken");
                 localStorage.removeItem("RefreshToken");
 
-                // 리다이렉션
-                const redirectUrl = response.headers['location'];
-                window.location.href = redirectUrl;
+                window.location.href = "/";
             })
             .catch(error => {
                 localStorage.removeItem("AccessToken");
                 localStorage.removeItem("RefreshToken");
 
-                // 리다이렉션
-                const redirectUrl = response.headers['location'];
-                window.location.href = redirectUrl;
+                window.location.href = "/";
             });
     } else {
         localStorage.removeItem("AccessToken");
         localStorage.removeItem("RefreshToken");
+
+        window.location.href = "/";
     }
 });
 
 function loadPosts() {
-    axios.get("/api/posts", {
+    axios.get("/api/posts/list/all", {
         params: {
             page: 1,
             size: 15
         }})
         .then(response => {
             const posts = response.data.data.postSummaryList;
-            const tbody = document.querySelector("table tbody");
+            const totalPages = response.data.data.totalPages;
 
+            // 게시글 목록
+            const tbody = document.querySelector("table tbody");
             posts.forEach((post) => {
                 const createdAt = new Date(post.createdAt);
                 const formattedCreatedAt = `${createdAt.getFullYear()}/${(createdAt.getMonth() + 1).toString().padStart(2, '0')}/${createdAt.getDate().toString().padStart(2, '0')} ${createdAt.getHours().toString().padStart(2, '0')}:${createdAt.getMinutes().toString().padStart(2, '0')}`;
-                const row =
-                    `
+                const row = `
                     <tr>
                         <td>${post.id}</td>
-                        <td><a href="/posts/${post.id}" style="text-decoration: none;">${post.title}</a></td>
-                        <td>${post.authorNickname}</td>
+                        <td><a href="/view/posts/${post.id}/details" style="text-decoration: none;">${post.title}</a></td>
+                        <td>${post.author.nickname}</td>
                         <td>${formattedCreatedAt}</td>
                     </tr>
                     `;
                 tbody.innerHTML += row;
             });
 
+            // 페이지 번호
             const pageInt = 1;
-            const totalPages = response.data.data.totalPages;
             const ul = document.querySelector("ul");
             ul.innerHTML = '';
 
@@ -127,7 +123,7 @@ function loadPosts() {
             } else {
                 ul.innerHTML += `
                 <li class="page-item">
-                    <a class="page-link" href="/home/${pageInt - 1}">Previous</a>
+                    <a class="page-link" href="/view/home/${pageInt - 1}">Previous</a>
                 </li>  
                 `;
             }
@@ -138,7 +134,7 @@ function loadPosts() {
             for (let i = startPage; i <= endPage; i++) {
                 ul.innerHTML += `
                 <li class="page-item ${parseInt(i) === pageInt ? 'active' : ''}">
-                    <a class="page-link" href="/home/${i}">${i}</a>
+                    <a class="page-link" href="/view/home/${i}">${i}</a>
                 </li>
                 `;
             }
@@ -153,7 +149,7 @@ function loadPosts() {
             } else {
                 ul.innerHTML += `
                 <li class="page-item">
-                    <a class="page-link" href="/home/${pageInt + 1}">Next</a>
+                    <a class="page-link" href="/view/home/${pageInt + 1}">Next</a>
                 </li>
                 `;
             }

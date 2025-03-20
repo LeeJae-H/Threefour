@@ -19,13 +19,13 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function loadPostDetails(postId) {
-    axios.get(`/api/posts/id/${postId}`)
+    axios.get(`/api/posts/${postId}/details`)
         .then(response => {
             const post = response.data.data;
 
             document.getElementById("category").innerText = post.category;
             document.getElementById("title").innerText = post.title;
-            document.getElementById("authorNickname").innerText = post.authorNickname;
+            document.getElementById("authorNickname").innerText = post.author.nickname;
             document.getElementById("content").innerText = post.content;
             const createdAt = new Date(post.postTimeInfo.createdAt);
             const updatedAt = new Date(post.postTimeInfo.updatedAt);
@@ -43,7 +43,7 @@ function loadPostDetails(postId) {
 }
 
 function loadPostDetailsWithAccessToken(postId, accessToken) {
-    axios.get(`/api/posts/id/${postId}`, {
+    axios.get(`/api/posts/${postId}/details`, {
         headers: {
             "AccessToken": accessToken
         }})
@@ -52,7 +52,7 @@ function loadPostDetailsWithAccessToken(postId, accessToken) {
 
             document.getElementById("category").innerText = post.category;
             document.getElementById("title").innerText = post.title;
-            document.getElementById("authorNickname").innerText = post.authorNickname;
+            document.getElementById("authorNickname").innerText = post.author.nickname;
             document.getElementById("content").innerText = post.content;
             const createdAt = new Date(post.postTimeInfo.createdAt);
             const updatedAt = new Date(post.postTimeInfo.updatedAt);
@@ -68,7 +68,7 @@ function loadPostDetailsWithAccessToken(postId, accessToken) {
             if (post.isMine) {
                 const editPostButton = document.getElementById("editPostButton");
                 editPostButton.style.display = 'block';
-                editPostButton.href = `/posts/edit/${postId}`;
+                editPostButton.href = `/view/posts/${postId}/edit`;
 
                 const deletePostButton = document.getElementById("deletePostButton");
                 deletePostButton.style.display = 'block';
@@ -80,7 +80,7 @@ function loadPostDetailsWithAccessToken(postId, accessToken) {
 
 // 게시글 삭제하기
 document.getElementById("deletePostButton").addEventListener("click", function (event) {
-    event.preventDefault(); // 기본 폼 제출 방지
+    event.preventDefault();
 
     const accessToken = localStorage.getItem('AccessToken');
     const postId = document.getElementById("postId").value;
@@ -91,10 +91,10 @@ document.getElementById("deletePostButton").addEventListener("click", function (
         }})
         .then(response => {
             alert("삭제가 완료됐습니다.");
-            window.location.href = "/home";
+            window.location.href = "/";
         })
         .catch(error => {
             alert("삭제에 실패했습니다.");
-            window.location.href = "/home";
+            window.location.href = "/";
         });
 });

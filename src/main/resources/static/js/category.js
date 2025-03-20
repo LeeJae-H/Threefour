@@ -1,38 +1,39 @@
 document.addEventListener("DOMContentLoaded", function() {
     const category = document.getElementById("category").value;
     const writePostButton = document.getElementById("writePostButton");
-    writePostButton.href = `/posts/write/${category}`;
 
+    writePostButton.href = `/view/posts/${category}/write`;
     loadPosts(category);
 });
 
 function loadPosts(category) {
-    axios.get(`/api/posts/category/${category}`, {
+    axios.get(`/api/posts/list/all/${category}`, {
         params: {
             page: 1,
             size: 15
         }})
         .then(response => {
             const posts = response.data.data.postSummaryList;
-            const tbody = document.querySelector("table tbody");
+            const totalPages = response.data.data.totalPages;
 
+            // 게시글 목록
+            const tbody = document.querySelector("table tbody");
             posts.forEach((post) => {
                 const createdAt = new Date(post.createdAt);
                 const formattedCreatedAt = `${createdAt.getFullYear()}/${(createdAt.getMonth() + 1).toString().padStart(2, '0')}/${createdAt.getDate().toString().padStart(2, '0')} ${createdAt.getHours().toString().padStart(2, '0')}:${createdAt.getMinutes().toString().padStart(2, '0')}`;
-                const row =
-                    `
+                const row = `
                     <tr>
                         <td>${post.id}</td>
-                        <td><a href="/posts/${post.id}" style="text-decoration: none;">${post.title}</a></td>
-                        <td>${post.authorNickname}</td>
+                        <td><a href="/view/posts/${post.id}/details" style="text-decoration: none;">${post.title}</a></td>
+                        <td>${post.author.nickname}</td>
                         <td>${formattedCreatedAt}</td>
                     </tr>
                     `;
                 tbody.innerHTML += row;
             });
 
+            // 페이지 번호
             const pageInt = 1;
-            const totalPages = response.data.data.totalPages;
             const ul = document.querySelector("ul");
             ul.innerHTML = '';
 
@@ -46,7 +47,7 @@ function loadPosts(category) {
             } else {
                 ul.innerHTML += `
                 <li class="page-item">
-                    <a class="page-link" href="/posts/category/${category}/${pageInt - 1}">Previous</a>
+                    <a class="page-link" href="/view/posts/${category}/${pageInt - 1}">Previous</a>
                 </li>  
                 `;
             }
@@ -57,7 +58,7 @@ function loadPosts(category) {
             for (let i = startPage; i <= endPage; i++) {
                 ul.innerHTML += `
                 <li class="page-item ${parseInt(i) === pageInt ? 'active' : ''}">
-                    <a class="page-link" href="/posts/category/${category}/${i}">${i}</a>
+                    <a class="page-link" href="/view/posts/${category}/${i}">${i}</a>
                 </li>
                 `;
             }
@@ -72,7 +73,7 @@ function loadPosts(category) {
             } else {
                 ul.innerHTML += `
                 <li class="page-item">
-                    <a class="page-link" href="/posts/category/${category}/${pageInt + 1}">Next</a>
+                    <a class="page-link" href="/view/posts/${category}/${pageInt + 1}">Next</a>
                 </li>
                 `;
             }

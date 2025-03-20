@@ -83,7 +83,7 @@ public class PostService {
     }
 
     private void checkAuthor(User user, Post post) {
-        if (!post.getAuthorNickname().equals(user.getNickname())) {
+        if (!post.getAuthor().getNickname().equals(user.getNickname())) {
             throw new ExpectedException(ErrorCode.POST_ACCESS_DENIED);
         }
     }
@@ -94,7 +94,7 @@ public class PostService {
         // 조회한 사람이 게시글 작성자인지 여부
         boolean isMine = checkIfUserIsAuthor(foundPost, accessToken);
 
-        return new PostDetailsResponse(foundPost.getAuthorNickname(), foundPost.getCategory(), foundPost.getTitle(), foundPost.getContent(), foundPost.getPostTimeInfo(), isMine);
+        return new PostDetailsResponse(foundPost.getAuthor(), foundPost.getCategory(), foundPost.getTitle(), foundPost.getContent(), foundPost.getPostTimeInfo(), isMine);
     }
 
     private boolean checkIfUserIsAuthor(Post foundPost, String accessToken) {
@@ -119,14 +119,14 @@ public class PostService {
         String email = jwtProvider.getEmail(token);
         User foundUser = getUserByEmail(email);
 
-        return foundPost.getAuthorNickname().equals(foundUser.getNickname());
+        return foundPost.getAuthor().getNickname().equals(foundUser.getNickname());
     }
 
     public PostsListResponse getPostsList(Pageable pageable) {
         Page<Post> posts = postRepository.findAll(pageable);
 
         List<PostSummary> postSummaryList = posts.stream()
-                .map(post -> new PostSummary(post.getId(), post.getTitle(), post.getAuthorNickname(), post.getPostTimeInfo().getCreatedAt()))
+                .map(post -> new PostSummary(post.getId(), post.getTitle(), post.getAuthor(), post.getPostTimeInfo().getCreatedAt()))
                 .collect(Collectors.toList());
 
         return new PostsListResponse(postSummaryList, posts.getTotalPages());
@@ -136,7 +136,7 @@ public class PostService {
         Page<Post> posts = postRepository.findAllByCategory(category, pageable);
 
         List<PostSummary> postSummaryList = posts.stream()
-                .map(post -> new PostSummary(post.getId(), post.getTitle(), post.getAuthorNickname(), post.getPostTimeInfo().getCreatedAt()))
+                .map(post -> new PostSummary(post.getId(), post.getTitle(), post.getAuthor(), post.getPostTimeInfo().getCreatedAt()))
                 .collect(Collectors.toList());
 
         return new PostsListResponse(postSummaryList, posts.getTotalPages());

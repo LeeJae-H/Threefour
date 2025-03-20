@@ -20,7 +20,7 @@ public class UserJoinService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void join(JoinRequest joinRequest) {
+    public String join(JoinRequest joinRequest) {
         String email = joinRequest.getEmail();
         String password = joinRequest.getPassword();
         String nickname = joinRequest.getNickname();
@@ -36,6 +36,7 @@ public class UserJoinService {
         // 회원가입
         User newUser = User.join(email, encodedPassword, nickname);
         userRepository.save(newUser);
+        return newUser.getNickname();
     }
 
     public void sendEmailAuthNumber(String email) {

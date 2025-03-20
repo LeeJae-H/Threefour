@@ -41,7 +41,7 @@ public class Post {
         return id;
     }
 
-    public Author getAuthorNickname() {
+    public Author getAuthor() {
         return author;
     }
 

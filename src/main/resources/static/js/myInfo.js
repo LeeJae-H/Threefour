@@ -1,6 +1,6 @@
 let beforeNickname;
-let isNicknameValidated = false;
 let validatedNickname;
+let isNicknameValidated = false;
 
 document.addEventListener("DOMContentLoaded", function() {
     const accessToken = localStorage.getItem('AccessToken');
@@ -11,9 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 'AccessToken': accessToken
             }})
             .then(response => {
-
-
-                axios.get("/api/users/my/info", {
+                axios.get("/api/users/my", {
                     headers: {
                         'AccessToken': accessToken
                     }})
@@ -25,48 +23,39 @@ document.addEventListener("DOMContentLoaded", function() {
                         beforeNickname = nickname;
                     })
                     .catch(error => {
-                        document.body.innerHTML = '';
-                        const userConfirmed = window.confirm("로그인이 필요한 페이지입니다.");
-                        if (userConfirmed) {
-                            window.location.href = "/home";
-                        }
+                        window.confirm("로그인이 필요한 페이지입니다.");
+                        window.location.href = "/";
                     });
-
-
             })
             .catch(error => {
-                document.body.innerHTML = '';
-                const userConfirmed = window.confirm("로그인이 필요한 페이지입니다.");
-                if (userConfirmed) {
-                    window.location.href = "/home";
-                }
+                window.confirm("로그인이 필요한 페이지입니다.");
+                window.location.href = "/";
             });
     } else {
-        document.body.innerHTML = '';
         window.confirm("로그인이 필요한 페이지입니다.");
-        window.location.href = "/home";
+        window.location.href = "/";
     }
 });
 
 // 내 정보 수정
 document.getElementById('updateForm').addEventListener('submit', function (event) {
-    event.preventDefault(); // 기본 폼 제출 방지
+    event.preventDefault();
 
     const accessToken = localStorage.getItem('AccessToken');
 
+    const updateData = {};
+
     const password = document.getElementById("password").value;
     const password2 = document.getElementById("password2").value;
-    if (password !== password2) {
-        alert("비밀번호가 일치하지 않습니다.");
-        return;
+    if (password) {
+        if (password !== password2) {
+            alert("비밀번호가 일치하지 않습니다.");
+            return;
+        }
+        updateData.password = password;
     }
 
     const nickname = document.getElementById('nickname').value;
-
-    const updateData = {};
-    if (password) {
-        updateData.password = password;
-    }
     if (nickname !== beforeNickname) {
         if (nickname !== validatedNickname) {
             alert("닉네임 확인이 필요합니다.");
@@ -75,13 +64,13 @@ document.getElementById('updateForm').addEventListener('submit', function (event
         updateData.nickname = nickname;
     }
 
-    axios.put('/api/users/my/info', updateData, {
+    axios.put('/api/users/my', updateData, {
         headers: {
             'AccessToken': accessToken
         }})
         .then(response => {
             window.confirm("수정이 완료됐습니다.");
-            window.location.href = "/home";
+            window.location.href = "/";
         })
         .catch(error => {
             alert("잘못된 비밀번호입니다.");
@@ -91,7 +80,7 @@ document.getElementById('updateForm').addEventListener('submit', function (event
 
 // 닉네임 확인
 document.getElementById("nicknameButton").addEventListener("click", function (event) {
-    event.preventDefault(); // 기본 폼 제출 방지
+    event.preventDefault();
 
     const nickname = document.getElementById("nickname").value;
 

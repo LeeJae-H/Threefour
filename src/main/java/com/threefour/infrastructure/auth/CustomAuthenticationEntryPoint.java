@@ -22,6 +22,10 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         ErrorCode errorCode = (ErrorCode) request.getAttribute("exception");
 
+        if (errorCode == null) {
+            errorCode = ErrorCode.NOT_ACCESS_TOKEN;
+        }
+
         response.setStatus(errorCode.getHttpStatus());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

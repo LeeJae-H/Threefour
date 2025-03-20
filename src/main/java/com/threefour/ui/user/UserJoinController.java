@@ -25,8 +25,8 @@ public class UserJoinController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse<String>> join(@RequestBody JoinRequest joinRequest) {
-        userJoinService.join(joinRequest);
-        return new ResponseEntity<>(ApiResponse.success("success"), HttpStatus.OK);
+        String nickname = userJoinService.join(joinRequest);
+        return new ResponseEntity<>(ApiResponse.success(nickname), HttpStatus.OK);
     }
 
     /**
