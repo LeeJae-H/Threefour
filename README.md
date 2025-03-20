@@ -1,3 +1,18 @@
+## 기술 스택
+- **Backend**  
+    - Spring Boot 3.4.3  
+    - Java 17  
+    - Spring Security
+    - jjwt
+    - Spring Data JPA
+    - MySQL
+    - Junit 5  
+    - Thymleaf
+    
+- **Frontend**    
+    - HTML / CSS, Bootstrap / Javascript(Axios)  
+<br>
+
 ## 요구사항
 <div align="center">
     <img src="https://github.com/user-attachments/assets/c96a4de2-996b-4c38-bd39-ef7c8c76c271" width="680" height="410">
@@ -42,6 +57,7 @@
 <br>
 
 - **공통(common) 모듈 계층**
+
   - 공통(common) 모듈은 모든 모듈에서 사용될 수 있다.
   - 공통(common) 모듈은 프로젝트 내 어떠한 모듈도 의존하지 않는다. => 추가적으로, 이 프로젝트의 공통(common) 모듈은 어떠한 외부 의존도 갖지 않도록 했다. (= 순수 Java 클래스)
 
