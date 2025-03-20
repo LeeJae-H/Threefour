@@ -10,18 +10,21 @@
 
 ## 요구사항
 <div align="center">
-    <img src="https://github.com/user-attachments/assets/c96a4de2-996b-4c38-bd39-ef7c8c76c271" width="680" height="410">
+    <img src="https://github.com/user-attachments/assets/64de2cc5-02fc-4f68-a10b-a115e6e6b56e" width="690" height="390">
 </div>
+<div align="center">
+    <img src="https://github.com/user-attachments/assets/9bc54d08-b6b5-44c5-9700-c07131e5638f" width="50" height="50">
+</div>
+<div align="center">
+    <img src="https://github.com/user-attachments/assets/9ec587f9-51c3-463f-b5fa-09c5453e159d" width="550" height="180">
+</div>
+<br>
 
 ## 도메인 모델
 <div align="center">
-    <img src="https://github.com/user-attachments/assets/432b4310-1bec-44e7-93ca-a14340d1994f" width="600" height="300">
+    <img src="https://github.com/user-attachments/assets/94bec7be-d02d-40b4-b9a5-0577a9679540" width="780" height="330">
 </div>
-<br>
-<br>
-<div align="center">
-    <img src="https://github.com/user-attachments/assets/705fd997-778c-4a78-abf4-39129c12b9c5" width="650" height="300">
-</div>
+
 <br>
 
 ## 소프트웨어 아키텍처 - 계층 구조
