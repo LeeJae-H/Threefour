@@ -1,16 +1,11 @@
 ## 기술 스택
-- **Backend**  
-    - Spring Boot 3.4.3  
-    - Java 17  
-    - Spring Security
-    - jjwt
-    - Spring Data JPA
-    - MySQL
-    - Junit 5  
-    - Thymleaf
+#### Backend
+<img src="https://github.com/user-attachments/assets/2df0a4c8-23a7-4264-86e7-84015a9568f4" width="680" height="100">
     
-- **Frontend**    
-    - HTML / CSS, Bootstrap / Javascript(Axios)  
+#### Frontend
+<img src="https://github.com/user-attachments/assets/c490fc2d-3ca2-4eaf-8ed8-f8637a3996b8" width="430" height="100">
+
+<br>
 <br>
 
 ## 요구사항
@@ -27,6 +22,7 @@
 <div align="center">
     <img src="https://github.com/user-attachments/assets/705fd997-778c-4a78-abf4-39129c12b9c5" width="650" height="300">
 </div>
+<br>
 <br>
 
 ## 소프트웨어 아키텍처 - 계층 구조
@@ -52,8 +48,9 @@
 ## 모듈 구성
 > **각 모듈 계층은 소프트웨어 아키텍처의 각 계층에 대응한다.**
 <div align="center">
-    <img src="https://github.com/user-attachments/assets/c821ef82-4daf-4c2e-b774-3f566dc7fc29" width="420" height="320">
+    <img src="https://github.com/user-attachments/assets/e2bc3b03-2e3a-4c32-b393-15912fa258b7" width="420" height="320">
 </div>
+
 <br>
 
 - **공통(common) 모듈 계층**
@@ -64,3 +61,34 @@
 <br>
 
 ## 패키지 구성
+```bash
+├── application
+│   ├── auth
+│   ├── user
+│   └── post
+|
+├── common
+│   ├── auth
+│   ├── user
+│   └── post
+|
+├── domain
+│   ├── auth
+│   ├── user
+│   └── post
+|
+├── dto
+│   ├── auth
+│   ├── user
+│   └── post
+|
+├── infrastructure
+│   ├── auth
+│   ├── config
+│   └── user
+|
+├── ui
+│   ├── auth
+│   ├── user
+│   └── post
+``` 
