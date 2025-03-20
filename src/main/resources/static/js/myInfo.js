@@ -97,3 +97,32 @@ document.getElementById("nicknameButton").addEventListener("click", function (ev
             alert("닉네임 형식이 올바르지 않거나, 이미 사용 중인 닉네임입니다.");
         });
 });
+
+// 회원 탈퇴
+document.getElementById("deleteButton").addEventListener("click", function (event) {
+    event.preventDefault();
+
+    const accessToken = localStorage.getItem("AccessToken");
+    const refreshToken = localStorage.getItem("RefreshToken");
+
+    if (refreshToken) {
+        axios.delete("/api/users/my", {
+            headers: {
+                "AccessToken": accessToken,
+                "RefreshToken": refreshToken
+            }})
+            .then(response => {
+                localStorage.removeItem("AccessToken");
+                localStorage.removeItem("RefreshToken");
+                window.confirm("성공적으로 탈퇴되었습니다.");
+                window.location.href = "/";
+            })
+            .catch(error => {
+                window.confirm("로그인이 필요한 페이지입니다.");
+                window.location.href = "/";
+            });
+    } else {
+        window.confirm("로그인이 필요한 페이지입니다.");
+        window.location.href = "/";
+    }
+});

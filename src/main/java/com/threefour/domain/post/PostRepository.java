@@ -2,6 +2,7 @@ package com.threefour.domain.post;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
@@ -15,6 +16,7 @@ public interface PostRepository extends Repository<Post, Long> {
     Page<Post> findAllByCategory(String category, Pageable pageable);
     void delete(Post post);
 
-    @Query("DELETE FROM Post p WHERE p.author = :author")
+    @Modifying
+    @Query("DELETE FROM Post p WHERE p.author.nickname = :author")
     void deleteByAuthor(String author);
 }
