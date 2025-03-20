@@ -1,11 +1,12 @@
 package com.threefour.user.application;
 
-import com.threefour.auth.AuthConstants;
-import com.threefour.auth.JwtProvider;
-import com.threefour.post.domain.Post;
-import com.threefour.user.domain.User;
-import com.threefour.user.dto.MyInfoResponse;
-import com.threefour.user.dto.UpdateMyInfoRequest;
+import com.threefour.application.user.UserMyAccountService;
+import com.threefour.common.Constants;
+import com.threefour.infrastructure.auth.JwtProvider;
+import com.threefour.domain.post.Post;
+import com.threefour.domain.user.User;
+import com.threefour.dto.user.MyInfoResponse;
+import com.threefour.dto.user.UpdateMyInfoRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -192,9 +193,9 @@ public class UserMyAccountServiceIntegrationTest {
         // DB에 사용자가 존재
         User savedUser = saveUser(user);
         // DB에 RefreshToken이 존재
-        String refreshToken = jwtProvider.createJwt("refresh", savedUser.getEmail(), "ROLE_USER", AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+        String refreshToken = jwtProvider.createJwt("refresh", savedUser.getEmail(), "ROLE_USER", Constants.REFRESH_TOKEN_EXPIRATION_TIME);
         String insertQuery = "INSERT INTO refresh_token (user_email, refresh_token, expiration) VALUES (?, ?, ?)";
-        jdbcTemplate.update(insertQuery, savedUser.getEmail(), refreshToken, AuthConstants.REFRESH_TOKEN_EXPIRATION_TIME);
+        jdbcTemplate.update(insertQuery, savedUser.getEmail(), refreshToken, Constants.REFRESH_TOKEN_EXPIRATION_TIME);
         // DB에 사용자가 작성한 게시글 존재
         Post post = Post.writePost(savedUser.getNickname(), "테스트게시판", "테스트제목", "테스트내용");
         String saveQuery = "INSERT INTO post (author_nickname, category, title, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";

@@ -1,11 +1,12 @@
 package com.threefour.post.application;
 
+import com.threefour.application.post.PostService;
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
-import com.threefour.post.domain.Post;
-import com.threefour.post.dto.EditPostRequest;
-import com.threefour.post.dto.WritePostReqeust;
-import com.threefour.user.domain.User;
+import com.threefour.domain.post.Post;
+import com.threefour.dto.post.EditPostRequest;
+import com.threefour.dto.post.WritePostReqeust;
+import com.threefour.domain.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

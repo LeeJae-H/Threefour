@@ -1,5 +1,6 @@
 package com.threefour.post.domain;
 
+import com.threefour.domain.post.Post;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

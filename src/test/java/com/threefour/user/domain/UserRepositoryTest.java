@@ -1,5 +1,7 @@
 package com.threefour.user.domain;
 
+import com.threefour.domain.user.User;
+import com.threefour.domain.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

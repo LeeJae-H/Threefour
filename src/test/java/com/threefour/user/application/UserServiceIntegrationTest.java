@@ -1,9 +1,10 @@
 package com.threefour.user.application;
 
+import com.threefour.application.user.UserService;
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
-import com.threefour.user.domain.User;
-import com.threefour.user.dto.OtherUserInfoResponse;
+import com.threefour.domain.user.User;
+import com.threefour.dto.user.OtherUserInfoResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

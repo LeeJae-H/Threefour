@@ -1,11 +1,14 @@
 package com.threefour.common;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@Getter
-@RequiredArgsConstructor
 public class ExpectedException extends RuntimeException {
 
     private final ErrorCode errorCode;
+
+    public ExpectedException(ErrorCode errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    public ErrorCode getErrorCode() {
+        return errorCode;
+    }
 }
