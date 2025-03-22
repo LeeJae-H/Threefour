@@ -1,4 +1,4 @@
-package com.threefour.application.auth;
+package com.threefour.application;
 
 import com.threefour.domain.auth.RefreshToken;
 import com.threefour.domain.auth.RefreshTokenRepository;

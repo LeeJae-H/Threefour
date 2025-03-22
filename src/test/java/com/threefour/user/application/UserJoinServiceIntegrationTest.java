@@ -1,6 +1,6 @@
 package com.threefour.user.application;
 
-import com.threefour.application.user.UserJoinService;
+import com.threefour.application.UserJoinService;
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
 import com.threefour.domain.user.User;

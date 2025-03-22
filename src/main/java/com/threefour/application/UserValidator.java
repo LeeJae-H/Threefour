@@ -1,4 +1,4 @@
-package com.threefour.application.user;
+package com.threefour.application;
 
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;

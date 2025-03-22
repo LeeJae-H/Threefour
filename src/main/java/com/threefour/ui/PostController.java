@@ -1,7 +1,7 @@
-package com.threefour.ui.post;
+package com.threefour.ui;
 
 import com.threefour.common.ApiResponse;
-import com.threefour.application.post.PostService;
+import com.threefour.application.PostService;
 import com.threefour.dto.post.EditPostRequest;
 import com.threefour.dto.post.PostDetailsResponse;
 import com.threefour.dto.post.PostsListResponse;

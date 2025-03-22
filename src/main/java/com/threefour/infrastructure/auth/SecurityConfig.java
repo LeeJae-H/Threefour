@@ -1,9 +1,7 @@
-package com.threefour.infrastructure.config;
+package com.threefour.infrastructure.auth;
 
-import com.threefour.infrastructure.auth.JwtProvider;
 import com.threefour.common.Constants;
 import com.threefour.domain.auth.RefreshTokenRepository;
-import com.threefour.infrastructure.auth.CustomAuthenticationEntryPoint;
 import com.threefour.infrastructure.auth.filter.CustomLogoutFilter;
 import com.threefour.infrastructure.auth.filter.JwtFilter;
 import com.threefour.infrastructure.auth.filter.CustomLoginFilter;

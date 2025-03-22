@@ -1,6 +1,6 @@
 package com.threefour.post.application;
 
-import com.threefour.application.post.PostService;
+import com.threefour.application.PostService;
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
 import com.threefour.domain.post.Post;

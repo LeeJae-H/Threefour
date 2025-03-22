@@ -1,4 +1,4 @@
-package com.threefour.application.user;
+package com.threefour.application;
 
 import com.threefour.domain.user.EmailValidator;
 import com.threefour.domain.user.PasswordEncoder;

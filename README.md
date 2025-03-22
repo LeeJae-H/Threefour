@@ -65,19 +65,13 @@
 ## 패키지 구성
 ```bash
 ├── application
-│   ├── auth (인증/인가)
-│   ├── user (회원 도메인)
-│   └── post (게시글 도메인)
 |
 ├── common
-│   ├── auth
-│   ├── user
-│   └── post
 |
 ├── domain
 │   ├── auth
-│   ├── user
-│   └── post
+│   ├── user 
+│   └── post 
 |
 ├── dto
 │   ├── auth
@@ -86,11 +80,9 @@
 |
 ├── infrastructure
 │   ├── auth
-│   ├── config
+│   ├── discord
+│   ├── event
 │   └── user
 |
 ├── ui
-│   ├── auth
-│   ├── user
-│   └── post
 ``` 

@@ -1,7 +1,7 @@
-package com.threefour.ui.user;
+package com.threefour.ui;
 
 import com.threefour.common.ApiResponse;
-import com.threefour.application.user.UserJoinService;
+import com.threefour.application.UserJoinService;
 import com.threefour.dto.user.EmailAuthNumberRequest;
 import com.threefour.dto.user.JoinRequest;
 import lombok.RequiredArgsConstructor;

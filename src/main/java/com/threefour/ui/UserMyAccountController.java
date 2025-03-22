@@ -1,7 +1,7 @@
-package com.threefour.ui.user;
+package com.threefour.ui;
 
 import com.threefour.common.ApiResponse;
-import com.threefour.application.user.UserMyAccountService;
+import com.threefour.application.UserMyAccountService;
 import com.threefour.dto.user.MyInfoResponse;
 import com.threefour.dto.user.UpdateMyInfoRequest;
 import lombok.RequiredArgsConstructor;

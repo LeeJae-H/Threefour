@@ -1,6 +1,6 @@
 package com.threefour.user.application;
 
-import com.threefour.application.user.UserMyAccountService;
+import com.threefour.application.UserMyAccountService;
 import com.threefour.common.Constants;
 import com.threefour.infrastructure.auth.JwtProvider;
 import com.threefour.domain.post.Post;

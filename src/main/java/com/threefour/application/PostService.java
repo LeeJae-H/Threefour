@@ -1,4 +1,4 @@
-package com.threefour.application.post;
+package com.threefour.application;
 
 import com.threefour.infrastructure.auth.JwtProvider;
 import com.threefour.common.ErrorCode;

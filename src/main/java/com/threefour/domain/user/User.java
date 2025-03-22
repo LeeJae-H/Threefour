@@ -1,5 +1,6 @@
 package com.threefour.domain.user;
 
+import com.threefour.infrastructure.event.Events;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -70,8 +71,9 @@ public class User {
         return userTimeInfo;
     }
 
+    // password 인자는 암호화된 상태로 넘어와야 합니다.
     public static User join(String email, String password, String nickname) {
-        // password 인자는 암호화된 상태로 넘어와야 합니다.
+        Events.raise(new JoinedEvent(email, nickname));
         return new User(email, password, nickname, "ROLE_USER", new UserTimeInfo(LocalDateTime.now(), LocalDateTime.now()));
     }
 

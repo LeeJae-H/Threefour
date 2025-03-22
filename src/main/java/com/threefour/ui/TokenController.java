@@ -1,6 +1,6 @@
-package com.threefour.ui.auth;
+package com.threefour.ui;
 
-import com.threefour.application.auth.TokenService;
+import com.threefour.application.TokenService;
 import com.threefour.dto.auth.TokenResponse;
 import com.threefour.common.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
