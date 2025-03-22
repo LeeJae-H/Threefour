@@ -29,8 +29,9 @@
 
     <!-- 운영 환경 -->
     <springProfile name="deploy">
-        <!-- 모든 로그는 파일에 출력한다. -->
+        <!-- 모든 로그는 콘솔, 파일에 출력한다. -->
         <root level="INFO">
+            <appender-ref ref="CONSOLE" />
             <appender-ref ref="FILE" />
         </root>
     </springProfile>
