@@ -10,7 +10,9 @@ import com.threefour.domain.user.User;
 import com.threefour.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -123,7 +125,9 @@ public class PostService {
     }
 
     public PostsListResponse getPostsList(Pageable pageable) {
-        Page<Post> posts = postRepository.findAll(pageable);
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "postTimeInfo.createdAt"));
+
+        Page<Post> posts = postRepository.findAll(sortedPageable);
 
         List<PostSummary> postSummaryList = posts.stream()
                 .map(post -> new PostSummary(post.getId(), post.getTitle(), post.getAuthor(), post.getPostTimeInfo().getCreatedAt()))

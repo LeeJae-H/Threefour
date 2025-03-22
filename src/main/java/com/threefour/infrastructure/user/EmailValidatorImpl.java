@@ -8,6 +8,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -26,7 +27,7 @@ public class EmailValidatorImpl implements EmailValidator {
     @Value("${spring.mail.username}")
     private String sender;
 
-    // todo 사용자 경험을 위해 이메일 인증번호 발송은 이벤트(도메인 이벤트)로 처리
+    @Async
     @Override
     public void sendEmailAuthNumber(String email) {
         // 인증번호 생성
