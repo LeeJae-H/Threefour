@@ -36,22 +36,27 @@ jobs:
           echo "${{ secrets.APPLICATION_DEPLOY }}" > ./src/main/resources/application-deploy.yaml
         shell: bash
 
-#      - name: Make application-test.yaml
-#        run: |
-#          mkdir -p ./src/test/resources
-#          echo "${{ secrets.APPLICATION_TEST }}" > ./src/test/resources/application-test.yaml
-#        shell: bash
+      # 데이터베이스 연결(SSH)을 위한 key 파일
+      - name: Create SSH Key File
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.BASTION_HOST_KEY }}" > ~/.ssh/bastion-key.pem
+          chmod 600 ~/.ssh/bastion-key.pem
+        shell: bash
+
+      - name: Make application-test.yaml
+        run: |
+          mkdir -p ./src/test/resources
+          echo "${{ secrets.APPLICATION_TEST }}" > ./src/test/resources/application-test.yaml
+        shell: bash
 
       - name: Grant execute permission for Gradle Wrapper
         run: |
           chmod +x ./gradlew
 
-      - name: Build with Gradle Wrapper - No Test
+      - name: Build with Gradle Wrapper - Include Test
         run: |
-          ./gradlew clean build -x test
-
-#      - name: Test with Gradle Wrapper
-#        run: ./gradlew test
+          ./gradlew clean build
 
       - name: DockerHub Login
         if: contains(github.ref, 'main')

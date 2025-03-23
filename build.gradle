@@ -55,6 +55,7 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'com.github.mwiede:jsch:0.2.22'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
