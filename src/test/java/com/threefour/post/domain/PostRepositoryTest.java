@@ -44,7 +44,7 @@ public class PostRepositoryTest {
         // then
         assertThat(savedPost).isNotNull();
         assertThat(savedPost.getId()).isNotNull(); // DB에 저장됐는지 여부 확인 -> DB에 저장되지 않으면 Id는 null 값
-        assertThat(savedPost.getAuthorNickname()).isEqualTo(post.getAuthorNickname());
+        assertThat(savedPost.getAuthor().getNickname()).isEqualTo(post.getAuthor().getNickname());
         assertThat(savedPost.getCategory()).isEqualTo(post.getCategory());
         assertThat(savedPost.getTitle()).isEqualTo(post.getTitle());
         assertThat(savedPost.getContent()).isEqualTo(post.getContent());
@@ -64,7 +64,7 @@ public class PostRepositoryTest {
 
         // then
         assertThat(foundPost.isPresent()).isTrue();
-        assertThat(foundPost.get().getAuthorNickname()).isEqualTo(savedPost.getAuthorNickname());
+        assertThat(foundPost.get().getAuthor().getNickname()).isEqualTo(savedPost.getAuthor().getNickname());
         assertThat(foundPost.get().getCategory()).isEqualTo(savedPost.getCategory());
         assertThat(foundPost.get().getTitle()).isEqualTo(savedPost.getTitle());
         assertThat(foundPost.get().getContent()).isEqualTo(savedPost.getContent());
@@ -92,6 +92,27 @@ public class PostRepositoryTest {
     }
 
     @Test
+    @DisplayName("게시판 게시글 페이지 단위로 조회")
+    void findCategoryPostsByPageTest() {
+        Post post1 = createTestPostInstance();
+        Post post2 = createTestPostInstance();
+        Post post3 = createTestPostInstance();
+
+        // given
+        // DB에 게시글들이 존재
+        postRepository.save(post1);
+        postRepository.save(post2);
+        postRepository.save(post3);
+
+        // when
+        Page<Post> page = postRepository.findAllByCategory(post1.getCategory(), PageRequest.of(0, 2));
+
+        // then
+        assertThat(page.getContent()).hasSize(2);
+        assertThat(page.getTotalElements()).isEqualTo(3);
+    }
+
+    @Test
     @DisplayName("게시글 삭제")
     void deletePostTest() {
         Post post = createTestPostInstance();
@@ -109,24 +130,27 @@ public class PostRepositoryTest {
         assertThat(isExist).isFalse();
     }
 
+    // JPQL은 DB의 데이터는 바로 삭제하지만, 영속성 컨텍스트에 남아 있는 엔티티는 삭제하지 않는다.
+    // 따라서, 삭제 이후 findById로 조회 시 영속성 컨텍스트에서 조회한다.
     @Test
     @DisplayName("작성자 닉네임으로 해당 작성자의 모든 게시글 삭제")
     void deletePostByAuthorNicknameTest() {
         Post post1 = createTestPostInstance();
         Post post2 = createTestPostInstance();
-        String authorNickname = post1.getAuthorNickname();
+        String authorNickname = post1.getAuthor().getNickname();
 
         // given
         // DB에 게시글들이 존재
-        Post savedPost1 = postRepository.save(post1);
-        Post savedPost2 = postRepository.save(post2);
+        postRepository.save(post1);
+        postRepository.save(post2);
 
         // when
-        postRepository.deleteByAuthorNickname(authorNickname);
+        postRepository.deleteByAuthor(authorNickname);
 
         // then
-        assertThat(postRepository.findById(savedPost1.getId())).isEmpty();
-        assertThat(postRepository.findById(savedPost2.getId())).isEmpty();
+        String query = "SELECT COUNT(*) FROM post WHERE author_nickname = ?";
+        Integer count = jdbcTemplate.queryForObject(query, Integer.class, authorNickname);
+        assertThat(count).isZero();
     }
 
     private Post createTestPostInstance() {

@@ -119,6 +119,25 @@ public class UserRepositoryTest {
         assertThat(isNotExist).isFalse();
     }
 
+    @Test
+    @DisplayName("닉네임 존재 여부 확인")
+    void existsByNicknameTest() {
+        User user = createTestUserInstance();
+        String notNicknameEmail = "조유리";
+
+        // given
+        // DB에 사용자가 존재
+        User savedUser = userRepository.save(user);
+
+        // when
+        Boolean isExist = userRepository.existsByNickname(savedUser.getNickname());
+        Boolean isNotExist = userRepository.existsByNickname(notNicknameEmail);
+
+        // then
+        assertThat(isExist).isTrue();
+        assertThat(isNotExist).isFalse();
+    }
+
     private User createTestUserInstance() {
         String email = "test@naver.com";
         String encodedPassword = "testEncodedPassword";

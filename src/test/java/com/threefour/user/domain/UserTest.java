@@ -41,12 +41,14 @@ public class UserTest {
         // given
         // 사용자 정보가 존재
         User user = User.join(email, password, nickname);
+        LocalDateTime updatedAtBefore = user.getUserTimeInfo().getUpdatedAt();
 
         // when
         user.changePassword(newPassword);
 
         // then
         assertThat(user.getPassword()).isEqualTo(newPassword);
+        assertThat(user.getUserTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
     }
 
     @Test
@@ -60,30 +62,13 @@ public class UserTest {
         // given
         // 사용자 정보가 존재
         User user = User.join(email, password, nickname);
+        LocalDateTime updatedAtBefore = user.getUserTimeInfo().getUpdatedAt();
 
         // when
         user.changeNickname(newNickname);
 
         // then
         assertThat(user.getNickname()).isEqualTo(newNickname);
-    }
-
-    @Test
-    @DisplayName("수정일시 갱신")
-    void updateUpdatedAtTest() {
-        String email = "test@naver.com";
-        String password = "testPassword";
-        String nickname = "테스트닉네임";
-
-        // given
-        // 사용자 정보가 존재
-        User user = User.join(email, password, nickname);
-        LocalDateTime updatedAtBefore = user.getUserTimeInfo().getUpdatedAt();
-
-        // when
-        user.updateUpdatedAt();
-
-        // then
         assertThat(user.getUserTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
     }
 }

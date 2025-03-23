@@ -23,7 +23,7 @@ public class PostTest {
 
         // then
         assertThat(newPost).isNotNull();
-        assertThat(newPost.getAuthorNickname()).isEqualTo(authorNickname);
+        assertThat(newPost.getAuthor().getNickname()).isEqualTo(authorNickname);
         assertThat(newPost.getCategory()).isEqualTo(category);
         assertThat(newPost.getTitle()).isEqualTo(title);
         assertThat(newPost.getContent()).isEqualTo(content);
@@ -43,12 +43,14 @@ public class PostTest {
         // given
         // 게시글 정보가 존재
         Post post = Post.writePost(authorNickname, category, title, content);
+        LocalDateTime updatedAtBefore = post.getPostTimeInfo().getUpdatedAt();
 
         // when
         post.editTitle(newTitle);
 
         // then
         assertThat(post.getTitle()).isEqualTo(newTitle);
+        assertThat(post.getPostTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
     }
 
     @Test
@@ -63,31 +65,13 @@ public class PostTest {
         // given
         // 게시글 정보가 존재
         Post post = Post.writePost(authorNickname, category, title, content);
+        LocalDateTime updatedAtBefore = post.getPostTimeInfo().getUpdatedAt();
 
         // when
         post.editContent(newContent);
 
         // then
         assertThat(post.getContent()).isEqualTo(newContent);
-    }
-
-    @Test
-    @DisplayName("수정일시 갱신")
-    void updateUpdatedAtTest() {
-        String authorNickname = "테스트작성자닉네임";
-        String category = "테스트게시판";
-        String title = "테스트제목";
-        String content = "테스트내용";
-
-        // given
-        // 게시글 정보가 존재
-        Post post = Post.writePost(authorNickname, category, title, content);
-        LocalDateTime updatedAtBefore = post.getPostTimeInfo().getUpdatedAt();
-
-        // when
-        post.updateUpdatedAt();
-
-        // then
         assertThat(post.getPostTimeInfo().getUpdatedAt()).isNotEqualTo(updatedAtBefore);
     }
 }
