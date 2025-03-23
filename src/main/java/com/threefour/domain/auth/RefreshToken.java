@@ -1,8 +1,10 @@
 package com.threefour.domain.auth;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter // 테스트를 위해 추가한 어노테이션입니다.
 public class RefreshToken {
 
     @Id

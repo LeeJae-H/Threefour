@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -70,8 +70,8 @@ public class TokenService {
     }
 
     private void saveRefreshToken(String email, String refresh) {
-        Date date = new Date(System.currentTimeMillis() + Constants.REFRESH_TOKEN_EXPIRATION_TIME);
-        RefreshToken refreshToken = new RefreshToken(email, refresh, date.toString());
+        LocalDateTime expiration = LocalDateTime.now().plusNanos(Constants.REFRESH_TOKEN_EXPIRATION_TIME * 1_000_000);
+        RefreshToken refreshToken = new RefreshToken(email, refresh, expiration.toString());
         refreshTokenRepository.save(refreshToken);
     }
 }

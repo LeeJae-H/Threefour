@@ -1,4 +1,4 @@
-package com.threefour.user.domain;
+package com.threefour.domain;
 
 import com.threefour.domain.user.User;
 import org.junit.jupiter.api.DisplayName;

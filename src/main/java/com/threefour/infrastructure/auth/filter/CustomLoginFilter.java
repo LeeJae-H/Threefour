@@ -18,8 +18,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 
 /**
@@ -78,7 +78,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         String refreshToken = jwtProvider.createJwt("refresh", email, role, Constants.REFRESH_TOKEN_EXPIRATION_TIME);
 
         // 데이터베이스에 RefreshToken 저장
-        saveRefreshToken(email, refreshToken, Constants.REFRESH_TOKEN_EXPIRATION_TIME);
+        saveRefreshToken(email, refreshToken);
 
         // Response Header에 AccessToken과 RefreshToken을 추가
         response.setHeader("AccessToken", "Bearer " + accessToken);
@@ -99,9 +99,9 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         response.setStatus(401);
     }
 
-    private void saveRefreshToken(String email, String refresh, Long expirationTime) {
-        Date date = new Date(System.currentTimeMillis() + expirationTime);
-        RefreshToken refreshToken = new RefreshToken(email, refresh, date.toString());
+    private void saveRefreshToken(String email, String refresh) {
+        LocalDateTime expiration = LocalDateTime.now().plusNanos(Constants.REFRESH_TOKEN_EXPIRATION_TIME * 1_000_000);
+        RefreshToken refreshToken = new RefreshToken(email, refresh, expiration.toString());
         refreshTokenRepository.save(refreshToken);
     }
 }

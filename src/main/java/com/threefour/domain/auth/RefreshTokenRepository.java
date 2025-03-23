@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface RefreshTokenRepository extends Repository<RefreshToken, Long> {
 
-    void save(RefreshToken refreshToken);
+    RefreshToken save(RefreshToken refreshToken);
     Boolean existsByRefreshToken(String refreshToken);
     @Transactional
     void deleteByRefreshToken(String refreshToken);

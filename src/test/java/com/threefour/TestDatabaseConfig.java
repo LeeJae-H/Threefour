@@ -48,7 +48,7 @@ public class TestDatabaseConfig {
         session.setPortForwardingL(localPort, remoteHost, remotePort);
 
         // DB 연결
-        String dbUrl = "jdbc:mysql://localhost:" + localPort + "/threefour_test?serverTimezone=Asia/Seoul&characterEncoding=UTF-8";
+        String dbUrl = "jdbc:mysql://localhost:" + localPort + "/threefour_test?rewriteBatchedStatements=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8";
         return DataSourceBuilder.create()
                 .url(dbUrl)
                 .username(dbUsername)

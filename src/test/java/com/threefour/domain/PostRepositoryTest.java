@@ -1,4 +1,4 @@
-package com.threefour.post.domain;
+package com.threefour.domain;
 
 import com.threefour.TestDatabaseConfig;
 import com.threefour.domain.post.Post;
