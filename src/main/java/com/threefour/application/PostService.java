@@ -126,10 +126,9 @@ public class PostService {
 
     public PostsListResponse getPostsList(Pageable pageable) {
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
-
         Page<Post> posts = postRepository.findAll(sortedPageable);
 
-        List<PostSummary> postSummaryList = posts.stream()
+        List<PostSummary> postSummaryList = posts.getContent().stream()
                 .map(post -> new PostSummary(post.getId(), post.getTitle(), post.getAuthor(), post.getPostTimeInfo().getCreatedAt()))
                 .collect(Collectors.toList());
 
@@ -138,10 +137,9 @@ public class PostService {
 
     public PostsListResponse getPostsListByCategory(String category, Pageable pageable) {
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
-
         Page<Post> posts = postRepository.findAllByCategory(category, sortedPageable);
 
-        List<PostSummary> postSummaryList = posts.stream()
+        List<PostSummary> postSummaryList = posts.getContent().stream()
                 .map(post -> new PostSummary(post.getId(), post.getTitle(), post.getAuthor(), post.getPostTimeInfo().getCreatedAt()))
                 .collect(Collectors.toList());
 

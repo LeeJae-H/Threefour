@@ -25,7 +25,12 @@ public enum ErrorCode {
     POST_NOT_FOUND(400, "POST_NOT_FOUND", "게시글을 찾을 수 없습니다."),
     POST_ACCESS_DENIED(401, "POST_ACCESS_DENIED", "게시글 접근 권한이 없습니다."),
     INVALID_TITLE_LENGTH(400, "INVALID_TITLE_LENGTH", "게시글 제목은 1~50자 이내여야 합니다."),
-    INVALID_CONTENT_LENGTH(400, "INVALID_CONTENT_LENGTH", "게시글 내용은 최소 1자 이상이어야 합니다.");
+    INVALID_CONTENT_LENGTH(400, "INVALID_CONTENT_LENGTH", "게시글 내용은 최소 1자 이상이어야 합니다."),
+
+    // 댓글(Comment)
+    COMMENT_NOT_FOUND(400, "COMMENT_NOT_FOUND", "댓글을 찾을 수 없습니다."),
+    COMMENT_ACCESS_DENIED(401, "COMMENT_ACCESS_DENIED", "댓글 접근 권한이 없습니다."),
+    INVALID_COMMENT_LENGTH(400, "INVALID_COMMENT_LENGTH", "댓글 내용은 1~50자 이내여야 합니다.");
 
     private final int httpStatus;
     private final String code;
