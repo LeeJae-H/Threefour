@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @RequiredArgsConstructor
-public class EmailValidatorImpl implements EmailValidator {
+public class LocalCacheEmailValidator implements EmailValidator {
 
     private final JavaMailSender mailSender;
     // todo 추후 분산 서버를 고려한다면 Redis로 변경해야 합니다.

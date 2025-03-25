@@ -1,4 +1,4 @@
-package com.threefour.dto.post;
+package com.threefour.dto.comment;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -8,16 +8,14 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostSummary {
+public class CommentSummary {
 
-    private Long postId;
-    private String title;
+    private String content;
     private String nickname;
     private LocalDateTime createdAt;
 
-    public PostSummary(Long postId, String title, String nickname, LocalDateTime createdAt) {
-        this.postId = postId;
-        this.title = title;
+    public CommentSummary(String content, String nickname, LocalDateTime createdAt) {
+        this.content = content;
         this.nickname = nickname;
         this.createdAt = createdAt;
     }

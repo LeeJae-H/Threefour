@@ -1,5 +1,6 @@
 package com.threefour.application;
-
+import com.threefour.domain.comment.CommentRepository;
+import com.threefour.dto.comment.CommentSummary;
 import com.threefour.infrastructure.auth.JwtProvider;
 import com.threefour.common.ErrorCode;
 import com.threefour.common.ExpectedException;
@@ -25,6 +26,7 @@ public class PostService {
 
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final JwtProvider jwtProvider;
 
     @Transactional
@@ -91,14 +93,19 @@ public class PostService {
     }
 
     public PostDetailsResponse getPostDetails(Long postId, String accessToken) {
-        Post foundPost = getPostById(postId);
+        Post foundPost = postRepository.findById(postId)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
 
         // 조회한 사람이 게시글 작성자인지 여부
         boolean isMine = checkIfUserIsAuthor(foundPost, accessToken);
 
-        String nickname = getUserById(foundPost.getAuthor().getUserId()).getNickname();
+        String postAuthor = getUserNicknameById(foundPost.getAuthor().getUserId());
 
-        return new PostDetailsResponse(nickname, foundPost.getCategory(), foundPost.getTitle(), foundPost.getContent(), foundPost.getPostTimeInfo(), isMine);
+        // 게시글의 댓글과 댓글 작성자 닉네임을 가져오는 1번의 쿼리 실행
+        List<CommentSummary> comments = commentRepository.findCommentSummary(postId);
+
+
+        return new PostDetailsResponse(postAuthor, foundPost.getCategory(), foundPost.getTitle(), foundPost.getContent(), foundPost.getPostTimeInfo(), isMine, comments);
     }
 
     private boolean checkIfUserIsAuthor(Post foundPost, String accessToken) {
@@ -132,8 +139,8 @@ public class PostService {
 
         List<PostSummary> postSummaryList = posts.getContent().stream()
                 .map(post -> {
-                    String nickname = getUserById(post.getAuthor().getUserId()).getNickname();
-                    return new PostSummary(post.getId(), post.getTitle(), nickname, post.getPostTimeInfo().getCreatedAt());
+                    String postAuthor = getUserNicknameById(post.getAuthor().getUserId());
+                    return new PostSummary(post.getId(), post.getTitle(), postAuthor, post.getPostTimeInfo().getCreatedAt());
                 })
                 .collect(Collectors.toList());
 
@@ -146,17 +153,18 @@ public class PostService {
 
         List<PostSummary> postSummaryList = posts.getContent().stream()
                 .map(post -> {
-                    String nickname = getUserById(post.getAuthor().getUserId()).getNickname();
-                    return new PostSummary(post.getId(), post.getTitle(), nickname, post.getPostTimeInfo().getCreatedAt());
+                    String postAuthor = getUserNicknameById(post.getAuthor().getUserId());
+                    return new PostSummary(post.getId(), post.getTitle(), postAuthor, post.getPostTimeInfo().getCreatedAt());
                 })
                 .collect(Collectors.toList());
 
         return new PostsListResponse(postSummaryList, posts.getTotalPages());
     }
 
-    private User getUserById(Long id) {
-        return userRepository.findById(id)
+    private String getUserNicknameById(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+        return user.getNickname();
     }
 
     private User getUserByEmail(String email) {

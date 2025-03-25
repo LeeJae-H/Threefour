@@ -99,8 +99,8 @@ function loadPosts() {
                 const formattedCreatedAt = `${createdAt.getFullYear()}/${(createdAt.getMonth() + 1).toString().padStart(2, '0')}/${createdAt.getDate().toString().padStart(2, '0')} ${createdAt.getHours().toString().padStart(2, '0')}:${createdAt.getMinutes().toString().padStart(2, '0')}`;
                 const row = `
                     <tr>
-                        <td>${post.id}</td>
-                        <td><a href="/view/posts/${post.id}/details" style="text-decoration: none;">${post.title}</a></td>
+                        <td>${post.postId}</td>
+                        <td><a href="/view/posts/${post.postId}/details" style="text-decoration: none;">${post.title}</a></td>
                         <td>${post.nickname}</td>
                         <td>${formattedCreatedAt}</td>
                     </tr>
