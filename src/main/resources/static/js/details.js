@@ -25,7 +25,7 @@ function loadPostDetails(postId) {
 
             document.getElementById("category").innerText = post.category;
             document.getElementById("title").innerText = post.title;
-            document.getElementById("authorNickname").innerText = post.author.nickname;
+            document.getElementById("authorNickname").innerText = post.nickname;
             document.getElementById("content").innerText = post.content;
             const createdAt = new Date(post.postTimeInfo.createdAt);
             const updatedAt = new Date(post.postTimeInfo.updatedAt);
@@ -52,7 +52,7 @@ function loadPostDetailsWithAccessToken(postId, accessToken) {
 
             document.getElementById("category").innerText = post.category;
             document.getElementById("title").innerText = post.title;
-            document.getElementById("authorNickname").innerText = post.author.nickname;
+            document.getElementById("authorNickname").innerText = post.nickname;
             document.getElementById("content").innerText = post.content;
             const createdAt = new Date(post.postTimeInfo.createdAt);
             const updatedAt = new Date(post.postTimeInfo.updatedAt);

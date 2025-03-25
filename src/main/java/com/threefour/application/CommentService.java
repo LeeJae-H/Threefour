@@ -21,6 +21,7 @@ public class CommentService {
     @Transactional
     public void writeComment(WriteCommentRequest writeCommentRequest, String email) {
         User foundUser = getUserByEmail(email);
+        Long userId = foundUser.getId();
         Long postId = writeCommentRequest.getPostId();
         String content = writeCommentRequest.getContent();
 
@@ -31,7 +32,7 @@ public class CommentService {
         }
 
         // 댓글 작성
-        Comment newComment = Comment.writeComment(foundUser.getId(), postId, content);
+        Comment newComment = Comment.writeComment(userId, postId, content);
         commentRepository.save(newComment);
     }
 
@@ -48,7 +49,7 @@ public class CommentService {
     }
 
     private void checkAuthor(User user, Comment comment) {
-        if (!comment.getUserId().equals(user.getId())) {
+        if (!comment.getAuthor().getUserId().equals(user.getId())) {
             throw new ExpectedException(ErrorCode.COMMENT_ACCESS_DENIED);
         }
     }

@@ -1,5 +1,6 @@
 package com.threefour.domain.post;
 
+import com.threefour.domain.common.Author;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -61,8 +62,8 @@ public class Post {
         return postTimeInfo;
     }
 
-    public static Post writePost(String author, String category, String title, String content) {
-        return new Post(new Author(author), category, title, content, new PostTimeInfo(LocalDateTime.now(), LocalDateTime.now()));
+    public static Post writePost(Long userId, String category, String title, String content) {
+        return new Post(new Author(userId), category, title, content, new PostTimeInfo(LocalDateTime.now(), LocalDateTime.now()));
     }
 
     public void editTitle(String title) {

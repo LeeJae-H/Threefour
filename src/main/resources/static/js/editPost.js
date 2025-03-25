@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         const post = response.data.data;
 
                         document.getElementById("category").innerText = post.category;
-                        document.getElementById("authorNickname").innerText = post.author.nickname;
+                        document.getElementById("authorNickname").innerText = post.nickname;
                         const createdAt = new Date(post.postTimeInfo.createdAt);
                         const updatedAt = new Date(post.postTimeInfo.updatedAt);
 

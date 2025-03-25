@@ -101,7 +101,7 @@ function loadPosts() {
                     <tr>
                         <td>${post.id}</td>
                         <td><a href="/view/posts/${post.id}/details" style="text-decoration: none;">${post.title}</a></td>
-                        <td>${post.author.nickname}</td>
+                        <td>${post.nickname}</td>
                         <td>${formattedCreatedAt}</td>
                     </tr>
                     `;

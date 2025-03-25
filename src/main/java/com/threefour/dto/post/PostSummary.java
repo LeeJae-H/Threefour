@@ -1,6 +1,6 @@
 package com.threefour.dto.post;
 
-import com.threefour.domain.post.Author;
+import com.threefour.domain.common.Author;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,13 +13,13 @@ public class PostSummary {
 
     private Long id;
     private String title;
-    private Author author;
+    private String nickname;
     private LocalDateTime createdAt;
 
-    public PostSummary(Long id, String title, Author author, LocalDateTime createdAt) {
+    public PostSummary(Long id, String title, String nickname, LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
-        this.author = author;
+        this.nickname = nickname;
         this.createdAt = createdAt;
     }
 }

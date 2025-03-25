@@ -15,6 +15,6 @@ public class Constants {
             // 게시글(Post)
             "/api/posts/*/details", "/api/posts/list/all", "/api/posts/list/all/*"
     };
-    public static final Long ACCESS_TOKEN_EXPIRATION_TIME = 1000*60*10L; // 10분
+    public static final Long ACCESS_TOKEN_EXPIRATION_TIME = 1000*60*60L; // 10분
     public static final Long REFRESH_TOKEN_EXPIRATION_TIME = 1000*60*60*24L; // 24시간
 }

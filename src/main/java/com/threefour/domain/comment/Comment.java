@@ -1,5 +1,6 @@
 package com.threefour.domain.comment;
 
+import com.threefour.domain.common.Author;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -12,8 +13,8 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Embedded
+    private Author author;
 
     @Column(name = "post_id")
     private Long postId;
@@ -26,8 +27,8 @@ public class Comment {
 
     protected Comment() {}
 
-    private Comment(Long userId, Long postId, String content, CommentTimeInfo commentTimeInfo) {
-        this.userId = userId;
+    private Comment(Author author, Long postId, String content, CommentTimeInfo commentTimeInfo) {
+        this.author = author;
         this.postId = postId;
         this.content = content;
         this.commentTimeInfo = commentTimeInfo;
@@ -37,8 +38,8 @@ public class Comment {
         return id;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Author getAuthor() {
+        return author;
     }
 
     public Long getPostId() {
@@ -54,6 +55,6 @@ public class Comment {
     }
 
     public static Comment writeComment(Long userId, Long postId, String content) {
-        return new Comment(userId, postId, content, new CommentTimeInfo(LocalDateTime.now()));
+        return new Comment(new Author(userId), postId, content, new CommentTimeInfo(LocalDateTime.now()));
     }
 }

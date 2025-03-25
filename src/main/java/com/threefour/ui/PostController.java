@@ -34,26 +34,6 @@ public class PostController {
     }
 
     /**
-     * 게시글 상세 조회 API
-     *
-     * 작성자가 본인 게시글을 상세 조회하는 경우에,
-     * isMine을 true로 응답합니다. 이를 위해,
-     * 선택적으로 AccessToken을 요청으로 받습니다.
-     *
-     * @param postId
-     * @param accessToken
-     * @return PostDetailsResponse
-     */
-    @GetMapping("/{postId}/details")
-    public ResponseEntity<ApiResponse<PostDetailsResponse>> getPostDetails(
-            @PathVariable Long postId,
-            @RequestHeader(value = "AccessToken", required = false) String accessToken
-    ) {
-        PostDetailsResponse postDetailsResponse = postService.getPostDetails(postId, accessToken);
-        return new ResponseEntity<>(ApiResponse.success(postDetailsResponse), HttpStatus.OK);
-    }
-
-    /**
      * 게시글 수정 API
      * 작성자 본인만 가능합니다.
      *
@@ -81,6 +61,26 @@ public class PostController {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         postService.deletePost(postId, email);
         return new ResponseEntity<>(ApiResponse.success("success"), HttpStatus.OK);
+    }
+
+    /**
+     * 게시글 상세 조회 API
+     *
+     * 작성자가 본인 게시글을 상세 조회하는 경우에,
+     * isMine을 true로 응답합니다. 이를 위해,
+     * 선택적으로 AccessToken을 요청으로 받습니다.
+     *
+     * @param postId
+     * @param accessToken
+     * @return PostDetailsResponse
+     */
+    @GetMapping("/{postId}/details")
+    public ResponseEntity<ApiResponse<PostDetailsResponse>> getPostDetails(
+            @PathVariable Long postId,
+            @RequestHeader(value = "AccessToken", required = false) String accessToken
+    ) {
+        PostDetailsResponse postDetailsResponse = postService.getPostDetails(postId, accessToken);
+        return new ResponseEntity<>(ApiResponse.success(postDetailsResponse), HttpStatus.OK);
     }
 
     /**

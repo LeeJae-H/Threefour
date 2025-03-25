@@ -66,7 +66,7 @@ public class UserMyAccountService {
         User foundUser = getUserByEmail(email);
 
         // 회원이 작성한 게시글 모두 삭제
-        postRepository.deleteByAuthor(foundUser.getNickname());
+        postRepository.deleteByAuthor(foundUser.getId());
 
         // 데이터베이스에서 회원 삭제
         userRepository.delete(foundUser);

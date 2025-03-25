@@ -17,6 +17,6 @@ public interface PostRepository extends Repository<Post, Long> {
     void delete(Post post);
 
     @Modifying
-    @Query("DELETE FROM Post p WHERE p.author.nickname = :author")
-    void deleteByAuthor(String author);
+    @Query("DELETE FROM Post p WHERE p.author.userId = :userId")
+    void deleteByAuthor(Long userId);
 }

@@ -30,7 +30,7 @@ public class PostService {
     @Transactional
     public void writePost(WritePostReqeust writePostReqeust, String email) {
         User foundUser = getUserByEmail(email);
-        String authorNickname = foundUser.getNickname();
+        Long userId = foundUser.getId();
         String category = writePostReqeust.getCategory();
         String title = writePostReqeust.getTitle();
         String content = writePostReqeust.getContent();
@@ -40,7 +40,7 @@ public class PostService {
         PostValidator.validateContent(content);
 
         // 게시글 작성
-        Post newPost = Post.writePost(authorNickname, category, title, content);
+        Post newPost = Post.writePost(userId, category, title, content);
         postRepository.save(newPost);
     }
 
@@ -85,7 +85,7 @@ public class PostService {
     }
 
     private void checkAuthor(User user, Post post) {
-        if (!post.getAuthor().getNickname().equals(user.getNickname())) {
+        if (!post.getAuthor().getUserId().equals(user.getId())) {
             throw new ExpectedException(ErrorCode.POST_ACCESS_DENIED);
         }
     }
@@ -96,7 +96,9 @@ public class PostService {
         // 조회한 사람이 게시글 작성자인지 여부
         boolean isMine = checkIfUserIsAuthor(foundPost, accessToken);
 
-        return new PostDetailsResponse(foundPost.getAuthor(), foundPost.getCategory(), foundPost.getTitle(), foundPost.getContent(), foundPost.getPostTimeInfo(), isMine);
+        String nickname = getUserById(foundPost.getAuthor().getUserId()).getNickname();
+
+        return new PostDetailsResponse(nickname, foundPost.getCategory(), foundPost.getTitle(), foundPost.getContent(), foundPost.getPostTimeInfo(), isMine);
     }
 
     private boolean checkIfUserIsAuthor(Post foundPost, String accessToken) {
@@ -121,7 +123,7 @@ public class PostService {
         String email = jwtProvider.getEmail(token);
         User foundUser = getUserByEmail(email);
 
-        return foundPost.getAuthor().getNickname().equals(foundUser.getNickname());
+        return foundPost.getAuthor().getUserId().equals(foundUser.getId());
     }
 
     public PostsListResponse getPostsList(Pageable pageable) {
@@ -129,7 +131,10 @@ public class PostService {
         Page<Post> posts = postRepository.findAll(sortedPageable);
 
         List<PostSummary> postSummaryList = posts.getContent().stream()
-                .map(post -> new PostSummary(post.getId(), post.getTitle(), post.getAuthor(), post.getPostTimeInfo().getCreatedAt()))
+                .map(post -> {
+                    String nickname = getUserById(post.getAuthor().getUserId()).getNickname();
+                    return new PostSummary(post.getId(), post.getTitle(), nickname, post.getPostTimeInfo().getCreatedAt());
+                })
                 .collect(Collectors.toList());
 
         return new PostsListResponse(postSummaryList, posts.getTotalPages());
@@ -140,10 +145,18 @@ public class PostService {
         Page<Post> posts = postRepository.findAllByCategory(category, sortedPageable);
 
         List<PostSummary> postSummaryList = posts.getContent().stream()
-                .map(post -> new PostSummary(post.getId(), post.getTitle(), post.getAuthor(), post.getPostTimeInfo().getCreatedAt()))
+                .map(post -> {
+                    String nickname = getUserById(post.getAuthor().getUserId()).getNickname();
+                    return new PostSummary(post.getId(), post.getTitle(), nickname, post.getPostTimeInfo().getCreatedAt());
+                })
                 .collect(Collectors.toList());
 
         return new PostsListResponse(postSummaryList, posts.getTotalPages());
+    }
+
+    private User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
     }
 
     private User getUserByEmail(String email) {
