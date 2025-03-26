@@ -10,26 +10,19 @@
 
 ## 요구사항
 <div align="center">
-    <img src="https://github.com/user-attachments/assets/45cb23aa-44c5-4d71-b276-9ee9390db4cb" width="1000" height="360">
-</div>
-<div align="center">
-    <img src="https://github.com/user-attachments/assets/9bc54d08-b6b5-44c5-9700-c07131e5638f" width="50" height="50">
-</div>
-<div align="center">
-    <img src="https://github.com/user-attachments/assets/c13d1b6c-1e1b-435b-b226-233971bd26c2" width="930" height="155">
+    <img src="https://github.com/user-attachments/assets/45cb23aa-44c5-4d71-b276-9ee9390db4cb" width="1000" height="330">
 </div>
 <br>
 
 ## 도메인 모델
 <div align="center">
-    <img src="https://github.com/user-attachments/assets/8ffdc35d-47ac-49df-9c3d-df761ac53e18" width="1000" height="310">
+    <img src="https://github.com/user-attachments/assets/5516ef40-fad1-4571-b77e-3f4bcdb46ef3" width="1000" height="280">
 </div>
-
 <br>
 
 ## ERD
 <div align="center">
-    <img src="https://github.com/user-attachments/assets/a81ec53e-44f5-4974-82c5-dc33142fa570" width="600" height="330">
+    <img src="https://github.com/user-attachments/assets/a81ec53e-44f5-4974-82c5-dc33142fa570" width="675" height="350">
 </div>
 
 <br>
