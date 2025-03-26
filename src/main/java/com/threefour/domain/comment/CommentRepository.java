@@ -11,10 +11,11 @@ public interface CommentRepository extends Repository<Comment, Long> {
     Comment save(Comment comment);
     Optional<Comment> findById(Long id);
     void delete(Comment comment);
+    List<Comment> findAllByPostId(Long postId);
 
     @Query("""
             SELECT new com.threefour.dto.comment.CommentSummary(
-                c.content, u.nickname, c.commentTimeInfo.createdAt
+                c.id, c.content, u.nickname, c.commentTimeInfo.createdAt
             )
             FROM Comment c JOIN User u ON c.author.userId = u.id
             WHERE c.postId = :postId

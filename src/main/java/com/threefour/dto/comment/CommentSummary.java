@@ -10,11 +10,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommentSummary {
 
+    private Long commentId;
     private String content;
     private String nickname;
     private LocalDateTime createdAt;
 
-    public CommentSummary(String content, String nickname, LocalDateTime createdAt) {
+    public CommentSummary(Long commentId, String content, String nickname, LocalDateTime createdAt) {
+        this.commentId = commentId;
         this.content = content;
         this.nickname = nickname;
         this.createdAt = createdAt;

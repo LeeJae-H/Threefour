@@ -96,14 +96,13 @@ public class PostService {
         Post foundPost = postRepository.findById(postId)
                 .orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
 
+        String postAuthor = getUserNicknameById(foundPost.getAuthor().getUserId());
+
         // 조회한 사람이 게시글 작성자인지 여부
         boolean isMine = checkIfUserIsAuthor(foundPost, accessToken);
 
-        String postAuthor = getUserNicknameById(foundPost.getAuthor().getUserId());
-
         // 게시글의 댓글과 댓글 작성자 닉네임을 가져오는 1번의 쿼리 실행
         List<CommentSummary> comments = commentRepository.findCommentSummary(postId);
-
 
         return new PostDetailsResponse(postAuthor, foundPost.getCategory(), foundPost.getTitle(), foundPost.getContent(), foundPost.getPostTimeInfo(), isMine, comments);
     }

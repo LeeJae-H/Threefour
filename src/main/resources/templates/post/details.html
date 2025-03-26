@@ -33,6 +33,16 @@
             <a id="editPostButton" class="col-md-1 offset-md-5 btn btn-primary" href="" style="display: none;">수정하기</a>
             <button id="deletePostButton" class="col-md-1 btn btn-danger" style="display: none;">삭제하기</button>
         </div>
+        <hr>
+        <!-- 댓글 -->
+        <div class="mt-4">
+            <p>댓글</p>
+            <div id="commentsList"></div>
+            <div class="mt-3">
+                <textarea id="commentContent" class="form-control" rows="3" placeholder="댓글을 입력하세요..."></textarea>
+                <button id="writeCommentButton" class="btn btn-primary col-md-1 offset-md-11 mt-2">등록</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

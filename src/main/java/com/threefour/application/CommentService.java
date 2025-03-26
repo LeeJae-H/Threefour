@@ -6,10 +6,15 @@ import com.threefour.domain.comment.Comment;
 import com.threefour.domain.comment.CommentRepository;
 import com.threefour.domain.user.User;
 import com.threefour.domain.user.UserRepository;
+import com.threefour.dto.comment.CommentListResponse;
+import com.threefour.dto.comment.CommentSummary;
 import com.threefour.dto.comment.WriteCommentRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +57,21 @@ public class CommentService {
         if (!comment.getAuthor().getUserId().equals(user.getId())) {
             throw new ExpectedException(ErrorCode.COMMENT_ACCESS_DENIED);
         }
+    }
+
+    public CommentListResponse getCommentsListByPostId(Long postId) {
+        List<Comment> comments = commentRepository.findAllByPostId(postId);
+
+        List<CommentSummary> commentSummaryList = comments.stream()
+                .map(comment -> {
+                    User user = userRepository.findById(comment.getAuthor().getUserId())
+                            .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+                    String commentAuthor = user.getNickname();
+                    return new CommentSummary(comment.getId(), comment.getContent(), commentAuthor, comment.getCommentTimeInfo().getCreatedAt());
+                })
+                .collect(Collectors.toList());
+
+        return new CommentListResponse(commentSummaryList);
     }
 
     private User getUserByEmail(String email) {

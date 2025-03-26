@@ -2,6 +2,7 @@ package com.threefour.ui;
 
 import com.threefour.application.CommentService;
 import com.threefour.common.ApiResponse;
+import com.threefour.dto.comment.CommentListResponse;
 import com.threefour.dto.comment.WriteCommentRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -39,5 +40,17 @@ public class CommentController {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         commentService.deleteComment(commentId, email);
         return new ResponseEntity<>(ApiResponse.success("success"), HttpStatus.OK);
+    }
+
+    /**
+     * 댓글 목록 조회 API
+     *
+     * @param postId
+     * @return CommentListResponse
+     */
+    @GetMapping("/list/{postId}")
+    public ResponseEntity<ApiResponse<CommentListResponse>> getComment(@PathVariable Long postId) {
+        CommentListResponse commentsList = commentService.getCommentsListByPostId(postId);
+        return new ResponseEntity<>(ApiResponse.success(commentsList), HttpStatus.OK);
     }
 }

@@ -1,4 +1,4 @@
-package com.threefour.infrastructure.user;
+package com.threefour.infrastructure.event;
 
 import com.threefour.domain.user.JoinedEvent;
 import com.threefour.infrastructure.discord.DiscordClient;

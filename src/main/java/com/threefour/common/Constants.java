@@ -13,7 +13,9 @@ public class Constants {
             // 회원(User)
             "/api/users/join", "/api/users/join/*",
             // 게시글(Post)
-            "/api/posts/*/details", "/api/posts/list/all", "/api/posts/list/all/*"
+            "/api/posts/*/details", "/api/posts/list/all", "/api/posts/list/all/*",
+            // 댓글(Comement)
+            "/api/comments/list/*"
     };
     public static final Long ACCESS_TOKEN_EXPIRATION_TIME = 1000*60*60L; // 10분
     public static final Long REFRESH_TOKEN_EXPIRATION_TIME = 1000*60*60*24L; // 24시간
