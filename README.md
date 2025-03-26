@@ -10,19 +10,26 @@
 
 ## 요구사항
 <div align="center">
-    <img src="https://github.com/user-attachments/assets/64de2cc5-02fc-4f68-a10b-a115e6e6b56e" width="690" height="390">
+    <img src="https://github.com/user-attachments/assets/45cb23aa-44c5-4d71-b276-9ee9390db4cb" width="1000" height="390">
 </div>
 <div align="center">
     <img src="https://github.com/user-attachments/assets/9bc54d08-b6b5-44c5-9700-c07131e5638f" width="50" height="50">
 </div>
 <div align="center">
-    <img src="https://github.com/user-attachments/assets/9ec587f9-51c3-463f-b5fa-09c5453e159d" width="550" height="180">
+    <img src="https://github.com/user-attachments/assets/c13d1b6c-1e1b-435b-b226-233971bd26c2" width="930" height="170">
 </div>
 <br>
 
 ## 도메인 모델
 <div align="center">
-    <img src="https://github.com/user-attachments/assets/94bec7be-d02d-40b4-b9a5-0577a9679540" width="780" height="330">
+    <img src="https://github.com/user-attachments/assets/8ffdc35d-47ac-49df-9c3d-df761ac53e18" width="1000" height="330">
+</div>
+
+<br>
+
+## ERD
+<div align="center">
+    <img src="https://github.com/user-attachments/assets/a81ec53e-44f5-4974-82c5-dc33142fa570" width="600" height="330">
 </div>
 
 <br>
@@ -70,13 +77,16 @@
 |
 ├── domain
 │   ├── auth
-│   ├── user 
-│   └── post 
+│   ├── comment
+│   ├── common
+│   ├── post 
+│   └── user 
 |
 ├── dto
 │   ├── auth
-│   ├── user
-│   └── post
+│   ├── comment
+│   ├── post
+│   └── user
 |
 ├── infrastructure
 │   ├── auth
